@@ -20,22 +20,21 @@ class Window:
 
     def setFocus(self, focus):
         self.focused = focus
-        xcb.xcb_set_input_focus(
-            self.ctx.connection,
-            xcb.XCB_INPUT_FOCUS_POINTER_ROOT,  # idk
-            self.id,
-            xcb.XCB_CURRENT_TIME,
-        )
-
-        vals = uintarr([focusedColor if focus else unfocusedColor])
-        xcb.xcb_change_window_attributes_checked(
-            self.ctx.connection, self.id, xcb.XCB_CW_BORDER_PIXEL, vals
-        )
-
+        color = unfocusedColor
         if focus:
-            if self.ctx.focused:
-                self.ctx.focused.setFocus(False)
+            color = focusedColor
+            xcb.xcb_set_input_focus(
+                self.ctx.connection,
+                xcb.XCB_INPUT_FOCUS_POINTER_ROOT,  # seemingly fine?
+                self.id,
+                xcb.XCB_CURRENT_TIME,
+            )
+            self.ctx.focused.setFocus(False)
             self.ctx.focused = self
+
+        xcb.xcb_change_window_attributes_checked(
+            self.ctx.connection, self.id, xcb.XCB_CW_BORDER_PIXEL, uintarr([color])
+        )
 
         xcb.xcb_flush(self.ctx.connection)
 
@@ -53,6 +52,7 @@ class Window:
         vals = []
         changed = 0
         for (new, currentName), change in compare.items():
+            new = max(0, new) #type:ignore
             current = self.__dict__[currentName]
             if new != current and new is not None:
                 changed |= change
@@ -70,3 +70,5 @@ class Window:
             changed,
             vals,
         )
+
+        xcb.xcb_flush(self.ctx.connection)

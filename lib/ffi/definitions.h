@@ -407,6 +407,65 @@ typedef struct xcb_map_notify_event_t
     unsigned char override_redirect;
     unsigned char pad1[3];
 } xcb_map_notify_event_t;
+typedef enum xcb_send_event_dest_t
+{
+    XCB_SEND_EVENT_DEST_POINTER_WINDOW = 0,
+    XCB_SEND_EVENT_DEST_ITEM_FOCUS = 1
+} xcb_send_event_dest_t;
+typedef struct xcb_get_property_cookie_t
+{
+    unsigned int sequence;
+} xcb_get_property_cookie_t;
+typedef struct xcb_get_property_reply_t
+{
+    unsigned char response_type;
+    unsigned char format;
+    unsigned short sequence;
+    unsigned int length;
+    xcb_atom_t type;
+    unsigned int bytes_after;
+    unsigned int value_len;
+    unsigned char pad0[12];
+} xcb_get_property_reply_t;
+typedef enum xcb_get_property_type_t {
+    XCB_GET_PROPERTY_TYPE_ANY = 0
+} xcb_get_property_type_t;
+typedef enum xcb_event_mask_t {
+    XCB_EVENT_MASK_NO_EVENT = 0,
+    XCB_EVENT_MASK_KEY_PRESS = 1,
+    XCB_EVENT_MASK_KEY_RELEASE = 2,
+    XCB_EVENT_MASK_BUTTON_PRESS = 4,
+    XCB_EVENT_MASK_BUTTON_RELEASE = 8,
+    XCB_EVENT_MASK_ENTER_WINDOW = 16,
+    XCB_EVENT_MASK_LEAVE_WINDOW = 32,
+    XCB_EVENT_MASK_POINTER_MOTION = 64,
+    XCB_EVENT_MASK_POINTER_MOTION_HINT = 128,
+    XCB_EVENT_MASK_BUTTON_1_MOTION = 256,
+    XCB_EVENT_MASK_BUTTON_2_MOTION = 512,
+    XCB_EVENT_MASK_BUTTON_3_MOTION = 1024,
+    XCB_EVENT_MASK_BUTTON_4_MOTION = 2048,
+    XCB_EVENT_MASK_BUTTON_5_MOTION = 4096,
+    XCB_EVENT_MASK_BUTTON_MOTION = 8192,
+    XCB_EVENT_MASK_KEYMAP_STATE = 16384,
+    XCB_EVENT_MASK_EXPOSURE = 32768,
+    XCB_EVENT_MASK_VISIBILITY_CHANGE = 65536,
+    XCB_EVENT_MASK_STRUCTURE_NOTIFY = 131072,
+    XCB_EVENT_MASK_RESIZE_REDIRECT = 262144,
+    XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY = 524288,
+    XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT = 1048576,
+    XCB_EVENT_MASK_FOCUS_CHANGE = 2097152,
+    XCB_EVENT_MASK_PROPERTY_CHANGE = 4194304,
+    XCB_EVENT_MASK_COLOR_MAP_CHANGE = 8388608,
+    XCB_EVENT_MASK_OWNER_GRAB_BUTTON = 16777216
+} xcb_event_mask_t;
+typedef enum xcb_button_index_t {
+    XCB_BUTTON_INDEX_ANY = 0,
+    XCB_BUTTON_INDEX_1 = 1,
+    XCB_BUTTON_INDEX_2 = 2,
+    XCB_BUTTON_INDEX_3 = 3,
+    XCB_BUTTON_INDEX_4 = 4,
+    XCB_BUTTON_INDEX_5 = 5
+} xcb_button_index_t;
 
 // functions
 
@@ -426,26 +485,25 @@ xcb_void_cookie_t xcb_map_window(xcb_connection_t *c, xcb_window_t window);
 xcb_void_cookie_t xcb_configure_window(xcb_connection_t *c, xcb_window_t window, unsigned short value_mask, const void *value_list);
 xcb_void_cookie_t xcb_set_input_focus(xcb_connection_t *c, unsigned char revert_to, xcb_window_t focus, xcb_timestamp_t time);
 xcb_void_cookie_t xcb_change_property(xcb_connection_t *conn, unsigned char mode, xcb_window_t window, xcb_atom_t property, xcb_atom_t type, unsigned char format, unsigned int data_len, const void *data);
+xcb_void_cookie_t xcb_delete_property(xcb_connection_t *conn, xcb_window_t window, xcb_atom_t property);
 xcb_get_atom_name_cookie_t xcb_get_atom_name(xcb_connection_t *conn, xcb_atom_t atom);
 xcb_intern_atom_cookie_t xcb_intern_atom(xcb_connection_t *conn, unsigned char only_if_exists, unsigned short name_len, const char *name);
 xcb_get_atom_name_reply_t *xcb_get_atom_name_reply(xcb_connection_t *conn, xcb_get_atom_name_cookie_t cookie, xcb_generic_error_t **e);
 xcb_intern_atom_reply_t *xcb_intern_atom_reply(xcb_connection_t *conn, xcb_intern_atom_cookie_t cookie, xcb_generic_error_t **e);
 char *xcb_get_atom_name_name(const xcb_get_atom_name_reply_t *R);
+xcb_void_cookie_t xcb_send_event(xcb_connection_t *conn, bool propagate, xcb_window_t destination, unsigned int event_mask, const char *event);
+xcb_get_property_cookie_t xcb_get_property(xcb_connection_t *conn, unsigned char _delete, xcb_window_t window, xcb_atom_t property, xcb_atom_t type, unsigned int long_offset, unsigned int long_length);
+xcb_get_property_reply_t *xcb_get_property_reply(xcb_connection_t *conn, xcb_get_property_cookie_t cookie, xcb_generic_error_t **e);
+void *xcb_get_property_value(const xcb_get_property_reply_t *reply);
+xcb_void_cookie_t xcb_ungrab_button(xcb_connection_t *conn, unsigned char button, xcb_window_t grab_window, unsigned short modifiers);
 
 // weird values
 
-unsigned int XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT = 1048576;
-unsigned int XCB_EVENT_MASK_STRUCTURE_NOTIFY = 131072;
-unsigned int XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY = 524288;
-unsigned int XCB_EVENT_MASK_PROPERTY_CHANGE = 4194304;
 unsigned int XCB_GRAB_ANY = 0;
 unsigned int XCB_GRAB_MODE_ASYNC = 1;
-unsigned int XCB_EVENT_MASK_BUTTON_PRESS = 4;
-unsigned int XCB_EVENT_MASK_BUTTON_RELEASE = 8;
 unsigned int XCB_NONE = 0;
 unsigned int XCB_GRAB_ANY = 0; // just for testing the keyboard :)
-unsigned int XCB_EVENT_MASK_FOCUS_CHANGE = 2097152;
-unsigned int XCB_EVENT_MASK_ENTER_WINDOW = 16;
+#define XCB_CURRENT_TIME 0L
 // these events will never appear in cpp, so i just took the definitions from the docs
 #define XCB_KEY_PRESS 2
 #define XCB_KEY_RELEASE 3
@@ -481,4 +539,3 @@ unsigned int XCB_EVENT_MASK_ENTER_WINDOW = 16;
 #define XCB_CLIENT_MESSAGE 33
 #define XCB_MAPPING_NOTIFY 34
 #define XCB_GE_GENERIC 35
-#define XCB_CURRENT_TIME 0L

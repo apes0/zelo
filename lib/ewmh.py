@@ -89,16 +89,39 @@ def handler(name):
 
     return decorator
 
+class Atom:
+    # this is mostly based on this:
+    #https://github.com/BurntSushi/xgbutil/blob/master/xprop/xprop.go
+    def __init__(self, id, window) -> None:
+        self.id = id
+        self.window = window
+    
+    def get(self, ctx: 'Ctx'):
+        req = xcb.xcb_get_property(ctx.connection, False, self.window, self.id,
+		xcb.XCB_GET_PROPERTY_TYPE_ANY, 0, (1<<32)-1)
+        response = xcb.xcb_get_property_reply(ctx.connection, req, ffi.NULL)
+        value = xcb.xcb_get_property_value(response)
+        
 
 @handler('_NET_WM_STATE')
 def WmState(ctx: 'Ctx', data, window):
     act = data[0]
-    p1, p2 = data[1], data[2]
     _src = data[3]
-    func = [0, 0, 0][act]  # 0 - remove, 1 - add, 2 - toggle
-    for part in [p1, p2]:
-        if part:
-            request = xcb.xcb_get_atom_name(ctx.connection, part)
+    for prop in [data[1], data[2]]:
+        print(prop)
+        if prop:
+            [
+                lambda: xcb.xcb_delete_property(
+                    ctx.connection,
+                    window,
+                    prop,
+                ),  # TODO: impl the rest
+                lambda: 0,
+                lambda: 0,
+            ][
+                act
+            ]()  # 0 - remove, 1 - add, 2 - toggle
+            request = xcb.xcb_get_atom_name(ctx.connection, prop)
             reply = xcb.xcb_get_atom_name_reply(ctx.connection, request, ffi.NULL)
             _name = xcb.xcb_get_atom_name_name(reply)
             print([_name[a] for a in range(reply.name_len)])
@@ -132,7 +155,7 @@ class AtomStore:
     def handle(self, ctx: 'Ctx', event: int, data, window: int):
         if window not in self.atoms:
             self.atoms[window] = {}
-        self.handlers[event](ctx, data, window)
+        self.handlers.get(event, lambda *a: 0)(ctx, data, window)
 
     # def add(self, name='', atom=None):
     #     assert name or atom, 'Name or atom must be set!'

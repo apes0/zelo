@@ -1,0 +1,3 @@
+ - Stop using xcb constants in extensions and main
+ - Add wayland support
+ - make a function/constant for everything (for future wayland support)
