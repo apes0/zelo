@@ -14,6 +14,7 @@ intp = FFIType('int*')
 intarr = FFIType('int[]')
 uintarr = FFIType('unsigned int[]')
 charp = FFIType('char*')
+uchararr = FFIType('unsigned char[]')
 chararr = FFIType('char[]')
 
 
@@ -43,3 +44,4 @@ unmapNotifyTC = Caster('xcb_unmap_notify_event_t *')
 # requests
 atomNameRequestTC = Caster('xcb_get_atom_name_request_t *')
 charpC = Caster('char*')
+genericErrorTC = Caster('xcb_generic_error_t*')

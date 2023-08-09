@@ -4,20 +4,17 @@ from lib.ctx import Ctx
 from lib.types import (
     intp,
     uintarr,
-    charpC,
     keyPressTC,
     createNotifyTC,
     mapRequestTC,
     confRequestTC,
     confNotifyTC,
-    enterNotifyTC,
-    focusInTC,
     clientMessageTC,
     destroyNotifyTC,
     mapNotifyTC,
     unmapNotifyTC,
     motionNotifyTC,
-    buttonPressTC,
+    genericErrorTC
 )
 from lib.connection import Connection
 from lib.cfg import keys, extensions
@@ -27,16 +24,15 @@ from lib.window import Window
 
 ctx = Ctx()
 
-extension: Extension
-for extension in extensions:
-    extension.ctx = ctx
-    ctx.extensions.append(extension)
-
-ctx.shortcuts = keys
 ctx.dname = ffi.NULL
 ctx.screenp = intp(0)
+ctx.shortcuts = keys
 
 conn = Connection(ctx)
+
+extension: Extension
+for extension, cfg in extensions.items():
+    ctx.extensions.append(extension(ctx, cfg))
 
 handlers = {}
 
@@ -205,6 +201,11 @@ def motionNotify(event):
     )
 
 
+@handler(0)
+def error(event):
+    event = genericErrorTC(event)
+    print(event.error_code)
+
 # @handler(xcb.XCB_FOCUS_IN)
 # def focusIn(event):
 #     event = focusInTC(event)
@@ -217,8 +218,7 @@ def motionNotify(event):
 #     ctx.getWindow(event.event).setFocus(False)
 
 
-ignore = [0, 9, 10]  # list of events to ignore
-# 0 - probably 0x80?
+ignore = [9, 10]  # list of events to ignore
 # 9 - focus in - it just breaks shit, but i *might* need it
 # 10 - focus out - same as focus in
 # TODO: verify this info (this will forever be here)

@@ -1,13 +1,17 @@
 from lib.extension import Extension
 from lib.ffi import ffi, lib as xcb
 from lib.types import enterNotifyTC, buttonPressTC, charpC
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from lib.ctx import Ctx
 
 # i found what enter notify and leave notify do here: (on line 853)
 # https://gitlab.gnome.org/GNOME/mutter/-/blob/main/src/x11/events.c
 
 class MouseFocus(Extension):
-    def __init__(self) -> None:
-        super().__init__('MouseFocus')
+    def __init__(self, ctx: 'Ctx', cfg) -> None:
+        super().__init__(ctx, cfg)
         self.addListener(xcb.XCB_ENTER_NOTIFY, self.enterNotify)
         self.addListener(xcb.XCB_LEAVE_NOTIFY, self.leaveNotify)
         self.addListener(xcb.XCB_BUTTON_PRESS, self.buttonPress)
@@ -15,7 +19,6 @@ class MouseFocus(Extension):
 
     def mapWindow(self, _event):
         for windowId in self.ctx.windows.keys():
-            print(windowId)
             xcb.xcb_grab_button(
                 self.ctx.connection,
                 0,

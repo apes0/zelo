@@ -2,7 +2,7 @@
 i found most of these with these commands:
 ``
 lookfor=('xcb_change_window_attributes_checked' 'xcb_ungrab_key' ...)
-cpped=`cpp <(echo "#include <xcb/xcb.h>\n#include<xcb/xcb_util.h>\n#include <xcb/xcb_keysyms.h>")`
+cpped=`cpp <(echo "#include <xcb/xcb.h>\n#include<xcb/xcb_util.h>\n#include <xcb/xcb_keysyms.h>\n#include <xcb/xcb_image.h>")`
 for look in $lookfor
 do
 echo $look
@@ -427,10 +427,12 @@ typedef struct xcb_get_property_reply_t
     unsigned int value_len;
     unsigned char pad0[12];
 } xcb_get_property_reply_t;
-typedef enum xcb_get_property_type_t {
+typedef enum xcb_get_property_type_t
+{
     XCB_GET_PROPERTY_TYPE_ANY = 0
 } xcb_get_property_type_t;
-typedef enum xcb_event_mask_t {
+typedef enum xcb_event_mask_t
+{
     XCB_EVENT_MASK_NO_EVENT = 0,
     XCB_EVENT_MASK_KEY_PRESS = 1,
     XCB_EVENT_MASK_KEY_RELEASE = 2,
@@ -458,7 +460,8 @@ typedef enum xcb_event_mask_t {
     XCB_EVENT_MASK_COLOR_MAP_CHANGE = 8388608,
     XCB_EVENT_MASK_OWNER_GRAB_BUTTON = 16777216
 } xcb_event_mask_t;
-typedef enum xcb_button_index_t {
+typedef enum xcb_button_index_t
+{
     XCB_BUTTON_INDEX_ANY = 0,
     XCB_BUTTON_INDEX_1 = 1,
     XCB_BUTTON_INDEX_2 = 2,
@@ -466,6 +469,69 @@ typedef enum xcb_button_index_t {
     XCB_BUTTON_INDEX_4 = 4,
     XCB_BUTTON_INDEX_5 = 5
 } xcb_button_index_t;
+typedef unsigned int xcb_gcontext_t;
+typedef unsigned int xcb_drawable_t;
+typedef enum xcb_line_style_t
+{
+    XCB_LINE_STYLE_SOLID = 0,
+    XCB_LINE_STYLE_ON_OFF_DASH = 1,
+    XCB_LINE_STYLE_DOUBLE_DASH = 2
+} xcb_line_style_t;
+typedef enum xcb_gx_t
+{
+    XCB_GX_CLEAR = 0,
+    XCB_GX_AND = 1,
+    XCB_GX_AND_REVERSE = 2,
+    XCB_GX_COPY = 3,
+    XCB_GX_AND_INVERTED = 4,
+    XCB_GX_NOOP = 5,
+    XCB_GX_XOR = 6,
+    XCB_GX_OR = 7,
+    XCB_GX_NOR = 8,
+    XCB_GX_EQUIV = 9,
+    XCB_GX_INVERT = 10,
+    XCB_GX_OR_REVERSE = 11,
+    XCB_GX_COPY_INVERTED = 12,
+    XCB_GX_OR_INVERTED = 13,
+    XCB_GX_NAND = 14,
+    XCB_GX_SET = 15
+} xcb_gx_t;
+typedef struct xcb_rectangle_t
+{
+    short x;
+    short y;
+    unsigned short width;
+    unsigned short height;
+} xcb_rectangle_t;
+typedef enum xcb_image_format_t
+{
+    XCB_IMAGE_FORMAT_XY_BITMAP = 0,
+    XCB_IMAGE_FORMAT_XY_PIXMAP = 1,
+    XCB_IMAGE_FORMAT_Z_PIXMAP = 2
+} xcb_image_format_t;
+typedef enum xcb_image_order_t
+{
+    XCB_IMAGE_ORDER_LSB_FIRST = 0,
+    XCB_IMAGE_ORDER_MSB_FIRST = 1
+} xcb_image_order_t;
+typedef struct xcb_image_t
+{
+    unsigned short width;
+    unsigned short height;
+    xcb_image_format_t format;
+    unsigned char scanline_pad;
+    unsigned char depth;
+    unsigned char bpp;
+    unsigned char unit;
+    unsigned int plane_mask;
+    xcb_image_order_t byte_order;
+    xcb_image_order_t bit_order;
+    unsigned int stride;
+    unsigned int size;
+    void *base;
+    unsigned char *data;
+} xcb_image_t;
+typedef unsigned int xcb_pixmap_t;
 
 // functions
 
@@ -496,6 +562,12 @@ xcb_get_property_cookie_t xcb_get_property(xcb_connection_t *conn, unsigned char
 xcb_get_property_reply_t *xcb_get_property_reply(xcb_connection_t *conn, xcb_get_property_cookie_t cookie, xcb_generic_error_t **e);
 void *xcb_get_property_value(const xcb_get_property_reply_t *reply);
 xcb_void_cookie_t xcb_ungrab_button(xcb_connection_t *conn, unsigned char button, xcb_window_t grab_window, unsigned short modifiers);
+xcb_void_cookie_t xcb_create_gc(xcb_connection_t *c, xcb_gcontext_t cid, xcb_drawable_t drawable, unsigned int value_mask, const void *value_list);
+xcb_void_cookie_t xcb_poly_fill_rectangle(xcb_connection_t *c, xcb_drawable_t drawable, xcb_gcontext_t gc, unsigned int rectangles_len, const xcb_rectangle_t *rectangles);
+xcb_image_t *xcb_image_create_native(xcb_connection_t *c, unsigned short width, unsigned short height, xcb_image_format_t format, unsigned char depth, void *base, unsigned int bytes, unsigned char *data);
+xcb_void_cookie_t xcb_image_put(xcb_connection_t *conn, xcb_drawable_t draw, xcb_gcontext_t gc, xcb_image_t *image, unsigned short x, unsigned short y, unsigned char left_pad);
+xcb_void_cookie_t xcb_create_pixmap(xcb_connection_t *c, unsigned char depth, xcb_pixmap_t pid, xcb_drawable_t drawable, unsigned short width, unsigned short height);
+xcb_void_cookie_t xcb_copy_area (xcb_connection_t *c, xcb_drawable_t src_drawable, xcb_drawable_t dst_drawable, xcb_gcontext_t gc, short src_x, short src_y, short dst_x, short dst_y, unsigned short width, unsigned short height);
 
 // weird values
 

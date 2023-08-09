@@ -11,7 +11,7 @@ def build():
         open(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ffi', 'source.c')
         ).read(),
-        libraries=['xcb', 'xcb-util'],
+        libraries=['xcb', 'xcb-util', 'xcb-image'],
     )
 
     ffibuilder.cdef(

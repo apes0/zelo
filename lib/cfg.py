@@ -3,6 +3,7 @@ from lib.ffi import lib as xcb
 from typing import TYPE_CHECKING
 from extensions.tiler import Tiler
 from extensions.mouseFocus import MouseFocus
+from extensions.wallpaper import Wallpaper
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -25,6 +26,10 @@ unfocusedColor = 0x393966
 
 # managers
 
-extensions = [Tiler(), MouseFocus()]
+extensions = {
+    Tiler: {'mainSize': 2/3, 'border': 5, 'spacing': 15},
+    MouseFocus : {},
+    Wallpaper: {'wall': 'wall.png'}
+}
 
 # startup

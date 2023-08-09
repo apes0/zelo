@@ -1,3 +1,2 @@
 cffi
-trio
-numpy
+opencv-python
