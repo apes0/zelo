@@ -204,7 +204,7 @@ def motionNotify(event):
 @handler(0)
 def error(event):
     event = genericErrorTC(event)
-    print(event.error_code)
+    # TODO: xcb-util-errors
 
 # @handler(xcb.XCB_FOCUS_IN)
 # def focusIn(event):

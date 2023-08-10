@@ -29,21 +29,25 @@ class Tiler(Extension):
                 self.main = window
             else:
                 self.secondary.append(window)
+            if window.x or window.y:
+                return
             self.update()
 
     def update(self):
         size = 1 / max(len(self.secondary), 1)
         y = self.spacing
-        height = round((self.ctx.screen.height_in_pixels) * size - self.spacing * 2)
+        _height = self.ctx.screen.height_in_pixels * size - self.spacing * 2
+        height = round(_height)
+        offset = _height - height
         for window in self.secondary:
             window.configure(
                 newX=round(self.ctx.screen.width_in_pixels * self.mainSize + self.spacing),
-                newY=y,
+                newY=round(y),
                 newHeight=height,
                 newWidth=round(self.ctx.screen.width_in_pixels * (1-self.mainSize) - self.spacing * 2),
                 newBorderWidth=self.border,
             )
-            y += height + self.spacing * 2
+            y += height + self.spacing * 2 + offset
         if self.main:
             mainSize = self.mainSize if self.secondary else 1
             self.main.configure(
