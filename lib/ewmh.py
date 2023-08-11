@@ -89,19 +89,27 @@ def handler(name):
 
     return decorator
 
+
 class Atom:
     # this is mostly based on this:
-    #https://github.com/BurntSushi/xgbutil/blob/master/xprop/xprop.go
+    # https://github.com/BurntSushi/xgbutil/blob/master/xprop/xprop.go
     def __init__(self, id, window) -> None:
         self.id = id
         self.window = window
-    
+
     def get(self, ctx: 'Ctx'):
-        req = xcb.xcb_get_property(ctx.connection, False, self.window, self.id,
-		xcb.XCB_GET_PROPERTY_TYPE_ANY, 0, (1<<32)-1)
+        req = xcb.xcb_get_property(
+            ctx.connection,
+            False,
+            self.window,
+            self.id,
+            xcb.XCB_GET_PROPERTY_TYPE_ANY,
+            0,
+            (1 << 32) - 1,
+        )
         response = xcb.xcb_get_property_reply(ctx.connection, req, ffi.NULL)
         value = xcb.xcb_get_property_value(response)
-        
+
 
 @handler('_NET_WM_STATE')
 def WmState(ctx: 'Ctx', data, window):

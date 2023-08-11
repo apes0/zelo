@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 # i found what enter notify and leave notify do here: (on line 853)
 # https://gitlab.gnome.org/GNOME/mutter/-/blob/main/src/x11/events.c
 
+
 class MouseFocus(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         super().__init__(ctx, cfg)
@@ -37,11 +38,11 @@ class MouseFocus(Extension):
         event = buttonPressTC(event)
         windowId = event.event
         xcb.xcb_ungrab_button(
-                self.ctx.connection,
-                xcb.XCB_BUTTON_INDEX_ANY,
-                windowId,
-                xcb.XCB_MOD_MASK_ANY,
-            )
+            self.ctx.connection,
+            xcb.XCB_BUTTON_INDEX_ANY,
+            windowId,
+            xcb.XCB_MOD_MASK_ANY,
+        )
         self.ctx.getWindow(windowId).setFocus(True)
 
     def enterNotify(self, event):
@@ -50,25 +51,25 @@ class MouseFocus(Extension):
         if windowId == self.ctx.focused.id:
             return
         xcb.xcb_grab_button(
-                self.ctx.connection,
-                0,
-                windowId,
-                xcb.XCB_EVENT_MASK_BUTTON_PRESS,
-                xcb.XCB_GRAB_MODE_ASYNC,
-                xcb.XCB_GRAB_MODE_ASYNC,
-                xcb.XCB_NONE,
-                0,
-                xcb.XCB_BUTTON_INDEX_ANY,
-                xcb.XCB_MOD_MASK_ANY,
-            )
+            self.ctx.connection,
+            0,
+            windowId,
+            xcb.XCB_EVENT_MASK_BUTTON_PRESS,
+            xcb.XCB_GRAB_MODE_ASYNC,
+            xcb.XCB_GRAB_MODE_ASYNC,
+            xcb.XCB_NONE,
+            0,
+            xcb.XCB_BUTTON_INDEX_ANY,
+            xcb.XCB_MOD_MASK_ANY,
+        )
         xcb.xcb_flush(self.ctx.connection)
-    
+
     def leaveNotify(self, event):
         event = enterNotifyTC(event)
         xcb.xcb_ungrab_button(
-                self.ctx.connection,
-                xcb.XCB_EVENT_MASK_BUTTON_PRESS,
-                event.event,
-                xcb.XCB_MOD_MASK_ANY,
-            )
+            self.ctx.connection,
+            xcb.XCB_EVENT_MASK_BUTTON_PRESS,
+            event.event,
+            xcb.XCB_MOD_MASK_ANY,
+        )
         xcb.xcb_flush(self.ctx.connection)

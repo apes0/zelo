@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 #! set the keys in the tuple in increasing order, else your shortcuts will **NOT** work!!!!
 keys = {
     ((133,), 0): lambda _ctx: spawn('ulauncher-toggle'),
-    ((28,), xcb.XCB_MOD_MASK_CONTROL): lambda ctx: spawn('xterm -bg black -fg white'),
+    ((28,), xcb.XCB_MOD_MASK_CONTROL): lambda ctx: spawn('alacritty'),
     ((39,), xcb.XCB_MOD_MASK_CONTROL): lambda ctx: stop(ctx),
     ((42,), xcb.XCB_MOD_MASK_CONTROL): lambda _ctx: spawn('glxgears'),
 }
@@ -27,9 +27,11 @@ unfocusedColor = 0x393966
 # managers
 
 extensions = {
-    Tiler: {'mainSize': 2/3, 'border': 5, 'spacing': 15},
-    MouseFocus : {},
-    Wallpaper: {'wall': 'wall.png'}
+    Tiler: {'mainSize': 2 / 3, 'border': 5, 'spacing': 10},
+    MouseFocus: {},
+    Wallpaper: {'wall': 'wall.png'},
 }
 
 # startup
+
+spawn('ulauncher')

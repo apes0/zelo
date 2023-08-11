@@ -1,8 +1,8 @@
 #!/bin/bash
-DISPLAY=:1
-Xephyr -screen 920x540 :2 &
+DISPLAY=:0
+Xephyr -screen 960x540 :1 &
 sleep 1
-DISPLAY=:2
+DISPLAY=:1
 
 progs=('glxgears' 'ulauncher' 'alacritty')
 

@@ -52,7 +52,7 @@ class Window:
         vals = []
         changed = 0
         for (new, currentName), change in compare.items():
-            new = max(0, new) #type:ignore
+            new = max(0, new)  # type:ignore
             current = self.__dict__[currentName]
             if new != current and new is not None:
                 changed |= change

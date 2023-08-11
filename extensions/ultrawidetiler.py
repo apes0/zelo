@@ -12,12 +12,11 @@ class Tiler(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         super().__init__(ctx, cfg)
         self.windows = []
-        self.border:int
-        self.spacing:int
+        self.border: int
+        self.spacing: int
 
         self.addListener(xcb.XCB_MAP_REQUEST, self.mapWindow)
         self.addListener(xcb.XCB_UNMAP_NOTIFY, self.unmapWindow)
-
 
     def mapWindow(self, event):
         event = mapRequestTC(event)

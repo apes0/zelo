@@ -3,6 +3,7 @@ import os
 
 lib = "xcb_cffi"
 
+
 def build():
     ffibuilder = FFI()
 
@@ -16,7 +17,9 @@ def build():
 
     ffibuilder.cdef(
         open(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ffi', 'definitions.h')
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), 'ffi', 'definitions.h'
+            )
         ).read(),
         override=True,
     )

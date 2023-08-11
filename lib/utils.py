@@ -7,6 +7,7 @@ from .ffi import lib as xcb
 if TYPE_CHECKING:
     from .ctx import Ctx
 
+
 def spawn(proc: str):
     subprocess.Popen(proc.split(' '), shell=False, env=os.environ.copy())
 
