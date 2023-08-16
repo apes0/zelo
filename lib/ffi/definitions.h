@@ -567,8 +567,9 @@ xcb_void_cookie_t xcb_poly_fill_rectangle(xcb_connection_t *c, xcb_drawable_t dr
 xcb_image_t *xcb_image_create_native(xcb_connection_t *c, unsigned short width, unsigned short height, xcb_image_format_t format, unsigned char depth, void *base, unsigned int bytes, unsigned char *data);
 xcb_void_cookie_t xcb_image_put(xcb_connection_t *conn, xcb_drawable_t draw, xcb_gcontext_t gc, xcb_image_t *image, unsigned short x, unsigned short y, unsigned char left_pad);
 xcb_void_cookie_t xcb_create_pixmap(xcb_connection_t *c, unsigned char depth, xcb_pixmap_t pid, xcb_drawable_t drawable, unsigned short width, unsigned short height);
-xcb_void_cookie_t xcb_copy_area (xcb_connection_t *c, xcb_drawable_t src_drawable, xcb_drawable_t dst_drawable, xcb_gcontext_t gc, short src_x, short src_y, short dst_x, short dst_y, unsigned short width, unsigned short height);
+xcb_void_cookie_t xcb_copy_area(xcb_connection_t *c, xcb_drawable_t src_drawable, xcb_drawable_t dst_drawable, xcb_gcontext_t gc, short src_x, short src_y, short dst_x, short dst_y, unsigned short width, unsigned short height);
 unsigned int xcb_get_maximum_request_length(xcb_connection_t *c);
+xcb_void_cookie_t xcb_unmap_window(xcb_connection_t *conn, xcb_window_t window);
 
 // weird values
 

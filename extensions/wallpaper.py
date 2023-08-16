@@ -18,8 +18,6 @@ class Wallpaper(Extension):
         self.addListener(xcb.XCB_UNMAP_NOTIFY, lambda *a: self.draw())
         self.addListener(xcb.XCB_CONFIGURE_NOTIFY, lambda *a: self.draw())
 
-        # TODO: this doesn't work on bigger screens??
-
         img: np.ndarray = cv2.imread(self.wall)
         img = cv2.resize(img, (ctx.screen.width_in_pixels, ctx.screen.height_in_pixels))
         self.height, self.width, px = img.shape

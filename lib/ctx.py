@@ -16,12 +16,10 @@ class Ctx:
         self.connection: ffi.CData
         self.screen: ffi.CData
         self.values: ffi.CData
-        self.shortcuts: dict
         self.windows: dict[int, Window] = {}
         self.focused: Window = None  # type:ignore
         self.atomStore: 'AtomStore'
-        self.keys = []  # list to hold pressed keys for shortcuts
-        self.extensions: list[Extension] = []  # list of loaded extensions
+        self.extensions: dict[type, Extension] = {}  # list of loaded extensions
 
     def getWindow(self, _id: int) -> Window:
         if _id == self._root:

@@ -30,23 +30,6 @@ class Connection:
             ctx.connection, xcb.XCB_GRAB_ANY, ctx._root, xcb.XCB_MOD_MASK_ANY
         )
 
-        keys = ctx.shortcuts.keys()
-        # NOTE: use xcb.XCB_GRAB_ANY for key to find the keycode
-        # keys = [xcb.XCB_GRAB_ANY]
-        # TODO: ignore caps and numlock
-        for key in keys:
-            mod = key[1]
-            for key in key[0]:
-                xcb.xcb_grab_key(
-                    self.conn,
-                    0,
-                    ctx._root,
-                    mod,
-                    key,
-                    xcb.XCB_GRAB_MODE_ASYNC,
-                    xcb.XCB_GRAB_MODE_ASYNC,
-                )
-
         # TODO: set supported ewmh's?
 
         xcb.xcb_flush(self.conn)

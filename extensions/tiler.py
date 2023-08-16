@@ -24,6 +24,7 @@ class Tiler(Extension):
     def mapWindow(self, event):
         event = mapRequestTC(event)
         window = self.ctx.getWindow(event.window)
+        window.map()
         if window.x or window.y:
             return
         if window not in self.secondary:
@@ -34,6 +35,16 @@ class Tiler(Extension):
             self.update()
 
     def update(self):
+        popped = 0
+        for idx, window in enumerate(self.secondary.copy()):
+            if not window.mapped:
+                self.secondary.pop(idx - popped)
+                popped += 1
+        if self.main and not self.main.mapped:
+            if self.secondary:
+                self.main = self.secondary.pop(0)
+            else:
+                self.main = None  # type: ignore
         windows = len(self.secondary)
         size = 1 / max(windows, 1)
         y = self.spacing

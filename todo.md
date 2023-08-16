@@ -7,3 +7,4 @@
 - use the icccm and ewmh extensions
 - reparenting and decorations
 - cfg reloading
+- make everything that is not completely neccessary an extension

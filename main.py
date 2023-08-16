@@ -1,10 +1,9 @@
-from lib.extension import Extension
+from lib.extension import setupExtensions
 from lib.ffi import ffi, lib as xcb
 from lib.ctx import Ctx
 from lib.types import (
     intp,
     uintarr,
-    keyPressTC,
     createNotifyTC,
     mapRequestTC,
     confRequestTC,
@@ -14,10 +13,10 @@ from lib.types import (
     mapNotifyTC,
     unmapNotifyTC,
     motionNotifyTC,
-    genericErrorTC
+    genericErrorTC,
 )
 from lib.connection import Connection
-from lib.cfg import keys, extensions
+from lib.cfg import extensions
 from lib.window import Window
 
 # this is mainly based on this code: https://github.com/mcpcpc/xwm/blob/main/xwm.c
@@ -26,13 +25,10 @@ ctx = Ctx()
 
 ctx.dname = ffi.NULL
 ctx.screenp = intp(0)
-ctx.shortcuts = keys
 
 conn = Connection(ctx)
 
-extension: Extension
-for extension, cfg in extensions.items():
-    ctx.extensions.append(extension(ctx, cfg))
+setupExtensions(ctx, extensions)
 
 handlers = {}
 
@@ -43,36 +39,8 @@ def handler(n):
 
     return decorator
 
-#TODO: handle errors
 
-@handler(xcb.XCB_KEY_PRESS)
-def keyPress(event):
-    event = keyPressTC(event)
-    key = event.detail
-    for idx, _key in enumerate(ctx.keys):
-        if key == _key:
-            break
-        if key < _key:
-            ctx.keys.insert(idx, key)
-            break
-    else:
-        ctx.keys.append(key)
-    fn = ctx.shortcuts.get((tuple(ctx.keys), event.state))
-    if fn:
-        fn(ctx)
-        ctx.keys = []
-
-
-@handler(xcb.XCB_KEY_RELEASE)
-def keyRelease(event):
-    event = keyPressTC(event)
-    key = event.detail
-    if key in ctx.keys:
-        ctx.keys.remove(key)
-    else:
-        # NOTE: if the key doesn't exist in the list of pressed keys, then it is a modifier, and
-        # thus, the keys list should be cleared
-        ctx.keys.clear()
+# TODO: handle errors
 
 
 @handler(xcb.XCB_CREATE_NOTIFY)
@@ -93,11 +61,11 @@ def mapRequest(event):
     event = mapRequestTC(event)
     _id: int = event.window
     window: Window = ctx.getWindow(_id)
-    xcb.xcb_map_window(ctx.connection, _id)
     ctx.values[0] = xcb.XCB_EVENT_MASK_ENTER_WINDOW | xcb.XCB_EVENT_MASK_FOCUS_CHANGE
     xcb.xcb_change_window_attributes_checked(
         ctx.connection, _id, xcb.XCB_CW_EVENT_MASK, ctx.values
     )
+    window.map()
     window.setFocus(True)
     ctx.focused = window
 
@@ -118,7 +86,7 @@ def confRequest(event):
         xcb.XCB_CONFIG_WINDOW_STACK_MODE: (event.stack_mode, 'stackMode'),
     }.items():
         if mask & valueMask:
-            change.append(max(value, 0)) # safety first :)
+            change.append(max(value, 0))  # safety first :)
             window.__dict__[lable] = value
 
     vals = uintarr(change)
@@ -206,6 +174,7 @@ def error(event):
     event = genericErrorTC(event)
     # TODO: xcb-util-errors
 
+
 # @handler(xcb.XCB_FOCUS_IN)
 # def focusIn(event):
 #     event = focusInTC(event)
@@ -227,7 +196,7 @@ ignore = [9, 10]  # list of events to ignore
 while not xcb.xcb_connection_has_error(ctx.connection):
     event = xcb.xcb_wait_for_event(ctx.connection)  # todo: dont skip events
     eventType: int = event.response_type & ~0x80
-    for extension in ctx.extensions:
+    for extension in ctx.extensions.values():
         extension.listeners.get(eventType, lambda _ev: 0)(event)
     if handler := handlers.get(eventType, None):  # type:ignore
         handler(event)

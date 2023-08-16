@@ -17,6 +17,17 @@ class Window:
         self.id = _id
         self.ctx: 'Ctx' = ctx
         self.focused = False
+        self.mapped = False
+
+    def map(self):
+        xcb.xcb_map_window(self.ctx.connection, self.id)
+        xcb.xcb_flush(self.ctx.connection)
+        self.mapped = True
+
+    def unmap(self):
+        xcb.xcb_unmap_window(self.ctx.connection, self.id)
+        xcb.xcb_flush(self.ctx.connection)
+        self.mapped = False
 
     def setFocus(self, focus):
         self.focused = focus
