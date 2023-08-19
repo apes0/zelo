@@ -58,6 +58,7 @@ def createNotify(event):
 
 @handler(xcb.XCB_MAP_REQUEST)
 def mapRequest(event):
+    # NOTE: its not our responsibility to map or focus the window, the tiler should do so
     event = mapRequestTC(event)
     _id: int = event.window
     window: Window = ctx.getWindow(_id)
@@ -65,8 +66,6 @@ def mapRequest(event):
     xcb.xcb_change_window_attributes_checked(
         ctx.connection, _id, xcb.XCB_CW_EVENT_MASK, ctx.values
     )
-    window.map()
-    window.setFocus(True)
     ctx.focused = window
 
 
@@ -130,26 +129,18 @@ def destroyNotify(event):
     # NOTE: actually doesn't appear to be that slow, check this:
     # https://wiki.python.org/moin/TimeComplexity
     if event.window in ctx.windows:
+        ctx.getWindow(event.window).mapped = False
         del ctx.windows[event.window]
-    if ctx.windows:
-        # TODO: do better lol
-        list(ctx.windows.values())[-1].setFocus(True)
+    # NOTE: not our job to select another window to focus to
 
 
 @handler(xcb.XCB_UNMAP_NOTIFY)
 def unmapNotify(event):
     event = unmapNotifyTC(event)
-    window = ctx.getWindow(event.window)
-    if window.id in ctx.windows:
-        del ctx.windows[window.id]
-
-
-@handler(xcb.XCB_MAP_NOTIFY)
-def mapNotify(event):
-    event = mapNotifyTC(event)
-    if event.override_redirect:
-        return
-    # TODO: call the manager here
+    _id = event.window
+    if _id in ctx.windows:
+        ctx.getWindow(_id).mapped = False
+        del ctx.windows[_id]
 
 
 @handler(xcb.XCB_MOTION_NOTIFY)

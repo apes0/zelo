@@ -1,8 +1,6 @@
 from lib.extension import Extension
 from typing import TYPE_CHECKING
-from lib.ffi import ffi, lib as xcb
-from lib.types import mapRequestTC, unmapNotifyTC
-
+from .windowTracker import Tracker
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -13,40 +11,24 @@ class Tiler(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         super().__init__(ctx, cfg)
         self.mainSize: int
-        self.main: Window = None  # type:ignore
-        self.secondary: list[Window] = []
+        self.mainId = 0
         self.border: int
         self.spacing: int
+        Tracker(self, self.update)
 
-        self.addListener(xcb.XCB_MAP_REQUEST, self.mapWindow)
-        self.addListener(xcb.XCB_UNMAP_NOTIFY, self.unmapWindow)
-
-    def mapWindow(self, event):
-        event = mapRequestTC(event)
-        window = self.ctx.getWindow(event.window)
-        window.map()
-        if window.x or window.y:
-            return
-        if window not in self.secondary:
-            if not self.main:
-                self.main = window
-            else:
-                self.secondary.append(window)
-            self.update()
-
-    def update(self):
-        popped = 0
-        for idx, window in enumerate(self.secondary.copy()):
-            if not window.mapped:
-                self.secondary.pop(idx - popped)
-                popped += 1
-        if self.main and not self.main.mapped:
-            if self.secondary:
-                self.main = self.secondary.pop(0)
-            else:
-                self.main = None  # type: ignore
-        windows = len(self.secondary)
-        size = 1 / max(windows, 1)
+    def update(self, _windows):
+        main = None
+        windows = []
+        for window in _windows:
+            if window.mapped:
+                if window.id == self.mainId:
+                    main = window
+                    continue
+                windows.append(window)
+        if not main and windows:
+            main = windows.pop(0)
+            self.mainId = main.id
+        size = 1 / max(len(windows), 1)
         y = self.spacing
         _height = (self.ctx.screen.height_in_pixels) * size - (2 + size) * self.spacing
         height = round(_height)
@@ -54,7 +36,7 @@ class Tiler(Extension):
         width = round(
             self.ctx.screen.width_in_pixels * (1 - self.mainSize) - self.spacing * 3
         )
-        for window in self.secondary:
+        for window in windows:
             window.configure(
                 newX=round(
                     self.ctx.screen.width_in_pixels * self.mainSize + self.spacing
@@ -65,9 +47,9 @@ class Tiler(Extension):
                 newBorderWidth=self.border,
             )
             y += height + self.spacing * 2 + offset
-        if self.main:
-            mainSize = self.mainSize if self.secondary else 1
-            self.main.configure(
+        if main:
+            mainSize = self.mainSize if windows else 1
+            main.configure(
                 newX=self.spacing,
                 newY=self.spacing,
                 newWidth=round(
@@ -76,15 +58,3 @@ class Tiler(Extension):
                 newHeight=self.ctx.screen.height_in_pixels - 3 * self.spacing,
                 newBorderWidth=self.border,
             )
-
-    def unmapWindow(self, event):
-        event = unmapNotifyTC(event)
-        window = self.ctx.getWindow(event.window)
-        if window in self.secondary:
-            self.secondary.remove(window)
-        elif window == self.main:
-            if self.secondary:
-                self.main = self.secondary.pop(0)
-            else:
-                self.main = None  # type:ignore
-        self.update()

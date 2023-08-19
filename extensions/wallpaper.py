@@ -58,7 +58,6 @@ class Wallpaper(Extension):
             xcb.xcb_image_put(
                 ctx.connection, self.pixmap, self.gc, image, 0, round(prev), 0
             )
-            print(image, pos, prev, self.parts)
             prev = pos
         self.draw()
 

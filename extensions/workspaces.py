@@ -16,6 +16,7 @@ class Workspaces(Extension):
         self.prev: tuple
         self.spaces = {}
         self.current = 0
+        self.windows = []
 
         shortcuts: Shortcuts = self.assure(Shortcuts)  # type:ignore
         shortcuts.conf(
@@ -42,11 +43,16 @@ class Workspaces(Extension):
         self.show()
 
     def hide(self):
-        self.spaces[self.current] = self.ctx.windows
+        windows = []
         for window in self.ctx.windows.values():
+            if window.mapped:
+                windows.append(window)
+        self.spaces[self.current] = {window.id: window for window in windows}
+        for window in windows:
             window.unmap()
 
     def show(self):
         self.ctx.windows = self.spaces.get(self.current, {})
+        self.windows = self.ctx.windows.values()
         for window in self.ctx.windows.values():
             window.map()

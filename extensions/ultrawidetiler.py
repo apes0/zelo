@@ -2,6 +2,7 @@ from lib.extension import Extension
 from typing import TYPE_CHECKING
 from lib.ffi import ffi, lib as xcb
 from lib.types import mapRequestTC, unmapNotifyTC
+from .windowTracker import Tracker
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -11,25 +12,15 @@ if TYPE_CHECKING:
 class Tiler(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         super().__init__(ctx, cfg)
-        self.windows = []
         self.border: int
         self.spacing: int
+        Tracker(self, self.update)
 
-        self.addListener(xcb.XCB_MAP_REQUEST, self.mapWindow)
-        self.addListener(xcb.XCB_UNMAP_NOTIFY, self.unmapWindow)
-
-    def mapWindow(self, event):
-        event = mapRequestTC(event)
-        window = self.ctx.getWindow(event.window)
-        if window not in self.windows:
-            self.windows.append(window)
-            self.update()
-
-    def update(self):
-        size = 1 / max(len(self.windows), 1)
+    def update(self, windows):
+        size = 1 / max(len(windows), 1)
         x = self.spacing
         width = round((self.ctx.screen.width_in_pixels) * size - self.spacing * 2)
-        for window in self.windows:
+        for window in windows:
             window.configure(
                 newX=x,
                 newY=self.spacing,
@@ -38,10 +29,3 @@ class Tiler(Extension):
                 newBorderWidth=self.border,
             )
             x += width + self.spacing * 2
-
-    def unmapWindow(self, event):
-        event = unmapNotifyTC(event)
-        window = self.ctx.getWindow(event.window)
-        if window in self.windows:
-            self.windows.remove(window)
-            self.update()
