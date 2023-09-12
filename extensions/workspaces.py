@@ -1,5 +1,5 @@
 from lib.extension import Extension
-from lib.ffi import ffi, lib as xcb
+from lib.backends.ffi import load
 from typing import TYPE_CHECKING
 from extensions.shotcuts import Shortcuts
 
@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from lib.ctx import Ctx
 
 
-class Workspaces(Extension):
+class Workspaces(Extension):  # TODO: make me work with the window tracker's focus queue
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         super().__init__(ctx, cfg)
 

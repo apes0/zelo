@@ -1,0 +1,47 @@
+from typing import Callable
+
+from .generic import GButton, GKey, GMod, GWindow
+
+# these are the generic events, which we export, these should be used instead of directly using the
+# backend's event, both wayland and x11 should support all of these
+
+
+class Event:
+    def __init__(self, *types: type) -> None:
+        self.listeners: list[Callable] = []
+        self.types = types
+
+    def addListener(self, fn: Callable):
+        self.listeners.append(fn)
+
+    def trigger(self, *args):
+        # check types
+        assert len(self.types) == len(
+            args
+        ), f'There need to be exactly {len(self.types)} arguments for this event, instead of {len(args)}.'
+        for n, _type in enumerate(self.types):
+            assert issubclass(
+                args[n].__class__, _type
+            ), f'argument #{n} must be of type {_type}, instead of {type(args[n])}'
+
+        for fn in self.listeners:
+            fn(*args)
+
+
+# you might be able to tell that all of these appear to be the same as the x11 events, you would be
+# right, the original code was xcb only, so, because i dont wanna change anything, i did this
+
+keyPress = Event(GKey, GMod, GWindow)
+keyRelease = Event(GKey, GMod, GWindow)
+# ? maybe include the x and y coordinates, but idk
+buttonPress = Event(GButton, GMod, GWindow)
+buttonRelease = Event(GButton, GMod, GWindow)
+mapRequest = Event(GWindow)
+unmapNotify = Event(GWindow)
+destroyNotify = Event(GWindow)
+createNotify = Event(GWindow)
+configureNotify = Event(GWindow)
+configureRequest = Event(GWindow)
+enterNotify = Event(GWindow)
+leaveNotify = Event(GWindow)
+focusChange = Event(GWindow | None, GWindow | None)  # old, new

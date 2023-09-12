@@ -1,12 +1,20 @@
 from lib.extension import Extension
 from typing import TYPE_CHECKING
-from lib.ffi import ffi, lib as xcb
-from lib.types import mapRequestTC, unmapNotifyTC
 from .windowTracker import Tracker
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
-    from lib.window import Window
+
+# tiles windows in the following way:
+#
+# Every window takes up ``1/len(windows)`` of the screen horizontally, and goes to the bottom of the
+# screen vertically.
+# __________________________
+# |    |     |    |   |    |
+# | #1 |  #2 | #3 |#4 | #5 |
+# |____|_____|____|___|____|
+
+# FIXME: wobbly
 
 
 class Tiler(Extension):
@@ -19,12 +27,12 @@ class Tiler(Extension):
     def update(self, windows):
         size = 1 / max(len(windows), 1)
         x = self.spacing
-        width = round((self.ctx.screen.width_in_pixels) * size - self.spacing * 2)
-        for window in windows:
+        width = round((self.ctx.screen.width) * size - self.spacing * 2)
+        for window in windows.values():
             window.configure(
                 newX=x,
                 newY=self.spacing,
-                newHeight=self.ctx.screen.height_in_pixels - 2 * self.spacing,
+                newHeight=self.ctx.screen.height - 2 * self.spacing,
                 newWidth=width,
                 newBorderWidth=self.border,
             )

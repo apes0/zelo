@@ -162,3 +162,6 @@ cython_debug/
 
 #cffi
 xcb_cffi.*
+
+#profiling
+program.prof

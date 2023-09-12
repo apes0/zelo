@@ -532,6 +532,43 @@ typedef struct xcb_image_t
     unsigned char *data;
 } xcb_image_t;
 typedef unsigned int xcb_pixmap_t;
+typedef struct xcb_setup_t
+{
+    unsigned char status;
+    unsigned char pad0;
+    unsigned short protocol_major_version;
+    unsigned short protocol_minor_version;
+    unsigned short length;
+    unsigned int release_number;
+    unsigned int resource_id_base;
+    unsigned int resource_id_mask;
+    unsigned int motion_buffer_size;
+    unsigned short vendor_len;
+    unsigned short maximum_request_length;
+    unsigned char roots_len;
+    unsigned char pixmap_formats_len;
+    unsigned char image_byte_order;
+    unsigned char bitmap_format_bit_order;
+    unsigned char bitmap_format_scanline_unit;
+    unsigned char bitmap_format_scanline_pad;
+    xcb_keycode_t min_keycode;
+    xcb_keycode_t max_keycode;
+    unsigned char pad1[4];
+} xcb_setup_t;
+typedef struct xcb_get_keyboard_mapping_cookie_t
+{
+    unsigned int sequence;
+} xcb_get_keyboard_mapping_cookie_t;
+typedef struct xcb_get_keyboard_mapping_reply_t
+{
+    unsigned char response_type;
+    unsigned char keysyms_per_keycode;
+    unsigned short sequence;
+    unsigned int length;
+    unsigned char pad0[24];
+} xcb_get_keyboard_mapping_reply_t;
+typedef unsigned int xcb_keysym_t;
+typedef struct _XCBKeySymbols xcb_key_symbols_t;
 
 // functions
 
@@ -570,6 +607,12 @@ xcb_void_cookie_t xcb_create_pixmap(xcb_connection_t *c, unsigned char depth, xc
 xcb_void_cookie_t xcb_copy_area(xcb_connection_t *c, xcb_drawable_t src_drawable, xcb_drawable_t dst_drawable, xcb_gcontext_t gc, short src_x, short src_y, short dst_x, short dst_y, unsigned short width, unsigned short height);
 unsigned int xcb_get_maximum_request_length(xcb_connection_t *c);
 xcb_void_cookie_t xcb_unmap_window(xcb_connection_t *conn, xcb_window_t window);
+const struct xcb_setup_t *xcb_get_setup(xcb_connection_t *c);
+xcb_get_keyboard_mapping_cookie_t xcb_get_keyboard_mapping(xcb_connection_t *c, xcb_keycode_t first_keycode, unsigned char count);
+xcb_get_keyboard_mapping_reply_t *xcb_get_keyboard_mapping_reply(xcb_connection_t *c, xcb_get_keyboard_mapping_cookie_t cookie, xcb_generic_error_t **e);
+xcb_keycode_t *xcb_key_symbols_get_keycode(xcb_key_symbols_t *syms, xcb_keysym_t keysym);
+xcb_key_symbols_t *xcb_key_symbols_alloc(xcb_connection_t *c);
+void xcb_key_symbols_free(xcb_key_symbols_t *syms);
 
 // weird values
 

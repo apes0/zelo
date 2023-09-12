@@ -1,10 +1,15 @@
+from lib.backends.generic import GWindow
 from lib.extension import Extension
-from lib.ffi import ffi, lib as xcb
-from lib.types import keyPressTC
+from lib.backends.ffi import load
 from typing import TYPE_CHECKING
+from itertools import combinations
+from lib.backends.events import keyPress, keyRelease
 
 if TYPE_CHECKING:
+    from lib.backends.generic import GKey, GMod
     from lib.ctx import Ctx
+
+Mod = load('keys').Mod
 
 
 class Shortcuts(Extension):
@@ -12,9 +17,26 @@ class Shortcuts(Extension):
         super().__init__(ctx, cfg)
         self.keys = []
         self.shortcuts: dict
+        self._shortcuts: dict = {}
 
-        self.addListener(xcb.XCB_KEY_PRESS, self.keyPress)
-        self.addListener(xcb.XCB_KEY_RELEASE, self.keyRelease)
+        baseIgnore: list[str] = [
+            'lock',
+            'mod2',
+        ]  # ? maybe make this a configurable value
+
+        self.baseIgnore: list[Mod] = [Mod(mod) for mod in baseIgnore]
+        self.ignore: list[Mod] = [
+            *self.baseIgnore,
+            Mod(
+                '',
+            ),
+        ]
+
+        for l in range(2, len(baseIgnore) + 1):
+            self.ignore += [Mod(*mod) for mod in combinations(baseIgnore, l)]
+
+        keyPress.addListener(self.keyPress)
+        keyRelease.addListener(self.keyRelease)
 
         self.register()
 
@@ -22,28 +44,27 @@ class Shortcuts(Extension):
         keys = self.shortcuts.keys()
         # NOTE: use xcb.XCB_GRAB_ANY for key to find the keycode
         # keys = [xcb.XCB_GRAB_ANY]
-        self.ignore = [
-            xcb.XCB_MOD_MASK_LOCK,
-            xcb.XCB_MOD_MASK_2,
-            0,
-        ]  # TODO: get all combinations (im too lazy to do this rn)
-        for _mod in [*self.ignore, sum(self.ignore)]:
-            for key in keys:
-                mod = key[1]
-                for key in key[0]:
-                    xcb.xcb_grab_key(
-                        self.ctx.connection,
-                        0,
-                        self.ctx._root,
-                        mod | _mod,
-                        key,
-                        xcb.XCB_GRAB_MODE_ASYNC,
-                        xcb.XCB_GRAB_MODE_ASYNC,
-                    )
 
-    def keyPress(self, event):
-        event = keyPressTC(event)
-        key = event.detail
+        for (
+            _mod
+        ) in self.ignore:  # do key.grab for every combination of ignored modifiers
+            for key in keys:
+                mod: GMod = key[1]  # add the modifier used for the actual shortcut
+                for _key in key[0]:
+                    _key: GKey
+                    _key.grab(self.ctx, _mod, mod)
+
+        shortcuts = {}  # adapt self.shortcuts to the old system, bc lazy
+
+        for (keys, mod), fn in self.shortcuts.items():
+            cuts = [key.key for key in keys]
+            cuts.sort()
+            shortcuts[(tuple(cuts), mod.mod)] = fn
+
+        self._shortcuts = shortcuts
+
+    def keyPress(self, key: 'GKey', mod: 'GMod', _win: 'GWindow'):
+        key = key.key  # type: ignore
         for idx, _key in enumerate(self.keys):
             if key == _key:
                 break
@@ -52,14 +73,15 @@ class Shortcuts(Extension):
                 break
         else:
             self.keys.append(key)
-        fn = self.shortcuts.get((tuple(self.keys), event.state & ~sum(self.ignore)))
+        fn = self._shortcuts.get(
+            (tuple(self.keys), mod.mod & ~sum([_mod.mod for _mod in self.baseIgnore]))
+        )
         if fn:
             fn(self.ctx)
             self.keys = []
 
-    def keyRelease(self, event):
-        event = keyPressTC(event)
-        key = event.detail
+    def keyRelease(self, key: 'GKey', _mod: 'GMod', _win: 'GWindow'):
+        key = key.key  # type: ignore
         if key in self.keys:
             self.keys.remove(key)
         else:

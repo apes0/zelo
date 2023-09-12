@@ -1,31 +1,32 @@
-from .ffi import ffi
-from .window import Window
+from .backends.ffi import load
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .ewmh import AtomStore
+    from .backends.generic import CData, GScreen, GWindow
     from .extension import Extension
+
+Window = load('window').Window
 
 
 class Ctx:
     def __init__(self):
         self._root: int
-        self.root: Window
-        self.dname: ffi.CData
-        self.screenp: ffi.CData
-        self.connection: ffi.CData
-        self.screen: ffi.CData
-        self.values: ffi.CData
-        self.windows: dict[int, Window] = {}
-        self.focused: Window = None  # type:ignore
-        self.atomStore: 'AtomStore'
+        self.root: GWindow
+        self.dname: CData
+        self.screenp: CData
+        self.connection: CData
+        self.screen: GScreen
+        self.values: CData
+        self.windows: dict[int, GWindow] = {}
+        self.focused: GWindow | None = None
         self.extensions: dict[type, Extension] = {}  # list of loaded extensions
+        self.closed = False
 
-    def getWindow(self, _id: int) -> Window:
+    def getWindow(self, _id: int) -> 'GWindow':
         if _id == self._root:
             return self.root
-        window = self.windows.get(_id, None)
+        window = self.windows.get(_id)  # type: ignore
         if not window:
-            window = Window(0, 0, 0, _id, self)
+            window: GWindow = Window(0, 0, 0, _id, self)
             self.windows[_id] = window
         return window

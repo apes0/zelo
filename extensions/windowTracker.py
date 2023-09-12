@@ -2,47 +2,69 @@
 # NOTE: i literally made this just because of the workspaces hah
 
 from lib.extension import Extension
-from lib.types import mapRequestTC
-from lib.ffi import ffi, lib as xcb
+from lib.backends.events import mapRequest, unmapNotify, destroyNotify, focusChange
+
+from collections import deque
 from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
-    from lib.window import Window
+    from lib.backends.generic import GWindow
+    from lib.backends.events import Event
 
 
 class Tracker:
-    def __init__(self, tiler: Extension, updateFn: Callable):
+    def __init__(
+        self,
+        tiler: Extension,
+        updateFn: Callable[[dict[int, 'GWindow']], None],
+        customEvents: list['Event'] = [],
+    ):
         self.ctx: 'Ctx' = tiler.ctx
-        self._update: Callable = updateFn
-        self.windows = []
+        self._update: Callable[[dict[int, 'GWindow']], None] = updateFn
+        self.windows: list['GWindow'] = []
+        self.queue: deque['GWindow'] = deque()
 
-        tiler.addListener(xcb.XCB_MAP_REQUEST, self.mapWindow)
-        tiler.addListener(xcb.XCB_UNMAP_NOTIFY, self.unmapWindow)
-        tiler.addListener(xcb.XCB_DESTROY_NOTIFY, self.destroyNotify)
+        mapRequest.addListener(self.mapWindow)
+        unmapNotify.addListener(self.unmapWindow)
+        destroyNotify.addListener(self.destroyNotify)
+        focusChange.addListener(self.focusChange)
+
+        for event in customEvents:
+            event.addListener(lambda *a: self.update())
 
     def update(self):
-        # sync with ctx, its important (workspaces changes the ctx.windows so ye)
-        windows = []
-        window: Window
-        for window in self.ctx.windows.values():
+        windows: dict[int, GWindow] = {}
+        window: GWindow
+        for id, window in self.ctx.windows.items():
             if not window.mapped:
                 continue
-            windows.append(window)
-        print(windows)
+            windows[id] = window
         self._update(windows)
 
-    def mapWindow(self, event):
-        event = mapRequestTC(event)
-        window: Window = self.ctx.getWindow(event.window)
-        if window.x or window.y:
-            return
-        window.map()
-        self.update()
-        window.setFocus(True)
+    def mapWindow(self, window: 'GWindow'):
+        if not window.mapped:
+            self.queue.append(window)
+            window.map()
+            window.setFocus(True)
+            self.update()
 
-    def unmapWindow(self, _event):
+    def unmapWindow(self, _window: 'GWindow'):
+        if not self.ctx.focused:
+            while self.queue and (window := self.queue.pop()):
+                if window.mapped:
+                    window.setFocus(True)
+                    break
         self.update()
 
-    def destroyNotify(self, _event):
+    def destroyNotify(self, _window: 'GWindow'):
+        if not self.ctx.focused:
+            while self.queue and (window := self.queue.pop()):
+                if window.mapped:
+                    window.setFocus(True)
+                    break
         self.update()
+
+    def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
+        if old and old.mapped and new is not None:
+            self.queue.append(old)

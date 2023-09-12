@@ -1,9 +1,9 @@
-from .ffi import ffi, lib as xcb
+from xcb_cffi import ffi, lib
 from .types import chararr, atomNameRequestTC
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .ctx import Ctx
+    from ...ctx import Ctx
     from .window import Window
 
 #!: a lot of this is copied and slightly edited from qtile
@@ -98,17 +98,17 @@ class Atom:
         self.window = window
 
     def get(self, ctx: 'Ctx'):
-        req = xcb.xcb_get_property(
+        req = lib.xcb_get_property(
             ctx.connection,
             False,
             self.window,
             self.id,
-            xcb.XCB_GET_PROPERTY_TYPE_ANY,
+            lib.XCB_GET_PROPERTY_TYPE_ANY,
             0,
             (1 << 32) - 1,
         )
-        response = xcb.xcb_get_property_reply(ctx.connection, req, ffi.NULL)
-        value = xcb.xcb_get_property_value(response)
+        response = lib.xcb_get_property_reply(ctx.connection, req, ffi.NULL)
+        value = lib.xcb_get_property_value(response)
 
 
 @handler('_NET_WM_STATE')
@@ -119,7 +119,7 @@ def WmState(ctx: 'Ctx', data, window):
         print(prop)
         if prop:
             [
-                lambda: xcb.xcb_delete_property(
+                lambda: lib.xcb_delete_property(
                     ctx.connection,
                     window,
                     prop,
@@ -129,9 +129,9 @@ def WmState(ctx: 'Ctx', data, window):
             ][
                 act
             ]()  # 0 - remove, 1 - add, 2 - toggle
-            request = xcb.xcb_get_atom_name(ctx.connection, prop)
-            reply = xcb.xcb_get_atom_name_reply(ctx.connection, request, ffi.NULL)
-            _name = xcb.xcb_get_atom_name_name(reply)
+            request = lib.xcb_get_atom_name(ctx.connection, prop)
+            reply = lib.xcb_get_atom_name_reply(ctx.connection, request, ffi.NULL)
+            _name = lib.xcb_get_atom_name_name(reply)
             print([_name[a] for a in range(reply.name_len)])
 
 
@@ -143,7 +143,7 @@ class AtomStore:
         requests = {}
 
         for handler in handlers.keys():
-            requests[handler] = xcb.xcb_intern_atom(
+            requests[handler] = lib.xcb_intern_atom(
                 self.ctx.connection,
                 False,
                 len(handler),
@@ -151,7 +151,7 @@ class AtomStore:
             )
 
         for handler, request in requests.items():
-            atom = xcb.xcb_intern_atom_reply(
+            atom = lib.xcb_intern_atom_reply(
                 self.ctx.connection, request, ffi.NULL
             ).atom
             self.atoms[handler] = atom

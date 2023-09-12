@@ -2,7 +2,7 @@ import subprocess
 from typing import TYPE_CHECKING
 import os
 
-from .ffi import lib as xcb
+from .backends.ffi import load
 
 if TYPE_CHECKING:
     from .ctx import Ctx
@@ -13,7 +13,7 @@ def spawn(proc: str):
 
 
 def stop(ctx: 'Ctx'):
-    xcb.xcb_disconnect(ctx.connection)
+    ctx.closed = True
 
 
 def close(ctx: 'Ctx', _id: int):

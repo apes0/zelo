@@ -1,19 +1,26 @@
-from extensions.workspaces import Workspaces
 from lib.utils import spawn, stop
-from lib.ffi import lib as xcb
+from lib.backends.ffi import load
+
 from extensions.tiler import Tiler
+from extensions.workspaces import Workspaces
 from extensions.mouseFocus import MouseFocus
 from extensions.wallpaper import Wallpaper
 from extensions.shotcuts import Shortcuts
 
-# todo: move to xkb (idk how tho)
+from typing import TYPE_CHECKING, Callable
 
-#! set the keys in the tuple in increasing order, else your shortcuts will **NOT** work!!!!
-keys = {
-    ((133,), 0): lambda _ctx: spawn('ulauncher-toggle'),
-    ((28,), xcb.XCB_MOD_MASK_CONTROL): lambda ctx: spawn('alacritty'),
-    ((39,), xcb.XCB_MOD_MASK_CONTROL): lambda ctx: stop(ctx),
-    ((42,), xcb.XCB_MOD_MASK_CONTROL): lambda _ctx: spawn('glxgears'),
+if TYPE_CHECKING:
+    from lib.backends.generic import GKey, GMod
+
+key = load('keys')
+Key: type = key.Key
+Mod: type = key.Mod
+
+keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
+    ((Key('super_l'),), Mod('')): lambda _ctx: spawn('ulauncher-toggle'),
+    ((Key('t'),), Mod('control')): lambda ctx: spawn('alacritty'),
+    ((Key('s'),), Mod('control')): lambda ctx: stop(ctx),
+    ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
 }
 
 focusedColor = 0x9999D6
@@ -27,8 +34,8 @@ extensions = {
     Wallpaper: {'wall': 'wall.png'},
     Shortcuts: {'shortcuts': keys},
     Workspaces: {
-        'prev': ((113,), xcb.XCB_MOD_MASK_CONTROL),
-        'next': ((114,), xcb.XCB_MOD_MASK_CONTROL),
+        'prev': ((Key('left'),), Mod('control')),
+        'next': ((Key('right'),), Mod('control')),
     },
 }
 
