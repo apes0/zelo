@@ -1,31 +1,30 @@
 from lib.backends.generic import GWindow
 from lib.extension import Extension
-from lib.backends.ffi import load
 from typing import TYPE_CHECKING
 from itertools import combinations
 from lib.backends.events import keyPress, keyRelease
+from lib.api.keys import Mod
 
 if TYPE_CHECKING:
     from lib.backends.generic import GKey, GMod
     from lib.ctx import Ctx
 
-Mod = load('keys').Mod
-
 
 class Shortcuts(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
-        super().__init__(ctx, cfg)
         self.keys = []
-        self.shortcuts: dict
+        self.shortcuts: dict = {}
         self._shortcuts: dict = {}
+
+        super().__init__(ctx, cfg)
 
         baseIgnore: list[str] = [
             'lock',
             'mod2',
         ]  # ? maybe make this a configurable value
 
-        self.baseIgnore: list[Mod] = [Mod(mod) for mod in baseIgnore]
-        self.ignore: list[Mod] = [
+        self.baseIgnore: list[GMod] = [Mod(mod) for mod in baseIgnore]
+        self.ignore: list[GMod] = [
             *self.baseIgnore,
             Mod(
                 '',
@@ -63,8 +62,8 @@ class Shortcuts(Extension):
 
         self._shortcuts = shortcuts
 
-    def keyPress(self, key: 'GKey', mod: 'GMod', _win: 'GWindow'):
-        key = key.key  # type: ignore
+    def keyPress(self, originalKey: 'GKey', mod: 'GMod', win: 'GWindow'):
+        key = originalKey.key  # type: ignore
         for idx, _key in enumerate(self.keys):
             if key == _key:
                 break
@@ -79,6 +78,9 @@ class Shortcuts(Extension):
         if fn:
             fn(self.ctx)
             self.keys = []
+        # else:
+        #    originalKey.press(self.ctx, win, mod)
+        #    originalKey.release(self.ctx, win, mod)
 
     def keyRelease(self, key: 'GKey', _mod: 'GMod', _win: 'GWindow'):
         key = key.key  # type: ignore

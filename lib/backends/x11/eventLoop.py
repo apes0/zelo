@@ -17,6 +17,7 @@ from .types import (
     buttonPressTC,
     keyPressTC,
     enterNotifyTC,
+    mapNotifyTC,
 )
 from lib.cfg import extensions
 from .connection import Connection
@@ -42,6 +43,9 @@ def handler(n):
 def createNotify(event, ctx: 'Ctx'):
     event = createNotifyTC(event)
     window = ctx.getWindow(event.window)
+    ignore = event.override_redirect
+
+    window.ignore = ignore
     window.configure(
         newX=max(0, event.x),
         newY=max(0, event.y),
@@ -103,6 +107,9 @@ def confRequest(event, ctx: 'Ctx'):
 def confNotify(event, ctx: 'Ctx'):
     event = confNotifyTC(event)
     window: GWindow = ctx.getWindow(event.window)
+    ignore = event.override_redirect
+    window.ignore = ignore
+
     change = {
         event.x: 'x',
         event.y: 'y',
@@ -151,6 +158,15 @@ def destroyNotify(event, ctx: 'Ctx'):
     events.destroyNotify.trigger(win)
 
 
+@handler(lib.XCB_MAP_NOTIFY)
+def mapNotify(event, ctx: 'Ctx'):
+    event = mapNotifyTC(event)
+    _id = event.window
+    win: GWindow = ctx.getWindow(_id)
+    ignore = event.override_redirect
+    win.ignore = ignore
+
+
 @handler(lib.XCB_UNMAP_NOTIFY)
 def unmapNotify(event, ctx: 'Ctx'):
     event = unmapNotifyTC(event)
@@ -192,6 +208,7 @@ def motionNotify(event, ctx: 'Ctx'):
 @handler(0)
 def error(event, ctx: 'Ctx'):
     event = genericErrorTC(event)
+    print(event.detail)
     # TODO: xcb-util-errors
 
 

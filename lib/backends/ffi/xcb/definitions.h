@@ -569,6 +569,33 @@ typedef struct xcb_get_keyboard_mapping_reply_t
 } xcb_get_keyboard_mapping_reply_t;
 typedef unsigned int xcb_keysym_t;
 typedef struct _XCBKeySymbols xcb_key_symbols_t;
+typedef unsigned int xcb_font_t;
+typedef enum xcb_gc_t
+{
+    XCB_GC_FUNCTION = 1,
+    XCB_GC_PLANE_MASK = 2,
+    XCB_GC_FOREGROUND = 4,
+    XCB_GC_BACKGROUND = 8,
+    XCB_GC_LINE_WIDTH = 16,
+    XCB_GC_LINE_STYLE = 32,
+    XCB_GC_CAP_STYLE = 64,
+    XCB_GC_JOIN_STYLE = 128,
+    XCB_GC_FILL_STYLE = 256,
+    XCB_GC_FILL_RULE = 512,
+    XCB_GC_TILE = 1024,
+    XCB_GC_STIPPLE = 2048,
+    XCB_GC_TILE_STIPPLE_ORIGIN_X = 4096,
+    XCB_GC_TILE_STIPPLE_ORIGIN_Y = 8192,
+    XCB_GC_FONT = 16384,
+    XCB_GC_SUBWINDOW_MODE = 32768,
+    XCB_GC_GRAPHICS_EXPOSURES = 65536,
+    XCB_GC_CLIP_ORIGIN_X = 131072,
+    XCB_GC_CLIP_ORIGIN_Y = 262144,
+    XCB_GC_CLIP_MASK = 524288,
+    XCB_GC_DASH_OFFSET = 1048576,
+    XCB_GC_DASH_LIST = 2097152,
+    XCB_GC_ARC_MODE = 4194304
+} xcb_gc_t;
 
 // functions
 
@@ -582,7 +609,6 @@ xcb_void_cookie_t xcb_change_window_attributes_checked(xcb_connection_t *c, xcb_
 xcb_void_cookie_t xcb_ungrab_key(xcb_connection_t *c, xcb_keycode_t key, xcb_window_t grab_window, unsigned short modifiers);
 xcb_void_cookie_t xcb_grab_key(xcb_connection_t *c, unsigned char owner_events, xcb_window_t grab_window, unsigned short modifiers, xcb_keycode_t key, unsigned char pointer_mode, unsigned char keyboard_mode);
 int xcb_flush(xcb_connection_t *c);
-xcb_void_cookie_t xcb_grab_button(xcb_connection_t *c, unsigned char owner_events, xcb_window_t grab_window, unsigned short event_mask, unsigned char pointer_mode, unsigned char keyboard_mode, xcb_window_t confine_to, xcb_cursor_t cursor, unsigned char button, unsigned short modifiers);
 xcb_generic_event_t *xcb_wait_for_event(xcb_connection_t *c);
 xcb_void_cookie_t xcb_map_window(xcb_connection_t *c, xcb_window_t window);
 xcb_void_cookie_t xcb_configure_window(xcb_connection_t *c, xcb_window_t window, unsigned short value_mask, const void *value_list);
@@ -610,9 +636,13 @@ xcb_void_cookie_t xcb_unmap_window(xcb_connection_t *conn, xcb_window_t window);
 const struct xcb_setup_t *xcb_get_setup(xcb_connection_t *c);
 xcb_get_keyboard_mapping_cookie_t xcb_get_keyboard_mapping(xcb_connection_t *c, xcb_keycode_t first_keycode, unsigned char count);
 xcb_get_keyboard_mapping_reply_t *xcb_get_keyboard_mapping_reply(xcb_connection_t *c, xcb_get_keyboard_mapping_cookie_t cookie, xcb_generic_error_t **e);
+// xcb_key_symbols_t *keysyms_alloc(xcb_connection_t *c);
 xcb_keycode_t *xcb_key_symbols_get_keycode(xcb_key_symbols_t *syms, xcb_keysym_t keysym);
 xcb_key_symbols_t *xcb_key_symbols_alloc(xcb_connection_t *c);
 void xcb_key_symbols_free(xcb_key_symbols_t *syms);
+xcb_void_cookie_t xcb_open_font(xcb_connection_t *c, xcb_font_t fid, unsigned short name_len, const char *name);
+xcb_void_cookie_t xcb_image_text_8(xcb_connection_t *c, unsigned char string_len, xcb_drawable_t drawable, xcb_gcontext_t gc, short x, short y, const char *string);
+xcb_void_cookie_t xcb_close_font(xcb_connection_t *conn, xcb_font_t font);
 
 // weird values
 

@@ -1,17 +1,15 @@
 from lib.extension import Extension
-from lib.backends.ffi import load
 from typing import TYPE_CHECKING
 from lib.backends.events import buttonPress, mapRequest, enterNotify, leaveNotify
+from lib.api.keys import Mod
+from lib.api.mouse import Button
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
-    from lib.backends.generic import GButton, GMod, GWindow
+    from lib.backends.generic import GButton, GWindow, GMod
 
 # i found what enter notify and leave notify do here: (on line 853)
 # https://gitlab.gnome.org/GNOME/mutter/-/blob/main/src/x11/events.c
-
-Button: type = load('mouse').Button
-Mod: type = load('keys').Mod
 
 
 class MouseFocus(Extension):

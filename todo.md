@@ -1,14 +1,18 @@
 
 # todo
 
-- Stop using xcb constants in extensions and main
 - Add wayland support
+- bars (when async)
 - make a function/constant for everything (for future wayland support)
 - use the icccm and ewmh extensions
 - reparenting and decorations
 - cfg reloading
-- make everything that is not completely neccessary an extension
+- make everything that is not completely neccessary an extension (kinda done i think but imma keep it here)
 - add a screen class/iterator
 - decide wheather to use the generic types or using the backend's types for typing
 - move to an async api (with trio, bc i like it)
+- use xtf or some library for drawing like cairo
 - docs
+- use the sequence thing in x11 backend
+- make button.press/release, just like key.press/release
+- actually implement GCtx lol

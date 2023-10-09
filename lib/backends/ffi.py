@@ -34,10 +34,9 @@ def buildX():
                 'definitions.h',
             )
         ).read(),
-        override=True,
     )
 
-    ffibuilder.compile(verbose=True)
+    ffibuilder.compile(verbose=True, target='*')
 
 
 def buildWayland():

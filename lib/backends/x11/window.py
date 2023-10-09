@@ -20,6 +20,7 @@ class Window(GWindow):
         self.ctx: 'Ctx' = ctx
         self.focused: bool = False
         self.mapped: bool = False
+        self.ignore = True  # set by override redirect (also we assume the worst, so we set it to true)
 
     def map(self):
         lib.xcb_map_window(self.ctx.connection, self.id)

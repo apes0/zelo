@@ -1,5 +1,5 @@
 from lib.utils import spawn, stop
-from lib.backends.ffi import load
+from lib.api.keys import Key, Mod
 
 from extensions.tiler import Tiler
 from extensions.workspaces import Workspaces
@@ -12,9 +12,6 @@ from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from lib.backends.generic import GKey, GMod
 
-key = load('keys')
-Key: type = key.Key
-Mod: type = key.Mod
 
 keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     ((Key('super_l'),), Mod('')): lambda _ctx: spawn('ulauncher-toggle'),
@@ -25,6 +22,8 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
 
 focusedColor = 0x9999D6
 unfocusedColor = 0x393966
+# unfocusedColor = 0x1CEEEE
+# focusedColor = 0xC0FFEE
 
 # extensions and their config
 
@@ -34,8 +33,8 @@ extensions = {
     Wallpaper: {'wall': 'wall.png'},
     Shortcuts: {'shortcuts': keys},
     Workspaces: {
-        'prev': ((Key('left'),), Mod('control')),
-        'next': ((Key('right'),), Mod('control')),
+        'prev': ((Key('left'), Key('super_l')), Mod('control')),
+        'next': ((Key('right'), Key('super_l')), Mod('control')),
     },
 }
 

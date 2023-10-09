@@ -37,7 +37,7 @@ class Tracker:
         windows: dict[int, GWindow] = {}
         window: GWindow
         for id, window in self.ctx.windows.items():
-            if not window.mapped:
+            if not window.mapped or window.ignore:
                 continue
             windows[id] = window
         self._update(windows)

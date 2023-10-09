@@ -1,11 +1,9 @@
-from .backends.ffi import load
 from typing import TYPE_CHECKING
+from .api.window import Window
 
 if TYPE_CHECKING:
     from .backends.generic import CData, GScreen, GWindow
     from .extension import Extension
-
-Window = load('window').Window
 
 
 class Ctx:

@@ -19,9 +19,9 @@ if TYPE_CHECKING:
 
 class Tiler(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
-        super().__init__(ctx, cfg)
         self.border: int
         self.spacing: int
+        super().__init__(ctx, cfg)
         Tracker(self, self.update)
 
     def update(self, windows):

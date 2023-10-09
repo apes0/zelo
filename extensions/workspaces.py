@@ -1,5 +1,4 @@
 from lib.extension import Extension
-from lib.backends.ffi import load
 from typing import TYPE_CHECKING
 from extensions.shotcuts import Shortcuts
 
@@ -9,14 +8,13 @@ if TYPE_CHECKING:
 
 class Workspaces(Extension):  # TODO: make me work with the window tracker's focus queue
     def __init__(self, ctx: 'Ctx', cfg) -> None:
-        super().__init__(ctx, cfg)
-
         # these take the same thing as a shortcut (because they are shortcuts)
         self.next: tuple
         self.prev: tuple
         self.spaces = {}
         self.current = 0
         self.windows = []
+        super().__init__(ctx, cfg)
 
         shortcuts: Shortcuts = self.assure(Shortcuts)  # type:ignore
         shortcuts.conf(

@@ -1,32 +1,33 @@
 import cffi
 import _cffi_backend
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
     from ..ctx import Ctx
 
 # these are definitions for what functions and classes the backends should have
 
-# TODO: make everything here raise NotImplementedError, so that if something is missing in the
-# backend, we will be told
-
 CData = _cffi_backend._CDataBase  # cffi.FFI.CData
 
+# NOTE: we need the file to load from in front of the class
 
+
+# connection
 class GConnection:
     def __init__(self) -> None:
         self.conn: cffi.FFI.CData
 
     def disconnect(self):
-        pass
+        raise NotImplementedError
 
 
 # TODO: use this in ctx, basically as a ctx for the backend
-class GCtx:
-    def __init__(self) -> None:
-        pass
+# class GCtx:
+#    def __init__(self) -> None:
+#        raise NotImplementedError
 
 
+# window
 class GWindow:
     def __init__(
         self, height: int, width: int, borderWidth: int, _id: int, ctx: 'Ctx'
@@ -40,55 +41,65 @@ class GWindow:
         self.ctx: 'Ctx' = ctx
         self.focused = False
         self.mapped = False
-        self.age: int  # used for auto focus
+        self.ignore: bool
 
     def map(self):
-        pass
+        raise NotImplementedError
 
     def unmap(self):
-        pass
+        raise NotImplementedError
 
     def setFocus(self, focus):
-        pass
+        raise NotImplementedError
 
     def configure(
         self, newX=None, newY=None, newWidth=None, newHeight=None, newBorderWidth=None
     ):
-        pass
+        raise NotImplementedError
 
 
+# keys
 class GMod:
     def __init__(self, *names: str) -> None:
         self.mod: int
 
 
+# keys
 class GKey:
     def __init__(self, lable: str) -> None:
         self.lable: str = lable
         self.key: int | None = None
 
     def load(self, ctx: 'Ctx'):
-        pass
+        raise NotImplementedError
 
     def grab(self, ctx: 'Ctx', *modifiers: GMod):
-        pass
+        raise NotImplementedError
 
     def ungrab(self, ctx: 'Ctx'):
-        pass
+        raise NotImplementedError
+
+    def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: GMod):
+        raise NotImplementedError
+
+    def release(self, ctx: 'Ctx', window: 'GWindow', *modifiers: GMod):
+        raise NotImplementedError
 
 
+# mouse
 class GButton:
     def __init__(self, lable: str | None = None, button: int | None = None) -> None:
         self.lable: str
         self.button: int
 
     def grab(self, ctx: 'Ctx', window: GWindow, *mods: GMod):
-        pass
+        raise NotImplementedError
 
     def ungrab(self, ctx: 'Ctx', window: GWindow, *mods: GMod):
-        pass
+        raise NotImplementedError
 
 
+# drawer
 class GImage:
     def __init__(
         self,
@@ -100,15 +111,20 @@ class GImage:
         x: int,
         y: int,
     ) -> None:
-        pass
+        raise NotImplementedError
 
     def draw(self):
-        pass
+        raise NotImplementedError
 
 
+# screen
 class GScreen:
     def __init__(self) -> None:
         self.width: int
         self.height: int
         self.root: int
         self.screen: CData
+
+
+# eventLoop
+GEventLoop: Callable  # FIXME: this will not get caught when generating the api

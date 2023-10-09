@@ -1,3 +1,5 @@
+#!/usr/bin/zsh
+
 keysymdef=$(cpp <(echo "#include <X11/keysymdef.h>") | grep -o '\/.*X11\/keysymdef.h')
 # ^ cpp returns an empty file for some reason here, so you cannot just use its result
 

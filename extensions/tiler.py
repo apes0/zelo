@@ -34,16 +34,18 @@ if TYPE_CHECKING:
 
 class Tiler(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
-        super().__init__(ctx, cfg)
         self.mainSize: int
         self.border: int
         self.spacing: int
+        super().__init__(ctx, cfg)
         Tracker(self, self.update, [focusChange])
 
     def update(self, windows: dict[int, 'GWindow']):
         main: GWindow | None = self.ctx.focused
 
-        if not main:  # cant have secondary windows if there isnt a main one
+        if (
+            not main or main.ignore
+        ):  # cant have secondary windows if there isnt a main one
             return
         if main.id in windows:
             del windows[main.id]
