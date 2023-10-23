@@ -82,8 +82,6 @@ class Image(GImage):
                 ctx.connection, self.pixmap, self.gc, image, 0, round(prev), 0
             )
 
-            print(lib.xcb_connection_has_error(ctx.connection))
-
             prev = pos
         self.draw()
 
@@ -100,9 +98,6 @@ class Image(GImage):
             self.width,
             self.height,
         )
-
-        lib.xcb_flush(self.ctx.connection)
-        print(lib.xcb_connection_has_error(self.ctx.connection))
 
         lib.xcb_flush(self.ctx.connection)
 

@@ -16,15 +16,14 @@ class Workspaces(Extension):  # TODO: make me work with the window tracker's foc
         self.windows = []
         super().__init__(ctx, cfg)
 
-        shortcuts: Shortcuts = self.assure(Shortcuts)  # type:ignore
-        shortcuts.conf(
+        shortcuts: Shortcuts = Shortcuts(  # type:ignore
+            ctx,
             {
                 'shortcuts': {
-                    **shortcuts.__dict__.get('shortcuts', {}),
                     self.next: self.nextSpace,
                     self.prev: self.prevSpace,
                 }
-            }
+            },
         )
         shortcuts.register()
 

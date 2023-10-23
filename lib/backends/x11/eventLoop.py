@@ -18,6 +18,7 @@ from .types import (
     keyPressTC,
     enterNotifyTC,
     mapNotifyTC,
+    randrNotifyTC,
 )
 from lib.cfg import extensions
 from .connection import Connection
@@ -208,7 +209,7 @@ def motionNotify(event, ctx: 'Ctx'):
 @handler(0)
 def error(event, ctx: 'Ctx'):
     event = genericErrorTC(event)
-    print(event.detail)
+    print(event.error_code)
     # TODO: xcb-util-errors
 
 
@@ -262,6 +263,12 @@ def leaveNotify(event, ctx: 'Ctx'):
     events.leaveNotify.trigger(window)
 
 
+@handler(lib.XCB_RANDR_NOTIFY)
+def randrNotify(event, ctx: 'Ctx'):
+    event = randrNotifyTC(event)
+    print(event.response_type, event.subCode)
+
+
 ignore = [9, 10]  # list of events to ignore
 # 9 - focus in - it just breaks shit, but i *might* need it
 # 10 - focus out - same as focus in
@@ -277,7 +284,7 @@ def loop(ctx: 'Ctx'):
     setupExtensions(ctx, extensions)
 
     while not lib.xcb_connection_has_error(ctx.connection) and not ctx.closed:
-        event = lib.xcb_wait_for_event(ctx.connection)  # todo: dont skip events
+        event = lib.xcb_wait_for_event(ctx.connection)
         eventType: int = event.response_type & ~0x80
         if handler := handlers.get(eventType, None):
             handler(event, ctx)

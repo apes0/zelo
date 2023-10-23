@@ -22,6 +22,7 @@ That being said, these are the currently available extensions:
 - wallpaper - sets a wallpaper
 - shortcuts - manages shortcuts
 - workspaces - adds support for workspaces
+- fake monitors - adds support for making multiple fake monitors on one monitor
 
 # Installation
 
@@ -34,7 +35,7 @@ and Ubuntu (i have tested it on both).
 
 If you are running anything unsupported by the install script, you need to do the following:
 
-- dowload the following dependencies: ``libxcb-util-dev libx11-xcb-dev libxcb-keysyms1-dev libxcb-image0-dev python3``
+- dowload the following dependencies: ``libxcb-util-dev libx11-xcb-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-randr0-dev python3``
 
 - run ``pip3 install -r requirements.py`` or install the following modules from your package manager: ``python3-cffi python3-opencv``
 
@@ -42,8 +43,12 @@ If you are running anything unsupported by the install script, you need to do th
 
 # Configuring
 
-The configuration is held in ``cfg.py``, there you can put shortcuts, extensions and their config, and what to be run when the window manager starts.
+The configuration is held in ``cfg.py``, there you can put shortcuts, extensions and their config, and what to be run when the window manager starts. I might add more info about how to configure the window manager.
 
 # Docs
 
 Realistically, i am going to be the only person who will actually use this, and i am also probably never going to finish the docs, but if i do finish them, there will be a link to them here.
+
+# Images
+
+![dirty](.assets/dirty.png)

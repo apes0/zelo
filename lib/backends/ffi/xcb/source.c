@@ -3,6 +3,7 @@
 #include <xcb/xcb_util.h>
 #include <xcb/xcb_keysyms.h>
 #include <xcb/xcb_image.h>
+#include <xcb/randr.h>
 
 // xcb_key_symbols_t *keysyms_alloc(xcb_connection_t *c)
 //{

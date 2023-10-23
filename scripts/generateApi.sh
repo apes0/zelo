@@ -22,7 +22,7 @@ mkdir $api
             class=substr($2, length(start) + 1)
             class=substr(class, 0, length(class) - 1) # remove the :
             file=(ENVIRON["api"] import ".py")
-            print "[ -e " file " ] || echo \x27from ..backends.ffi import load\nfrom..backends.generic import *\nloaded = load(\"" import "\")\n\x27 > " file
+            print "[ -e " file " ] || echo \x27from ..backends.ffi import load\nfrom ..backends.generic import *\n\nloaded = load(\"" import "\")\n\x27 > " file
             print "echo \x27" class ": type[" (start class) "] = loaded." class "\x27 >> " file;
         }
 }

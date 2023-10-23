@@ -61,7 +61,6 @@ class Key(GKey):
         code = lib.xcb_key_symbols_get_keycode(syms, keysym)
         assert code, f'Couldn\'t find keycode for {self.lable}...'
         self.key = code[0]
-        print(self.key)
         self.__class__.cache[self.lable] = code
         # lib.xcb_key_symbols_free(syms)  # ? idk how efficient this is lol
 

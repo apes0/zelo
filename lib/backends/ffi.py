@@ -22,7 +22,7 @@ def buildX():
                 os.path.dirname(os.path.abspath(__file__)), 'ffi', 'xcb', 'source.c'
             )
         ).read(),
-        libraries=['xcb', 'xcb-util', 'xcb-image', 'xcb-keysyms'],
+        libraries=['xcb', 'xcb-util', 'xcb-image', 'xcb-keysyms', 'xcb-randr'],
     )
 
     ffibuilder.cdef(

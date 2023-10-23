@@ -44,3 +44,6 @@ class MouseFocus(Extension):
     def leaveNotify(self, win: 'GWindow'):
         # ungrab the button when we stop hovering over the window
         self.button.ungrab(self.ctx, win, self.mod)
+
+    def focusChange(self, win: 'GWindow'):
+        pass

@@ -2,7 +2,7 @@
 i found most of these with these commands:
 ``
 lookfor=('xcb_change_window_attributes_checked' 'xcb_ungrab_key' ...)
-cpped=`cpp <(echo "#include <xcb/xcb.h>\n#include<xcb/xcb_util.h>\n#include <xcb/xcb_keysyms.h>\n#include <xcb/xcb_image.h>")`
+cpped=`cpp <(echo "#include <xcb/xcb.h>\n#include<xcb/xcb_util.h>\n#include <xcb/xcb_keysyms.h>\n#include <xcb/xcb_image.h>\n#include <xcb/xrandr.h>")`
 for look in $lookfor
 do
 echo $look
@@ -596,10 +596,170 @@ typedef enum xcb_gc_t
     XCB_GC_DASH_LIST = 2097152,
     XCB_GC_ARC_MODE = 4194304
 } xcb_gc_t;
+typedef struct xcb_randr_get_screen_resources_cookie_t
+{
+    unsigned int sequence;
+} xcb_randr_get_screen_resources_cookie_t;
+typedef struct xcb_randr_get_screen_resources_reply_t
+{
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    unsigned int length;
+    xcb_timestamp_t timestamp;
+    xcb_timestamp_t config_timestamp;
+    unsigned short num_crtcs;
+    unsigned short num_outputs;
+    unsigned short num_modes;
+    unsigned short names_len;
+    unsigned char pad1[8];
+} xcb_randr_get_screen_resources_reply_t;
+typedef unsigned int xcb_randr_crtc_t;
+typedef struct xcb_randr_get_crtc_info_cookie_t
+{
+    unsigned int sequence;
+} xcb_randr_get_crtc_info_cookie_t;
+typedef unsigned int xcb_randr_mode_t;
+typedef struct xcb_randr_get_crtc_info_reply_t
+{
+    unsigned char response_type;
+    unsigned char status;
+    unsigned short sequence;
+    unsigned int length;
+    xcb_timestamp_t timestamp;
+    short x;
+    short y;
+    unsigned short width;
+    unsigned short height;
+    xcb_randr_mode_t mode;
+    unsigned short rotation;
+    unsigned short rotations;
+    unsigned short num_outputs;
+    unsigned short num_possible_outputs;
+} xcb_randr_get_crtc_info_reply_t;
+typedef enum xcb_randr_notify_mask_t
+{
+    XCB_RANDR_NOTIFY_MASK_SCREEN_CHANGE = 1,
+    XCB_RANDR_NOTIFY_MASK_CRTC_CHANGE = 2,
+    XCB_RANDR_NOTIFY_MASK_OUTPUT_CHANGE = 4,
+    XCB_RANDR_NOTIFY_MASK_OUTPUT_PROPERTY = 8,
+    XCB_RANDR_NOTIFY_MASK_PROVIDER_CHANGE = 16,
+    XCB_RANDR_NOTIFY_MASK_PROVIDER_PROPERTY = 32,
+    XCB_RANDR_NOTIFY_MASK_RESOURCE_CHANGE = 64
+} xcb_randr_notify_mask_t;
+typedef struct xcb_randr_crtc_change_t
+{
+    xcb_timestamp_t timestamp;
+    xcb_window_t window;
+    xcb_randr_crtc_t crtc;
+    xcb_randr_mode_t mode;
+    unsigned short rotation;
+    unsigned int pad0[2];
+    short x;
+    short y;
+    unsigned short width;
+    unsigned short height;
+} xcb_randr_crtc_change_t;
+typedef struct xcb_randr_crtc_change_iterator_t
+{
+    xcb_randr_crtc_change_t *data;
+    int rem;
+    int index;
+} xcb_randr_crtc_change_iterator_t;
+typedef unsigned int xcb_randr_output_t;
+typedef struct xcb_randr_output_change_t
+{
+    xcb_timestamp_t timestamp;
+    xcb_timestamp_t config_timestamp;
+    xcb_window_t window;
+    xcb_randr_output_t output;
+    xcb_randr_crtc_t crtc;
+    xcb_randr_mode_t mode;
+    unsigned short rotation;
+    unsigned int connection;
+    unsigned int subpixel_order;
+} xcb_randr_output_change_t;
+typedef unsigned int xcb_randr_provider_t;
+typedef struct xcb_randr_output_property_t
+{
+    xcb_window_t window;
+    xcb_randr_output_t output;
+    xcb_atom_t atom;
+    xcb_timestamp_t timestamp;
+    unsigned int status;
+    unsigned int pad0[11];
+} xcb_randr_output_property_t;
+typedef struct xcb_randr_provider_change_t
+{
+    xcb_timestamp_t timestamp;
+    xcb_window_t window;
+    xcb_randr_provider_t provider;
+    unsigned int pad0[16];
+} xcb_randr_provider_change_t;
+typedef struct xcb_randr_provider_property_t
+{
+    xcb_window_t window;
+    xcb_randr_provider_t provider;
+    xcb_atom_t atom;
+    xcb_timestamp_t timestamp;
+    unsigned int state;
+    unsigned int pad0[11];
+} xcb_randr_provider_property_t;
+typedef struct xcb_randr_resource_change_t
+{
+    xcb_timestamp_t timestamp;
+    xcb_window_t window;
+    unsigned int pad0[20];
+} xcb_randr_resource_change_t;
+typedef union xcb_randr_notify_data_t
+{
+    xcb_randr_crtc_change_t cc;
+    xcb_randr_output_change_t oc;
+    xcb_randr_output_property_t op;
+    xcb_randr_provider_change_t pc;
+    xcb_randr_provider_property_t pp;
+    xcb_randr_resource_change_t rc;
+} xcb_randr_notify_data_t;
+typedef enum xcb_randr_notify_t
+{
+    XCB_RANDR_NOTIFY_CRTC_CHANGE = 0,
+    XCB_RANDR_NOTIFY_OUTPUT_CHANGE = 1,
+    XCB_RANDR_NOTIFY_OUTPUT_PROPERTY = 2,
+    XCB_RANDR_NOTIFY_PROVIDER_CHANGE = 3,
+    XCB_RANDR_NOTIFY_PROVIDER_PROPERTY = 4,
+    XCB_RANDR_NOTIFY_RESOURCE_CHANGE = 5
+} xcb_randr_notify_t;
+typedef struct xcb_randr_notify_event_t
+{
+    unsigned int response_type;
+    unsigned int subCode;
+    unsigned short sequence;
+    xcb_randr_notify_data_t u;
+} xcb_randr_notify_event_t;
+typedef struct xcb_query_pointer_cookie_t
+{
+    unsigned int sequence;
+} xcb_query_pointer_cookie_t;
+typedef struct xcb_query_pointer_reply_t
+{
+    unsigned char response_type;
+    unsigned char same_screen;
+    unsigned short sequence;
+    unsigned int length;
+    xcb_window_t root;
+    xcb_window_t child;
+    short root_x;
+    short root_y;
+    short win_x;
+    short win_y;
+    unsigned short mask;
+    unsigned char pad0[2];
+} xcb_query_pointer_reply_t;
 
 // functions
 
-xcb_connection_t *xcb_connect(const char *displayname, int *screenp);
+xcb_connection_t *
+xcb_connect(const char *displayname, int *screenp);
 int xcb_connection_has_error(xcb_connection_t *c);
 void xcb_disconnect(xcb_connection_t *c);
 unsigned int xcb_generate_id(xcb_connection_t *c);
@@ -643,6 +803,15 @@ void xcb_key_symbols_free(xcb_key_symbols_t *syms);
 xcb_void_cookie_t xcb_open_font(xcb_connection_t *c, xcb_font_t fid, unsigned short name_len, const char *name);
 xcb_void_cookie_t xcb_image_text_8(xcb_connection_t *c, unsigned char string_len, xcb_drawable_t drawable, xcb_gcontext_t gc, short x, short y, const char *string);
 xcb_void_cookie_t xcb_close_font(xcb_connection_t *conn, xcb_font_t font);
+xcb_randr_get_screen_resources_cookie_t xcb_randr_get_screen_resources(xcb_connection_t *c, xcb_window_t window);
+xcb_randr_get_screen_resources_reply_t *xcb_randr_get_screen_resources_reply(xcb_connection_t *c, xcb_randr_get_screen_resources_cookie_t cookie, xcb_generic_error_t **e);
+int xcb_randr_get_screen_resources_crtcs_length(const xcb_randr_get_screen_resources_reply_t *R);
+xcb_randr_crtc_t *xcb_randr_get_screen_resources_crtcs(const xcb_randr_get_screen_resources_reply_t *R);
+xcb_randr_get_crtc_info_cookie_t xcb_randr_get_crtc_info(xcb_connection_t *c, xcb_randr_crtc_t crtc, xcb_timestamp_t config_timestamp);
+xcb_randr_get_crtc_info_reply_t *xcb_randr_get_crtc_info_reply(xcb_connection_t *c, xcb_randr_get_crtc_info_cookie_t cookie, xcb_generic_error_t **e);
+xcb_void_cookie_t xcb_randr_select_input(xcb_connection_t *c, xcb_window_t window, unsigned short enable);
+xcb_query_pointer_cookie_t xcb_query_pointer(xcb_connection_t *conn, xcb_window_t window);
+xcb_query_pointer_reply_t *xcb_query_pointer_reply(xcb_connection_t *conn, xcb_query_pointer_cookie_t cookie, xcb_generic_error_t **e);
 
 // weird values
 
@@ -652,6 +821,7 @@ unsigned int XCB_NONE = 0;
 unsigned int XCB_GRAB_ANY = 0; // just for testing the keyboard :)
 #define XCB_CURRENT_TIME 0L
 // these events will never appear in cpp, so i just took the definitions from the docs
+#define XCB_RANDR_NOTIFY 1
 #define XCB_KEY_PRESS 2
 #define XCB_KEY_RELEASE 3
 #define XCB_BUTTON_PRESS 4

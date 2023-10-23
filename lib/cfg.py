@@ -6,6 +6,7 @@ from extensions.workspaces import Workspaces
 from extensions.mouseFocus import MouseFocus
 from extensions.wallpaper import Wallpaper
 from extensions.shotcuts import Shortcuts
+from extensions.fakeMonitors import FakeDisplays
 
 from typing import TYPE_CHECKING, Callable
 
@@ -28,6 +29,7 @@ unfocusedColor = 0x393966
 # extensions and their config
 
 extensions = {
+    FakeDisplays: {'displays': [[960, 960]]},  # just here for testing with xephyr
     Tiler: {'mainSize': 2 / 3, 'border': 5, 'spacing': 10},
     MouseFocus: {},
     Wallpaper: {'wall': 'wall.png'},

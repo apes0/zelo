@@ -1,4 +1,14 @@
-from ..generic import GScreen
+from ..generic import GScreen, GDisplay
+
+# TODO: support xinerama as well (should not be difficult i hope)
+
+
+class Display(GDisplay):
+    def __init__(self, x: int, y: int, width: int, height: int) -> None:
+        self.x: int = x
+        self.y: int = y
+        self.width: int = width
+        self.height: int = height
 
 
 class Screen(
@@ -9,4 +19,4 @@ class Screen(
         self.height: int = screen.height_in_pixels
         self.root: int = screen.root
         self.screen = screen
-        self.num: int  # gonna use this when i eventually support multiple monitors
+        self.displays: list[Display] = []

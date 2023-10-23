@@ -1,5 +1,5 @@
 from lib.backends.generic import GWindow
-from lib.extension import Extension
+from lib.extension import Extension, single
 from typing import TYPE_CHECKING
 from itertools import combinations
 from lib.backends.events import keyPress, keyRelease
@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from lib.ctx import Ctx
 
 
+@single
 class Shortcuts(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.keys = []
@@ -90,3 +91,6 @@ class Shortcuts(Extension):
             # NOTE: if the key doesn't exist in the list of pressed keys, then it is a modifier, and
             # thus, the keys list should be cleared
             self.keys.clear()
+
+    def conf(self, cfg: dict):
+        self.shortcuts = {**self.shortcuts, **cfg['shortcuts']}

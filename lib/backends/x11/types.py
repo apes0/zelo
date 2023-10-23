@@ -49,3 +49,5 @@ genericErrorTC = Caster('xcb_generic_error_t*')
 # others
 charpC = Caster('char*')
 keysymC = Caster('xcb_keysym_t*')
+# xrandr
+randrNotifyTC = Caster('xcb_randr_notify_event_t *')

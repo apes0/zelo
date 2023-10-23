@@ -16,3 +16,4 @@
 - use the sequence thing in x11 backend
 - make button.press/release, just like key.press/release
 - actually implement GCtx lol
+- always use checked function for xcb to catch errors

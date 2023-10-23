@@ -1,5 +1,6 @@
 from ..backends.ffi import load
-from..backends.generic import *
+from ..backends.generic import *
+
 loaded = load("keys")
 
 Mod: type[GMod] = loaded.Mod

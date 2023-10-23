@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -18,9 +18,6 @@ class Extension:
     def addListener(self, event: int, fn: Callable):
         self.listeners[event] = fn
 
-    def assure(self, ext: type) -> 'Extension':
-        return self.ctx.extensions.get(ext) or ext(self.ctx, {})
-
 
 def setupExtensions(ctx: 'Ctx', extensions: dict):
     for extension, cfg in extensions.items():
@@ -28,3 +25,29 @@ def setupExtensions(ctx: 'Ctx', extensions: dict):
             ext.conf(cfg)
             continue
         ctx.extensions[extension] = extension(ctx, cfg)
+
+
+def single(ext: type[Extension]) -> Extension:
+    class New(Extension):
+        def __init__(self) -> None:
+            self.ext = None
+
+        def __call__(self, ctx: 'Ctx', conf: dict) -> Any:  # fake init function lol
+            if not self.ext:
+                self.ext = ext(ctx, conf)
+            self.ext.conf(conf)
+            return self.ext
+
+    return New()
+
+
+# TODO: what should the behaviour of function calls here be?
+# TODO: i think its a good enoguh idea to just call the function
+# TODO: for each instance, but that might not work well
+def perDisplay(ext: type[Extension]) -> Extension:
+    class New(Extension):
+        def __init__(self, ctx: 'Ctx', cfg: dict) -> None:
+            for display in ctx.screen.displays:
+                ext(ctx, {**cfg, 'display': display})
+
+    return single(New)

@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING
+
 from .api.window import Window
 
 if TYPE_CHECKING:
-    from .backends.generic import CData, GScreen, GWindow
+    from .backends.generic import CData, GScreen, GWindow, GMouse
     from .extension import Extension
 
 
@@ -17,6 +18,7 @@ class Ctx:
         self.values: CData
         self.windows: dict[int, GWindow] = {}
         self.focused: GWindow | None = None
+        self.mouse: GMouse
         self.extensions: dict[type, Extension] = {}  # list of loaded extensions
         self.closed = False
 

@@ -1,11 +1,29 @@
 from xcb_cffi import ffi, lib
-from ..generic import GButton
+from ..generic import GButton, GMouse
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..generic import GWindow, GMod
     from ...ctx import Ctx
+
+
+class Mouse(GMouse):
+    def __init__(self, ctx: 'Ctx') -> None:
+        self.ctx = ctx
+
+    def location(self) -> tuple[int, int]:
+        resp = lib.xcb_query_pointer_reply(
+            self.ctx.connection,
+            lib.xcb_query_pointer(self.ctx.connection, self.ctx._root),
+            ffi.NULL,
+        )
+
+        return (
+            resp.root_x,
+            resp.root_y,
+        )  # ? idk if these are the values i need to return lol
+
 
 mappings = {
     'any': lib.XCB_BUTTON_INDEX_ANY,

@@ -1,11 +1,10 @@
 from lib.extension import Extension
 from typing import TYPE_CHECKING
-from .windowTracker import Tracker
-from lib.backends.events import focusChange
+from .windowTracker import track
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
-    from lib.backends.generic import GWindow
+    from lib.backends.generic import GWindow, GDisplay
 
 # tiles windows in the following way:
 #
@@ -32,36 +31,33 @@ if TYPE_CHECKING:
 # FIXME: breaks with too many windows (its an unreasonable number imho, but we should handle it properly)
 
 
+@track('update')
 class Tiler(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.mainSize: int
         self.border: int
         self.spacing: int
+        self.display: GDisplay
         super().__init__(ctx, cfg)
-        Tracker(self, self.update, [focusChange])
 
-    def update(self, windows: dict[int, 'GWindow']):
-        main: GWindow | None = self.ctx.focused
-
-        if (
-            not main or main.ignore
-        ):  # cant have secondary windows if there isnt a main one
-            return
+    def update(self, windows: dict[int, 'GWindow'], main: 'GWindow'):
         if main.id in windows:
             del windows[main.id]
 
+        # ? what the fuck is going on here lmao
+
         size = 1 / max(len(windows), 1)
         y = self.spacing
-        _height = self.ctx.screen.height * size - (2 + size) * self.spacing
+        _height = self.display.height * size - (2 + size) * self.spacing
         height = round(_height)
         offset = _height - height
-        width = round(self.ctx.screen.width * (1 - self.mainSize) - self.spacing * 3)
-        x = round(self.ctx.screen.width * self.mainSize + self.spacing)
+        width = round(self.display.width * (1 - self.mainSize) - self.spacing * 3)
+        x = round(self.display.width * self.mainSize + self.spacing)
 
         for window in windows.values():
             window.configure(
-                newX=x,
-                newY=round(y),
+                newX=x + self.display.x,
+                newY=round(y) + self.display.y,
                 newHeight=height,
                 newWidth=width,
                 newBorderWidth=self.border,
@@ -70,9 +66,9 @@ class Tiler(Extension):
 
         mainSize = self.mainSize if windows else 1
         main.configure(
-            newX=self.spacing,
-            newY=self.spacing,
-            newWidth=round(self.ctx.screen.width * mainSize - 3 * self.spacing),
-            newHeight=self.ctx.screen.height - 3 * self.spacing,
+            newX=self.spacing + self.display.x,
+            newY=self.spacing + self.display.y,
+            newWidth=round(self.display.width * mainSize - 3 * self.spacing),
+            newHeight=self.display.height - 3 * self.spacing,
             newBorderWidth=self.border,
         )

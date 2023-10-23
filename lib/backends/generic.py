@@ -42,6 +42,7 @@ class GWindow:
         self.focused = False
         self.mapped = False
         self.ignore: bool
+        raise NotImplementedError
 
     def map(self):
         raise NotImplementedError
@@ -62,6 +63,7 @@ class GWindow:
 class GMod:
     def __init__(self, *names: str) -> None:
         self.mod: int
+        raise NotImplementedError
 
 
 # keys
@@ -69,6 +71,7 @@ class GKey:
     def __init__(self, lable: str) -> None:
         self.lable: str = lable
         self.key: int | None = None
+        raise NotImplementedError
 
     def load(self, ctx: 'Ctx'):
         raise NotImplementedError
@@ -91,12 +94,25 @@ class GButton:
     def __init__(self, lable: str | None = None, button: int | None = None) -> None:
         self.lable: str
         self.button: int
+        raise NotImplementedError
 
     def grab(self, ctx: 'Ctx', window: GWindow, *mods: GMod):
         raise NotImplementedError
 
     def ungrab(self, ctx: 'Ctx', window: GWindow, *mods: GMod):
         raise NotImplementedError
+
+
+# mouse
+class GMouse:
+    def __init__(self, ctx: 'Ctx') -> None:
+        pass
+        raise NotImplementedError
+
+    def location(self) -> tuple[int, int]:
+        raise NotImplementedError
+
+    # TODO: maybe add grab and ungrab from button?
 
 
 # drawer
@@ -124,6 +140,18 @@ class GScreen:
         self.height: int
         self.root: int
         self.screen: CData
+        self.displays: list[GDisplay] = []
+        raise NotImplementedError
+
+
+# screen
+class GDisplay:
+    def __init__(self) -> None:
+        self.x: int
+        self.y: int
+        self.width: int
+        self.height: int
+        raise NotImplementedError
 
 
 # eventLoop
