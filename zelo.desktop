@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Zelo Window Manager
+Comment=Zelo Window Manager session
+Exec=zelo
+TryExec=zelo
+Icon=
+Type=Application
