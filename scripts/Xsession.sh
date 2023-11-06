@@ -8,10 +8,11 @@ echo $mydir
 path="/bin/zelo"
 
 echo "#!/bin/bash
-cd $(pwd)/..
 while [ true ]
 do
-    python3 main.py
+	cd $(pwd)/..
+    python3 main.py & disown
+    cd ~
 done" > $path
 
 chmod +x $path

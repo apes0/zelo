@@ -72,13 +72,23 @@ class Connection(GConnection):
         # TODO: get x, y, border width, width, height here
         req = lib.xcb_query_tree_reply(ctx.connection, lib.xcb_query_tree(ctx.connection, ctx._root), ffi.NULL)
         win = lib.xcb_query_tree_children(req)
-        requests = {win[n]: lib.xcb_get_window_attributes(ctx.connection, win[n]) for n in range(req.children_len)}
+        requests = {win[n]: (lib.xcb_get_window_attributes(ctx.connection, win[n]), lib.xcb_get_geometry(ctx.connection, win[n])) for n in range(req.children_len)}
 
-        for _id, _req in requests.items():
-            resp = lib.xcb_get_window_attributes_reply(ctx.connection, _req, ffi.NULL)
-            win = Window(0, 0, 0, _id, ctx)
-            win.mapped = resp.map_state != lib.XCB_MAP_STATE_UNMAPPED
-            win.ignore = resp.override_redirect
+        for _id, req in requests.items():
+            attrs = lib.xcb_get_window_attributes_reply(ctx.connection, req[0], ffi.NULL)
+            mapped = attrs.map_state != lib.XCB_MAP_STATE_UNMAPPED
+            
+            x, y, height, width, borderWidth = 0, 0, 0, 0, 0
+            
+            if mapped:
+                geometry = lib.xcb_get_geometry_reply(ctx.connection, req[1], ffi.NULL)
+                x, y, height, width, borderWidth = geometry.x, geometry.y, geometry.height, geometry.width, geometry.border_width
+
+            win = Window(height, width, borderWidth, _id, ctx)
+            win.x = x
+            win.y = y
+            win.mapped = mapped
+            win.ignore = attrs.override_redirect
             ctx.windows[_id] = win
 
         lib.xcb_flush(self.conn)

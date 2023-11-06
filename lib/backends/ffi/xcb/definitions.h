@@ -799,6 +799,23 @@ typedef enum xcb_map_state_t {
     XCB_MAP_STATE_UNVIEWABLE = 1,
     XCB_MAP_STATE_VIEWABLE = 2
 } xcb_map_state_t;
+typedef struct xcb_get_geometry_cookie_t
+{
+    unsigned int sequence;
+} xcb_get_geometry_cookie_t;
+typedef struct xcb_get_geometry_reply_t {
+    uint8_t response_type;
+    uint8_t depth;
+    uint16_t sequence;
+    uint32_t length;
+    xcb_window_t root;
+    int16_t x;
+    int16_t y;
+    uint16_t width;
+    uint16_t height;
+    uint16_t border_width;
+    uint8_t pad0[2];
+} xcb_get_geometry_reply_t;
 
 // functions
 
@@ -863,6 +880,8 @@ xcb_query_tree_reply_t *xcb_query_tree_reply(xcb_connection_t *conn, xcb_query_t
 xcb_window_t *xcb_query_tree_children(const xcb_query_tree_reply_t *reply); //! man pages are wrong here!
 xcb_get_window_attributes_cookie_t xcb_get_window_attributes(xcb_connection_t *conn, xcb_window_t window);
 xcb_get_window_attributes_reply_t *xcb_get_window_attributes_reply(xcb_connection_t *conn, xcb_get_window_attributes_cookie_t cookie, xcb_generic_error_t **e);
+xcb_get_geometry_cookie_t xcb_get_geometry(xcb_connection_t *conn, xcb_drawable_t drawable);
+xcb_get_geometry_reply_t *xcb_get_geometry_reply(xcb_connection_t *conn, xcb_get_geometry_cookie_t cookie, xcb_generic_error_t **e);
 
 // weird values
 

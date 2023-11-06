@@ -1,8 +1,8 @@
 #!/bin/bash
 
 _DISPLAY=`echo $DISPLAY | awk '{print ":" strtonum(substr($1, 2)) + 1}'`
-w=960
-h=540
+w=480
+h=270
 #Xnest -geometry 960x540 $_DISPLAY &
 #Xephyr -screen 1280x720 $_DISPLAY &
 # here ``+extension RANDR`` does nothing (altho randr support works i think) :/

@@ -32,7 +32,7 @@ unfocusedColor = 0x393966
 # extensions and their config
 
 extensions = {
-    FakeDisplays: {'displays': [[960, 960]]},  # just here for testing with xephyr
+    FakeDisplays: {'displays': [[480, 480]]},  # just here for testing with xephyr
     Tiler: {'mainSize': 2 / 3, 'border': 5, 'spacing': 10},
     MouseFocus: {},
     Wallpaper: {'wall': 'wall.png'},

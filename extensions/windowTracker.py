@@ -140,7 +140,7 @@ class Tracker:
             if oldDisplay:
                 self.mains[oldDisplay] = None
 
-        if new:
+        if new and not new.ignore:
             newDisplay = getDisplay(self.ctx, new.x, new.y)
             if newDisplay:
                 self.mains[newDisplay] = new
