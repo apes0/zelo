@@ -24,10 +24,12 @@ from lib.cfg import extensions
 from .connection import Connection
 from typing import TYPE_CHECKING
 from .. import events
+from .gctx import Ctx as GCtx
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
     from lib.backends.generic import GConnection, GWindow
+
 # this is mainly based on this code: https://github.com/mcpcpc/xwm/blob/main/xwm.c
 
 handlers = {}
@@ -218,7 +220,7 @@ def keyPress(event, ctx: 'Ctx'):
     event = keyPressTC(event)
     key = Key(code=event.detail)
     mod = Mod(value=event.state)
-    window: GWindow = ctx.getWindow(event.event)
+    window: GWindow = ctx.getWindow(event.child)
     events.keyPress.trigger(key, mod, window)
 
 
@@ -278,6 +280,7 @@ ignore = [9, 10]  # list of events to ignore
 def loop(ctx: 'Ctx'):
     ctx.dname = ffi.NULL
     ctx.screenp = intp(0)
+    ctx.gctx = GCtx(ctx)
 
     conn: GConnection = Connection(ctx)
 

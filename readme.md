@@ -39,7 +39,9 @@ If you are running anything unsupported by the install script, you need to do th
 
 - run ``pip3 install -r requirements.py`` or install the following modules from your package manager: ``python3-cffi python3-opencv``
 
-- finally, run ``./scripts/keysyms.sh``
+- run ``./scripts/keysyms.sh``
+
+- ***(Optionally)*** run ``sudo ./scripts/Xsession.sh`` to add the window manager to your xsession directory and also add it to /bin
 
 # Configuring
 

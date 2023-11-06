@@ -22,9 +22,14 @@ class GConnection:
 
 
 # TODO: use this in ctx, basically as a ctx for the backend
-# class GCtx:
-#    def __init__(self) -> None:
-#        raise NotImplementedError
+# gctx
+class GCtx:
+    def __init__(self, ctx: 'Ctx') -> None:
+        self.ctx = ctx
+        raise NotImplementedError
+
+    def sendEvent(self, event, window: 'GWindow') -> None:
+        raise NotImplementedError
 
 
 # window
@@ -56,6 +61,9 @@ class GWindow:
     def configure(
         self, newX=None, newY=None, newWidth=None, newHeight=None, newBorderWidth=None
     ):
+        raise NotImplementedError
+
+    def close(self):
         raise NotImplementedError
 
 
@@ -110,6 +118,9 @@ class GMouse:
         raise NotImplementedError
 
     def location(self) -> tuple[int, int]:
+        raise NotImplementedError
+
+    def setCursor(self, window: 'GWindow', _font: str, name: str, fore=None, back=None):
         raise NotImplementedError
 
     # TODO: maybe add grab and ungrab from button?

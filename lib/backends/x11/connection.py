@@ -9,6 +9,7 @@ from .screen import Display, Screen
 
 
 # TODO: clean this up
+# TODO: export these to every file which these are connected to
 class Connection(GConnection):
     def __init__(self, ctx: Ctx) -> None:
         self.conn = lib.xcb_connect(ctx.dname, ctx.screenp)
@@ -24,8 +25,6 @@ class Connection(GConnection):
             ffi.NULL,
         )
 
-        print(screenRes.num_crtcs)
-
         first = lib.xcb_randr_get_screen_resources_crtcs(screenRes)
         requests = [
             lib.xcb_randr_get_crtc_info(self.conn, first[n], lib.XCB_CURRENT_TIME)
@@ -40,7 +39,6 @@ class Connection(GConnection):
         for crtc in crtcs:
             if crtc == ffi.NULL or (crtc.width + crtc.height) == 0:
                 continue
-            print(crtc.x, crtc.y, crtc.width, crtc.height)
             ctx.screen.displays.append(Display(crtc.x, crtc.y, crtc.width, crtc.height))
 
         ctx.root = Window(0, 0, 0, ctx._root, ctx)
@@ -64,6 +62,24 @@ class Connection(GConnection):
         # TODO: set supported ewmh's?
 
         ctx.mouse = Mouse(ctx)
+
+        ctx.mouse.setCursor(
+            ctx.root,
+            'cursor',
+            'left_ptr',
+        )  # TODO: export as plugin/config option (still havent decided which one i prefer more, but this is universal from what i understand)
+
+        # TODO: get x, y, border width, width, height here
+        req = lib.xcb_query_tree_reply(ctx.connection, lib.xcb_query_tree(ctx.connection, ctx._root), ffi.NULL)
+        win = lib.xcb_query_tree_children(req)
+        requests = {win[n]: lib.xcb_get_window_attributes(ctx.connection, win[n]) for n in range(req.children_len)}
+
+        for _id, _req in requests.items():
+            resp = lib.xcb_get_window_attributes_reply(ctx.connection, _req, ffi.NULL)
+            win = Window(0, 0, 0, _id, ctx)
+            win.mapped = resp.map_state != lib.XCB_MAP_STATE_UNMAPPED
+            win.ignore = resp.override_redirect
+            ctx.windows[_id] = win
 
         lib.xcb_flush(self.conn)
 

@@ -19,6 +19,9 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     ((Key('t'),), Mod('control')): lambda ctx: spawn('alacritty'),
     ((Key('s'),), Mod('control')): lambda ctx: stop(ctx),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
+    ((Key('x'),), Mod('mod1')): lambda ctx: ctx.focused.close()
+    if ctx.focused
+    else None,
 }
 
 focusedColor = 0x9999D6

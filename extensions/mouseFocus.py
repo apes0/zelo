@@ -1,6 +1,6 @@
 from lib.extension import Extension
 from typing import TYPE_CHECKING
-from lib.backends.events import buttonPress, mapRequest, enterNotify, leaveNotify
+from lib.backends.events import buttonPress, mapRequest, enterNotify, leaveNotify, focusChange
 from lib.api.keys import Mod
 from lib.api.mouse import Button
 
@@ -24,6 +24,10 @@ class MouseFocus(Extension):
         leaveNotify.addListener(self.leaveNotify)
         buttonPress.addListener(self.buttonPress)
         mapRequest.addListener(self.mapWindow)
+        focusChange.addListener(self.focusChange)
+
+        for win in ctx.windows.values():
+            self.enterNotify(win)
 
     def mapWindow(self, _win):
         for window in self.ctx.windows.values():
@@ -45,5 +49,8 @@ class MouseFocus(Extension):
         # ungrab the button when we stop hovering over the window
         self.button.ungrab(self.ctx, win, self.mod)
 
-    def focusChange(self, win: 'GWindow'):
-        pass
+    def focusChange(self, old: 'GWindow', new: 'GWindow'):
+        for win in self.ctx.windows.values():
+            if win == new:
+                continue
+            self.button.grab(self.ctx, win, self.mod)

@@ -106,23 +106,18 @@ class Key(GKey):
         for _mod in modifiers:
             mod |= _mod.mod
 
-        event = keyEvent()
-        event.root = ctx._root
-        event.event = window.id
-        event.child = window.id
-        event.response_type = lib.XCB_BUTTON_PRESS
-        event.time = lib.XCB_CURRENT_TIME
-        event.root_x = 0
-        event.root_y = 0
-        event.event_x = 0
-        event.event_y = 0
-        event.state = mod
-        event.detail = self.key
+        print(mod, self.key)
 
-        lib.xcb_send_event(
-            ctx.connection, 1, window.id, lib.XCB_BUTTON_PRESS, charpC(event)
-        )
-        lib.xcb_flush(ctx.connection)
+        event = keyEvent()
+        event.response_type = lib.XCB_BUTTON_PRESS
+        event.detail = self.key
+        event.time = lib.XCB_CURRENT_TIME
+        event.event = ctx._root
+        event.child = window.id
+        event.state = mod
+        event.same_screen = 1
+
+        ctx.gctx.sendEvent(event, window)
 
     def release(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod):
         if not self.key:
@@ -134,22 +129,15 @@ class Key(GKey):
             mod |= _mod.mod
 
         event = keyEvent()
-        event.root = ctx._root
-        event.event = window.id
-        event.child = window.id
         event.response_type = lib.XCB_BUTTON_RELEASE
-        event.time = lib.XCB_CURRENT_TIME
-        event.root_x = 0
-        event.root_y = 0
-        event.event_x = 0
-        event.event_y = 0
-        event.state = mod
         event.detail = self.key
+        event.time = lib.XCB_CURRENT_TIME
+        event.event = ctx._root
+        event.child = window.id
+        event.state = mod
+        event.same_screen = 1
 
-        lib.xcb_send_event(
-            ctx.connection, 1, window.id, lib.XCB_BUTTON_RELEASE, charpC(event)
-        )
-        lib.xcb_flush(ctx.connection)
+        ctx.gctx.sendEvent(event, ctx.root)
 
     def __hash__(self) -> int:
         return hash(self.lable)

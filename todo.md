@@ -17,3 +17,6 @@
 - make button.press/release, just like key.press/release
 - actually implement GCtx lol
 - always use checked function for xcb to catch errors
+- fix workspaces
+- add cursor themeing
+- make all scripts be bash

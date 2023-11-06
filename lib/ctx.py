@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from .api.window import Window
 
 if TYPE_CHECKING:
-    from .backends.generic import CData, GScreen, GWindow, GMouse
+    from .backends.generic import CData, GScreen, GWindow, GMouse, GCtx
     from .extension import Extension
 
 
@@ -16,6 +16,7 @@ class Ctx:
         self.connection: CData
         self.screen: GScreen
         self.values: CData
+        self.gctx: GCtx
         self.windows: dict[int, GWindow] = {}
         self.focused: GWindow | None = None
         self.mouse: GMouse
@@ -28,5 +29,6 @@ class Ctx:
         window = self.windows.get(_id)  # type: ignore
         if not window:
             window: GWindow = Window(0, 0, 0, _id, self)
+            window.ignore = False # probably true if we are missing it lol
             self.windows[_id] = window
         return window

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 _DISPLAY=`echo $DISPLAY | awk '{print ":" strtonum(substr($1, 2)) + 1}'`
-w=480
+w=960
 h=540
 #Xnest -geometry 960x540 $_DISPLAY &
 #Xephyr -screen 1280x720 $_DISPLAY &
@@ -23,6 +23,7 @@ while [ true ]
 do
     clear
     python3 main.py
+#    [ $? == 1 ] && rm xcb_cffi.* 
 #    echo opening profile
 #    pgrep tuna | xargs kill -9
 #    tuna program.prof &
@@ -31,6 +32,6 @@ do
         (kill -15 $(pgrep $prog) 2>&1) >/dev/null
     done
     (pgrep Xephyr 2>&1) >/dev/null || exit
-    echo enter to restart
-    read
+#    echo enter to restart
+#    read
 done

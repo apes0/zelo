@@ -9,4 +9,6 @@ cd $mypath
 
 chmod +x ./keysyms.sh
 zsh keysyms.sh
+
+sudo ./Xsession.sh
 # i think this is all?

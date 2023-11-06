@@ -755,11 +755,54 @@ typedef struct xcb_query_pointer_reply_t
     unsigned short mask;
     unsigned char pad0[2];
 } xcb_query_pointer_reply_t;
+typedef struct xcb_query_tree_cookie_t
+{
+    unsigned int sequence;
+} xcb_query_tree_cookie_t;
+typedef struct xcb_query_tree_reply_t {
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    unsigned int length;
+    xcb_window_t root;
+    xcb_window_t parent;
+    unsigned short children_len;
+    unsigned char pad1[14];
+} xcb_query_tree_reply_t;
+typedef struct xcb_get_window_attributes_cookie_t
+{
+    unsigned int sequence;
+} xcb_get_window_attributes_cookie_t;
+typedef struct xcb_get_window_attributes_reply_t {
+    unsigned char response_type;
+    unsigned char backing_store;
+    unsigned short sequence;
+    unsigned int length;
+    xcb_visualid_t visual;
+    unsigned short _class;
+    unsigned char bit_gravity;
+    unsigned char win_gravity;
+    unsigned int backing_planes;
+    unsigned int backing_pixel;
+    unsigned char save_under;
+    unsigned char map_is_installed;
+    unsigned char map_state;
+    unsigned char override_redirect;
+    xcb_colormap_t colormap;
+    unsigned int all_event_masks;
+    unsigned int your_event_mask;
+    unsigned short do_not_propagate_mask;
+    unsigned char pad0[2];
+} xcb_get_window_attributes_reply_t;
+typedef enum xcb_map_state_t {
+    XCB_MAP_STATE_UNMAPPED = 0,
+    XCB_MAP_STATE_UNVIEWABLE = 1,
+    XCB_MAP_STATE_VIEWABLE = 2
+} xcb_map_state_t;
 
 // functions
 
-xcb_connection_t *
-xcb_connect(const char *displayname, int *screenp);
+xcb_connection_t *xcb_connect(const char *displayname, int *screenp);
 int xcb_connection_has_error(xcb_connection_t *c);
 void xcb_disconnect(xcb_connection_t *c);
 unsigned int xcb_generate_id(xcb_connection_t *c);
@@ -812,6 +855,14 @@ xcb_randr_get_crtc_info_reply_t *xcb_randr_get_crtc_info_reply(xcb_connection_t 
 xcb_void_cookie_t xcb_randr_select_input(xcb_connection_t *c, xcb_window_t window, unsigned short enable);
 xcb_query_pointer_cookie_t xcb_query_pointer(xcb_connection_t *conn, xcb_window_t window);
 xcb_query_pointer_reply_t *xcb_query_pointer_reply(xcb_connection_t *conn, xcb_query_pointer_cookie_t cookie, xcb_generic_error_t **e);
+xcb_void_cookie_t xcb_create_glyph_cursor(xcb_connection_t *c, xcb_cursor_t cid, xcb_font_t source_font, xcb_font_t mask_font, unsigned short source_char, unsigned short mask_char, unsigned short fore_red, unsigned short fore_green, unsigned short fore_blue, unsigned short back_red, unsigned short back_green, unsigned short back_blue);
+xcb_void_cookie_t xcb_free_cursor(xcb_connection_t *conn, xcb_cursor_t cursor);
+xcb_void_cookie_t xcb_kill_client(xcb_connection_t *conn, unsigned int resource);
+xcb_query_tree_cookie_t xcb_query_tree(xcb_connection_t *conn, xcb_window_t window);
+xcb_query_tree_reply_t *xcb_query_tree_reply(xcb_connection_t *conn, xcb_query_tree_cookie_t cookie, xcb_generic_error_t **e);
+xcb_window_t *xcb_query_tree_children(const xcb_query_tree_reply_t *reply); //! man pages are wrong here!
+xcb_get_window_attributes_cookie_t xcb_get_window_attributes(xcb_connection_t *conn, xcb_window_t window);
+xcb_get_window_attributes_reply_t *xcb_get_window_attributes_reply(xcb_connection_t *conn, xcb_get_window_attributes_cookie_t cookie, xcb_generic_error_t **e);
 
 // weird values
 
