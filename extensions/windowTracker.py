@@ -4,7 +4,6 @@
 from lib.extension import Extension
 from lib.backends.events import mapRequest, unmapNotify, destroyNotify, focusChange
 
-from collections import deque
 from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
@@ -51,13 +50,12 @@ class Tracker:
         self.exts: dict[GDisplay, Extension] = {}
         self.updates: dict[GDisplay, UpdateType] = {}
         self.mains = {}
-        self.queues: dict[GDisplay, deque['GWindow']] = {}
+        self.windows = [] # i prefer a list here rather than a dequeue
 
         for display in ctx.screen.displays:
             ext = tiler(ctx, {**args, 'display': display})
             self.exts[display] = ext
             self.updates[display] = getattr(ext, updateFn)
-            self.queues[display] = deque()
 
         mapRequest.addListener(self.mapWindow)
         unmapNotify.addListener(self.unmapWindow)
@@ -87,7 +85,6 @@ class Tracker:
         if not window.mapped:
             # this is a bit of a hack to get windows to be on the correct screen
             x, y = self.ctx.mouse.location()
-            print(x, y)
             display = getDisplay(self.ctx, x, y)
 
             if (
@@ -95,43 +92,54 @@ class Tracker:
             ):  # never should happen, but just in case it does, this is here (also it makes pylance stop complaining)
                 return
 
-            window.x = display.x
+            window.x = display.x #kinda a hack
             window.y = display.y
 
-            self.queues[display].append(window)
+            self.windows.append(window)
             window.map()
             window.setFocus(True)
-            self.mains[display] = window
+
+            if not window.ignore:
+                self.mains[display] = window
+
             self.update()
 
     def unmapWindow(self, _window: 'GWindow'):
-        display = getDisplay(self.ctx, _window.x, _window.y)
-
-        if not display:
-            return
-
-        queue: deque[GWindow] = self.queues[display]
-
+        window = None
+        
         if not self.ctx.focused:
-            while queue and (window := queue.pop()):
+            for window in self.windows:
                 if window.mapped:
                     window.setFocus(True)
                     break
+
+        dpy = getDisplay(self.ctx, _window.x, _window.y)
+        
+        if not dpy:
+            return
+        
+        for window in self.windows:
+            if getDisplay(self.ctx, window.x, window.y) == dpy and not window.ignore and window.mapped:
+                self.mains[dpy] = window
+        
         self.update()
 
     def destroyNotify(self, _window: 'GWindow'):
-        display = getDisplay(self.ctx, _window.x, _window.y)
-
-        if not display:
-            return
-
-        queue: deque[GWindow] = self.queues[display]
-
         if not self.ctx.focused:
-            while queue and (window := queue.pop()):
+            for window in self.windows:
                 if window.mapped:
                     window.setFocus(True)
                     break
+
+        dpy = getDisplay(self.ctx, _window.x, _window.y)
+        
+        if not dpy:
+            return
+        
+        for window in self.windows:
+            if getDisplay(self.ctx, window.x, window.y) == dpy and not window.ignore and window.mapped:
+                self.mains[dpy] = window
+        
         self.update()
 
     def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
@@ -146,8 +154,6 @@ class Tracker:
                 self.mains[newDisplay] = new
 
         if old and old.mapped and new is not None:
-            oldDisplay = getDisplay(self.ctx, old.x, old.y)
-            if oldDisplay:
-                self.queues[oldDisplay].append(old)
+            self.windows.append(old)
 
         self.update()

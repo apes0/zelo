@@ -32,6 +32,7 @@ do
         (kill -15 $(pgrep $prog) 2>&1) >/dev/null
     done
     (pgrep Xephyr 2>&1) >/dev/null || exit
+    sleep 2.5
 #    echo enter to restart
 #    read
 done

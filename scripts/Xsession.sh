@@ -7,14 +7,15 @@ echo $mydir
 
 path="/bin/zelo"
 
-echo "#!/bin/bash
+file="#!/bin/bash
 while [ true ]
 do
-	cd $(pwd)/..
-    python3 main.py & disown
-    cd ~
-done" > $path
+    cd /home/$(whoami)
+    python3 $(pwd)/../main.py
+done"
 
-chmod +x $path
+sudo sh -c "echo \"$file\" > $path"
+
+sudo chmod +x $path
 
 sudo cp ../zelo.desktop /usr/share/xsessions

@@ -43,6 +43,17 @@ If you are running anything unsupported by the install script, you need to do th
 
 - ***(Optionally)*** run ``sudo ./scripts/Xsession.sh`` to add the window manager to your xsession directory and also add it to /bin
 
+# Bugs
+
+This is a section dedicated to bugs that i know of and will think about solving.
+
+- qt apps do not work, unless you delete ``~/.local/lib/python3.10/site-packages/cv2/qt/plugins/platforms/libqxcb.so`` (not sure if it's just on my system)
+- popups from apps like firefox do not work currently
+- apps that cannot be resized are kinda jank and dont really work well
+- x11 image is ignoring redraw stuff
+- no "graceful" stopping of apps
+- mouse themeing doesn't work for some reason
+
 # Configuring
 
 The configuration is held in ``cfg.py``, there you can put shortcuts, extensions and their config, and what to be run when the window manager starts. I might add more info about how to configure the window manager.
