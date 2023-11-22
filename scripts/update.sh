@@ -6,4 +6,4 @@ git stash
 git pull
 git stash pop
 
-grep -lr '<<<<<<<' . | xargs git checkout --ours
+grep -lr '<<<<<<<' . | xargs git checkout --theirs

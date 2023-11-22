@@ -101,7 +101,6 @@ class Tracker:
 
             if not window.ignore:
                 self.mains[display] = window
-                print(window.id, 1)
 
             self.update()
 
@@ -110,7 +109,6 @@ class Tracker:
             self.mains[
                 getDisplay(self.ctx, _window.parent.x, _window.parent.y)
             ] = _window.parent
-            print(_window.parent.id, 2)
             _window.parent.setFocus(True)
             self.update()
             return
@@ -135,18 +133,15 @@ class Tracker:
                 and window.mapped
             ):
                 self.mains[dpy] = window
-                print(window.id, 3)
                 break
 
         self.update()
 
     def destroyNotify(self, _window: 'GWindow'):
-        print(_window.id)
         if _window.parent and _window.parent != self.ctx.root:
             self.mains[
                 getDisplay(self.ctx, _window.parent.x, _window.parent.y)
             ] = _window.parent
-            print(_window.parent.id, 4)
             _window.parent.setFocus(True)
             self.update()
             return
@@ -162,7 +157,7 @@ class Tracker:
         if not dpy:
             return
 
-        if not self.mains[dpy]:
+        if not self.mains.get(dpy):
             for window in self.windows:
                 if (
                     getDisplay(self.ctx, window.x, window.y) == dpy
@@ -170,7 +165,6 @@ class Tracker:
                     and window.mapped
                 ):
                     self.mains[dpy] = window
-                    print(window.id, 5)
                     break
 
         self.update()
@@ -180,13 +174,11 @@ class Tracker:
             oldDisplay = getDisplay(self.ctx, old.x, old.y)
             if oldDisplay:
                 self.mains[oldDisplay] = None
-                print(None, 6)
 
         if new and not new.ignore:
             newDisplay = getDisplay(self.ctx, new.x, new.y)
             if newDisplay:
                 self.mains[newDisplay] = new
-                print(new.id, 7)
 
         if old and old.mapped and new is not None:
             self.windows.append(old)
