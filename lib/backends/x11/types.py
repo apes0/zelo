@@ -16,7 +16,7 @@ uintarr = FFIType('unsigned int[]')
 charp = FFIType('char*')
 uchararr = FFIType('unsigned char[]')
 chararr = FFIType('char[]')
-rectangle = FFIType('xcb_rectangle_t')
+rectangle = FFIType('xcb_rectangle_t*')
 keyEvent = FFIType('xcb_key_press_event_t*')  # key release is the same
 
 

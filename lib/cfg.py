@@ -7,6 +7,7 @@ from extensions.mouseFocus import MouseFocus
 from extensions.wallpaper import Wallpaper
 from extensions.shotcuts import Shortcuts
 from extensions.fakeMonitors import FakeDisplays
+from extensions.bar import Bar
 
 from typing import TYPE_CHECKING, Callable
 
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
 
 
 keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
-#    ((Key('super_l'),), Mod('')): lambda _ctx: spawn('ulauncher-toggle'),
+    #    ((Key('super_l'),), Mod('')): lambda _ctx: spawn('ulauncher-toggle'),
     ((Key('t'),), Mod('control')): lambda ctx: spawn('alacritty'),
     ((Key('s'),), Mod('control')): lambda ctx: stop(ctx),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
@@ -41,8 +42,9 @@ extensions = {
         'prev': ((Key('left'), Key('super_l')), Mod('control')),
         'next': ((Key('right'), Key('super_l')), Mod('control')),
     },
+    Bar: {'width': 100, 'height': 100, 'x': 10, 'y': 10},
 }
 
 # startup
 
-#spawn('ulauncher')
+# spawn('ulauncher')

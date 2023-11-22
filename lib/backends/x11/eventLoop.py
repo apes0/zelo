@@ -66,6 +66,7 @@ def mapRequest(event, ctx: 'Ctx'):
     event = mapRequestTC(event)
     _id: int = event.window
     window: GWindow = ctx.getWindow(_id)
+    window.parent = ctx.getWindow(event.parent)
     ctx.values[0] = lib.XCB_EVENT_MASK_ENTER_WINDOW | lib.XCB_EVENT_MASK_FOCUS_CHANGE
     lib.xcb_change_window_attributes_checked(
         ctx.connection, _id, lib.XCB_CW_EVENT_MASK, ctx.values
@@ -76,6 +77,7 @@ def mapRequest(event, ctx: 'Ctx'):
 
 @handler(lib.XCB_CONFIGURE_REQUEST)
 def confRequest(event, ctx: 'Ctx'):
+    # TODO: there is a parent field, so should i follow it?
     event = confRequestTC(event)
     window = ctx.getWindow(event.window)
     valueMask = event.value_mask

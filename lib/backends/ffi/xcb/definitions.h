@@ -759,7 +759,8 @@ typedef struct xcb_query_tree_cookie_t
 {
     unsigned int sequence;
 } xcb_query_tree_cookie_t;
-typedef struct xcb_query_tree_reply_t {
+typedef struct xcb_query_tree_reply_t
+{
     unsigned char response_type;
     unsigned char pad0;
     unsigned short sequence;
@@ -773,7 +774,8 @@ typedef struct xcb_get_window_attributes_cookie_t
 {
     unsigned int sequence;
 } xcb_get_window_attributes_cookie_t;
-typedef struct xcb_get_window_attributes_reply_t {
+typedef struct xcb_get_window_attributes_reply_t
+{
     unsigned char response_type;
     unsigned char backing_store;
     unsigned short sequence;
@@ -794,7 +796,8 @@ typedef struct xcb_get_window_attributes_reply_t {
     unsigned short do_not_propagate_mask;
     unsigned char pad0[2];
 } xcb_get_window_attributes_reply_t;
-typedef enum xcb_map_state_t {
+typedef enum xcb_map_state_t
+{
     XCB_MAP_STATE_UNMAPPED = 0,
     XCB_MAP_STATE_UNVIEWABLE = 1,
     XCB_MAP_STATE_VIEWABLE = 2
@@ -803,18 +806,19 @@ typedef struct xcb_get_geometry_cookie_t
 {
     unsigned int sequence;
 } xcb_get_geometry_cookie_t;
-typedef struct xcb_get_geometry_reply_t {
-    uint8_t response_type;
-    uint8_t depth;
-    uint16_t sequence;
-    uint32_t length;
+typedef struct xcb_get_geometry_reply_t
+{
+    unsigned char response_type;
+    unsigned char depth;
+    unsigned short sequence;
+    unsigned int length;
     xcb_window_t root;
-    int16_t x;
-    int16_t y;
-    uint16_t width;
-    uint16_t height;
-    uint16_t border_width;
-    uint8_t pad0[2];
+    short x;
+    short y;
+    unsigned short width;
+    unsigned short height;
+    unsigned short border_width;
+    unsigned char pad0[2];
 } xcb_get_geometry_reply_t;
 
 // functions

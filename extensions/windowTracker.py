@@ -50,7 +50,7 @@ class Tracker:
         self.exts: dict[GDisplay, Extension] = {}
         self.updates: dict[GDisplay, UpdateType] = {}
         self.mains = {}
-        self.windows = [] # i prefer a list here rather than a dequeue
+        self.windows = []  # i prefer a list here rather than a dequeue
 
         for display in ctx.screen.displays:
             ext = tiler(ctx, {**args, 'display': display})
@@ -92,7 +92,7 @@ class Tracker:
             ):  # never should happen, but just in case it does, this is here (also it makes pylance stop complaining)
                 return
 
-            window.x = display.x #kinda a hack
+            window.x = display.x  # kinda a hack
             window.y = display.y
 
             self.windows.append(window)
@@ -101,12 +101,22 @@ class Tracker:
 
             if not window.ignore:
                 self.mains[display] = window
+                print(window.id, 1)
 
             self.update()
 
     def unmapWindow(self, _window: 'GWindow'):
+        if _window.parent:
+            self.mains[
+                getDisplay(self.ctx, _window.parent.x, _window.parent.y)
+            ] = _window.parent
+            print(_window.parent.id, 2)
+            _window.parent.setFocus(True)
+            self.update()
+            return
+
         window = None
-        
+
         if not self.ctx.focused:
             for window in self.windows:
                 if window.mapped:
@@ -114,17 +124,33 @@ class Tracker:
                     break
 
         dpy = getDisplay(self.ctx, _window.x, _window.y)
-        
+
         if not dpy:
             return
-        
+
         for window in self.windows:
-            if getDisplay(self.ctx, window.x, window.y) == dpy and not window.ignore and window.mapped:
+            if (
+                getDisplay(self.ctx, window.x, window.y) == dpy
+                and not window.ignore
+                and window.mapped
+            ):
                 self.mains[dpy] = window
-        
+                print(window.id, 3)
+                break
+
         self.update()
 
     def destroyNotify(self, _window: 'GWindow'):
+        print(_window.id)
+        if _window.parent and _window.parent != self.ctx.root:
+            self.mains[
+                getDisplay(self.ctx, _window.parent.x, _window.parent.y)
+            ] = _window.parent
+            print(_window.parent.id, 4)
+            _window.parent.setFocus(True)
+            self.update()
+            return
+
         if not self.ctx.focused:
             for window in self.windows:
                 if window.mapped:
@@ -132,14 +158,21 @@ class Tracker:
                     break
 
         dpy = getDisplay(self.ctx, _window.x, _window.y)
-        
+
         if not dpy:
             return
-        
-        for window in self.windows:
-            if getDisplay(self.ctx, window.x, window.y) == dpy and not window.ignore and window.mapped:
-                self.mains[dpy] = window
-        
+
+        if not self.mains[dpy]:
+            for window in self.windows:
+                if (
+                    getDisplay(self.ctx, window.x, window.y) == dpy
+                    and not window.ignore
+                    and window.mapped
+                ):
+                    self.mains[dpy] = window
+                    print(window.id, 5)
+                    break
+
         self.update()
 
     def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
@@ -147,11 +180,13 @@ class Tracker:
             oldDisplay = getDisplay(self.ctx, old.x, old.y)
             if oldDisplay:
                 self.mains[oldDisplay] = None
+                print(None, 6)
 
         if new and not new.ignore:
             newDisplay = getDisplay(self.ctx, new.x, new.y)
             if newDisplay:
                 self.mains[newDisplay] = new
+                print(new.id, 7)
 
         if old and old.mapped and new is not None:
             self.windows.append(old)

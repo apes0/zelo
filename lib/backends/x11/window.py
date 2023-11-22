@@ -18,6 +18,7 @@ class Window(GWindow):
         self.y: int = 0
         self.id = _id
         self.ctx: 'Ctx' = ctx
+        self.parent: Window | None = None
         self.focused: bool = False
         self.mapped: bool = False
         self.ignore = True  # set by override redirect (also we assume the worst, so we set it to true)

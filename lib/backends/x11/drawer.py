@@ -1,8 +1,8 @@
-from .types import uchararr, chararr, uintarr
+from .types import uchararr, chararr, uintarr, rectangle
 import cv2
 import numpy as np
 from xcb_cffi import ffi, lib
-from ..generic import GImage
+from ..generic import GImage, GWindow, GRectangle
 
 from typing import TYPE_CHECKING
 
@@ -162,6 +162,39 @@ class Text:
         lib.xcb_flush(self.ctx.connection)
 
 
-class Rectangle:
-    def __init__(self, ctx: 'Ctx', x: int, y: int, width: int, height: int) -> None:
-        lib.xcb_poly_fill_rectangle()
+class Rectangle(
+    GRectangle
+):  # ? maybe implement this for any polygon and then just use that for a rectangle
+    def __init__(
+        self,
+        ctx: 'Ctx',
+        window: 'GWindow',
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        color: int = 0x000000,
+    ) -> None:
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.window = window
+        self.ctx = ctx
+        self.rect = rectangle({'x': x, 'y': y, 'width': width, 'height': height})
+
+        self.gc = lib.xcb_generate_id(ctx.connection)
+
+        mask = lib.XCB_GC_FOREGROUND
+        args = uintarr([color])
+
+        lib.xcb_create_gc(ctx.connection, self.gc, window.id, mask, args)
+
+        self.draw()
+
+    def draw(self):
+        lib.xcb_poly_fill_rectangle(
+            self.ctx.connection, self.window.id, self.gc, 1, self.rect
+        )
+
+        lib.xcb_flush(self.ctx.connection)

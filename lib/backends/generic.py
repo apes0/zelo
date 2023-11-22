@@ -47,6 +47,7 @@ class GWindow:
         self.focused = False
         self.mapped = False
         self.ignore: bool
+        self.parent: GWindow | None
         raise NotImplementedError
 
     def map(self):
@@ -138,6 +139,31 @@ class GImage:
         x: int,
         y: int,
     ) -> None:
+        raise NotImplementedError
+
+    def draw(self):
+        raise NotImplementedError
+
+
+# drawer
+class GRectangle:  # ? maybe implement this for any polygon and then just use that for a rectangle
+    def __init__(
+        self,
+        ctx: 'Ctx',
+        window: 'GWindow',
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        color: int = 0x000000FF,
+    ) -> None:
+        self.x: int
+        self.y: int
+        self.width: int
+        self.height: int
+        self.window: GWindow
+        self.ctx: Ctx
+        self.rect: CData
         raise NotImplementedError
 
     def draw(self):
