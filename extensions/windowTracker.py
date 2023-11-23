@@ -81,7 +81,7 @@ class Tracker:
                 continue
             self.updates[display](_windows, main)
 
-    def mapWindow(self, window: 'GWindow'):
+    async def mapWindow(self, window: 'GWindow'):
         if not window.mapped:
             # this is a bit of a hack to get windows to be on the correct screen
             x, y = self.ctx.mouse.location()
@@ -104,7 +104,7 @@ class Tracker:
 
             self.update()
 
-    def unmapWindow(self, _window: 'GWindow'):
+    async def unmapWindow(self, _window: 'GWindow'):
         if _window.parent:
             self.mains[
                 getDisplay(self.ctx, _window.parent.x, _window.parent.y)
@@ -137,7 +137,7 @@ class Tracker:
 
         self.update()
 
-    def destroyNotify(self, _window: 'GWindow'):
+    async def destroyNotify(self, _window: 'GWindow'):
         if _window.parent and _window.parent != self.ctx.root:
             self.mains[
                 getDisplay(self.ctx, _window.parent.x, _window.parent.y)
@@ -169,7 +169,7 @@ class Tracker:
 
         self.update()
 
-    def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
+    async def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
         if old:
             oldDisplay = getDisplay(self.ctx, old.x, old.y)
             if oldDisplay:

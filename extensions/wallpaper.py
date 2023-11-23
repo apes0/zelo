@@ -15,7 +15,7 @@ class Wallpaper(Extension):
         self.display: GDisplay
         super().__init__(ctx, cfg)
 
-        img: GImage = Image(
+        self.img: GImage = Image(
             ctx,
             ctx.root,
             self.wall,
@@ -25,7 +25,10 @@ class Wallpaper(Extension):
             self.display.y,
         )
 
-        createNotify.addListener(lambda *a: img.draw())
-        mapRequest.addListener(lambda *a: img.draw())
-        unmapNotify.addListener(lambda *a: img.draw())
-        destroyNotify.addListener(lambda *a: img.draw())
+        createNotify.addListener(self.draw)
+        mapRequest.addListener(self.draw)
+        unmapNotify.addListener(self.draw)
+        destroyNotify.addListener(self.draw)
+
+    async def draw(self, *a):
+        self.img.draw()

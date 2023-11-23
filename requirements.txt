@@ -1,2 +1,3 @@
 cffi
 opencv-python
+trio

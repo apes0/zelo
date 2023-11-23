@@ -17,11 +17,14 @@ class Bar(Extension):
         self.color: int = 0x000000
         super().__init__(ctx, cfg)
 
-        rect: GRectangle = Rectangle(
+        self.rect: GRectangle = Rectangle(
             ctx, self.ctx.root, self.x, self.y, self.width, self.height
         )
 
-        createNotify.addListener(lambda *a: rect.draw())
-        mapRequest.addListener(lambda *a: rect.draw())
-        unmapNotify.addListener(lambda *a: rect.draw())
-        destroyNotify.addListener(lambda *a: rect.draw())
+        createNotify.addListener(self.draw)
+        mapRequest.addListener(self.draw)
+        unmapNotify.addListener(self.draw)
+        destroyNotify.addListener(self.draw)
+
+    async def draw(self, *a):
+        self.rect.draw()

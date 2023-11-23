@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+import trio
 from .api.window import Window
 
 if TYPE_CHECKING:
@@ -22,6 +23,7 @@ class Ctx:
         self.mouse: GMouse
         self.extensions: dict[type, Extension] = {}  # list of loaded extensions
         self.closed = False
+        self.nurs: trio.Nursery
 
     def getWindow(self, _id: int) -> 'GWindow':
         if _id == self._root:
@@ -29,6 +31,6 @@ class Ctx:
         window = self.windows.get(_id)  # type: ignore
         if not window:
             window: GWindow = Window(0, 0, 0, _id, self)
-            window.ignore = False # probably true if we are missing it lol
+            window.ignore = False  # probably true if we are missing it lol
             self.windows[_id] = window
         return window

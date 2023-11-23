@@ -54,7 +54,7 @@ class Window(GWindow):
             if not self.ctx.focused:
                 # print(f'focus on {self.id}, current: {None}')
                 self.ctx.focused = self
-                focusChange.trigger(None, self)
+                focusChange.trigger(self.ctx, None, self)
 
             elif self.ctx.focused.id != self.id:
                 # print(f'focus on {self.id}, current: {self.ctx.focused.id}')
@@ -62,7 +62,7 @@ class Window(GWindow):
                 old.setFocus(False)
                 self.ctx.focused = self
 
-                focusChange.trigger(old, self)
+                focusChange.trigger(self.ctx, old, self)
 
         else:
             # if the id of the focused is our id, and only then, we need to unfocus the window,
@@ -70,7 +70,7 @@ class Window(GWindow):
             if self.ctx.focused and self.ctx.focused.id == self.id:
                 # print(f'unfocus on {self.id}')
                 self.ctx.focused = None
-                focusChange.trigger(self, None)
+                focusChange.trigger(self.ctx, self, None)
 
         lib.xcb_change_window_attributes_checked(
             self.ctx.connection, self.id, lib.XCB_CW_BORDER_PIXEL, uintarr([color])

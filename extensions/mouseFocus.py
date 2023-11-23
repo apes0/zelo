@@ -14,30 +14,38 @@ if TYPE_CHECKING:
 
 class MouseFocus(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
-        super().__init__(ctx, cfg)
+        self.buttons: list[GButton] = [
+            Button('left'),
+            Button('right'),
+            Button('middle'),
+        ]
 
-        # TODO: maybe export these to the config
-        self.button: GButton = Button('any')
         self.mod: GMod = Mod('any')
+
+        super().__init__(ctx, cfg)
 
         buttonPress.addListener(self.buttonPress)
         mapRequest.addListener(self.mapWindow)
         focusChange.addListener(self.focusChange)
 
         for win in ctx.windows.values():
-            self.button.grab(self.ctx, win, self.mod)
+            for button in self.buttons:
+                button.grab(self.ctx, win, self.mod)
 
-    def mapWindow(self, _win):
+    async def mapWindow(self, _win):
         for window in self.ctx.windows.values():
-            self.button.grab(self.ctx, window, self.mod)
+            for button in self.buttons:
+                button.grab(self.ctx, window, self.mod)
 
-    def buttonPress(self, button: 'GButton', mod: 'GMod', window: 'GWindow'):
-        self.button.ungrab(self.ctx, window, self.mod)
+    async def buttonPress(self, button: 'GButton', mod: 'GMod', window: 'GWindow'):
+        for button in self.buttons:
+            button.ungrab(self.ctx, window, self.mod)
         window.setFocus(True)
 
-    def focusChange(self, old: 'GWindow', new: 'GWindow'):
+    async def focusChange(self, old: 'GWindow', new: 'GWindow'):
         for win in self.ctx.windows.values():
-            if win == new:
-                self.button.ungrab(self.ctx, win, self.mod)
-                continue
-            self.button.grab(self.ctx, win, self.mod)
+            for button in self.buttons:
+                if win == new:
+                    button.ungrab(self.ctx, win, self.mod)
+                    continue
+                button.grab(self.ctx, win, self.mod)

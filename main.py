@@ -1,6 +1,7 @@
 from lib.backends.ffi import load
 from lib.ctx import Ctx
+import trio
 
 ctx = Ctx()
 
-load('eventLoop').loop(ctx)
+trio.run(load('eventLoop').loop, ctx)

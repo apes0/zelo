@@ -63,7 +63,7 @@ class Shortcuts(Extension):
 
         self._shortcuts = shortcuts
 
-    def keyPress(self, originalKey: 'GKey', mod: 'GMod', win: 'GWindow'):
+    async def keyPress(self, originalKey: 'GKey', mod: 'GMod', win: 'GWindow'):
         key = originalKey.key  # type: ignore
         for idx, _key in enumerate(self.keys):
             if key == _key:
@@ -83,7 +83,7 @@ class Shortcuts(Extension):
             originalKey.press(self.ctx, win, mod)
             originalKey.release(self.ctx, win, mod)
 
-    def keyRelease(self, key: 'GKey', _mod: 'GMod', _win: 'GWindow'):
+    async def keyRelease(self, key: 'GKey', _mod: 'GMod', _win: 'GWindow'):
         key = key.key  # type: ignore
         if key in self.keys:
             self.keys.remove(key)
