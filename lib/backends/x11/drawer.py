@@ -19,7 +19,7 @@ class Image(GImage):
         self,
         ctx: 'Ctx',
         window: 'Window',
-        imgPath: str,
+        img: np.ndarray,
         width: int,
         height: int,
         x: int,
@@ -32,7 +32,6 @@ class Image(GImage):
 
         self.windowId = window.id
 
-        img: np.ndarray = cv2.imread(imgPath)
         img = cv2.resize(img, (width, height))
 
         self.height, self.width, px = img.shape

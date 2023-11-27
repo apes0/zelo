@@ -65,6 +65,17 @@ class Tracker:
         for event in customEvents:
             event.addListener(lambda *a: self.update())
 
+    def findMain(self, dpy: 'GDisplay'):
+        self.mains[dpy] = None  # if we havent found another
+        for window in reversed(self.windows):
+            if (
+                getDisplay(self.ctx, window.x, window.y) == dpy
+                and not window.ignore
+                and window.mapped
+            ):
+                self.mains[dpy] = window
+                break
+
     def update(self):
         # cleaning up the window list
         # TODO: maybe it would be better if i just had a list of all windows and reordered them in there
@@ -135,14 +146,7 @@ class Tracker:
         if not dpy:
             return
 
-        for window in self.windows:
-            if (
-                getDisplay(self.ctx, window.x, window.y) == dpy
-                and not window.ignore
-                and window.mapped
-            ):
-                self.mains[dpy] = window
-                break
+        self.findMain(dpy)
 
         self.update()
 
@@ -167,14 +171,7 @@ class Tracker:
             return
 
         if not self.mains.get(dpy):
-            for window in self.windows:
-                if (
-                    getDisplay(self.ctx, window.x, window.y) == dpy
-                    and not window.ignore
-                    and window.mapped
-                ):
-                    self.mains[dpy] = window
-                    break
+            self.findMain(dpy)
 
         self.update()
 
@@ -182,7 +179,7 @@ class Tracker:
         if old:
             oldDisplay = getDisplay(self.ctx, old.x, old.y)
             if oldDisplay:
-                self.mains[oldDisplay] = None
+                self.findMain(oldDisplay)
 
         if new and not new.ignore:
             newDisplay = getDisplay(self.ctx, new.x, new.y)

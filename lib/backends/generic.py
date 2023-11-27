@@ -1,6 +1,7 @@
 import cffi
 import _cffi_backend
 from typing import TYPE_CHECKING, Callable
+import numpy as np
 
 if TYPE_CHECKING:
     from ..ctx import Ctx
@@ -133,7 +134,7 @@ class GImage:
         self,
         ctx: 'Ctx',
         window: GWindow,
-        imgPath: str,
+        img: np.ndarray,
         width: int,
         height: int,
         x: int,

@@ -2,7 +2,7 @@ from ..generic import GWindow
 from xcb_cffi import ffi, lib
 from .types import uintarr
 from typing import TYPE_CHECKING
-from ...cfg import focusedColor, unfocusedColor
+from ...cfg import cfg
 from ..events import focusChange
 
 if TYPE_CHECKING:
@@ -41,9 +41,9 @@ class Window(GWindow):
         #    focus,
         # )
         self.focused = focus
-        color = unfocusedColor
+        color = cfg.unfocusedColor
         if focus:
-            color = focusedColor
+            color = cfg.focusedColor
             lib.xcb_set_input_focus(
                 self.ctx.connection,
                 lib.XCB_INPUT_FOCUS_POINTER_ROOT,  # seemingly fine?

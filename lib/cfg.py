@@ -1,5 +1,6 @@
 from lib.utils import spawn, stop
 from lib.api.keys import Key, Mod
+from lib._cfg import Cfg
 
 from extensions.tiler import Tiler
 from extensions.workspaces import Workspaces
@@ -14,6 +15,7 @@ from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from lib.backends.generic import GKey, GMod
 
+cfg = Cfg()
 
 keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     #    ((Key('super_l'),), Mod('')): lambda _ctx: spawn('ulauncher-toggle'),
@@ -25,24 +27,25 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     else None,
 }
 
-focusedColor = 0x9999D6
-unfocusedColor = 0x393966
+cfg.focusedColor = 0x9999D6
+cfg.unfocusedColor = 0x393966
 # unfocusedColor = 0x1CEEEE
 # focusedColor = 0xC0FFEE
 
 # extensions and their config
 
-extensions = {
+cfg.extensions = {
     FakeDisplays: {'displays': [[480, 480]]},  # just here for testing with xephyr
     Tiler: {'mainSize': 2 / 3, 'border': 5, 'spacing': 10},
     MouseFocus: {},
-    Wallpaper: {'wall': 'wall.png'},
+    #    Wallpaper: {'wall': 'wall.png'},
+    Wallpaper: {'wall': 'video.gif', 'video': True},
     Shortcuts: {'shortcuts': keys},
     Workspaces: {
         'prev': ((Key('left'), Key('super_l')), Mod('control')),
         'next': ((Key('right'), Key('super_l')), Mod('control')),
     },
-    Bar: {'width': 100, 'height': 100, 'x': 10, 'y': 10},
+    #    Bar: {'width': 100, 'height': 100, 'x': 10, 'y': 10},
 }
 
 # startup

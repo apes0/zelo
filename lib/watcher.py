@@ -19,7 +19,6 @@ def unwatch(fd: int):
 def loop():
     while True:
         changed, _, _ = select.select(watches.keys(), [], [])
-        print(changed)
         for fd in changed:
             trio.from_thread.run(watches[fd])
 

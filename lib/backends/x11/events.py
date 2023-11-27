@@ -20,7 +20,7 @@ from .types import (
     mapNotifyTC,
     randrNotifyTC,
 )
-from lib.cfg import extensions
+from lib.cfg import cfg
 from .connection import Connection
 from typing import TYPE_CHECKING
 from .. import events
@@ -275,9 +275,11 @@ async def randrNotify(event, ctx: 'Ctx'):
     print(event.response_type, event.subCode)
 
 
-ignore = [9, 10]  # list of events to ignore
+ignore = [9, 10, 14]  # list of events to ignore
 # 9 - focus in - it just breaks shit, but i *might* need it
 # 10 - focus out - same as focus in
+# 14 - idk tbh (XCB_NO_EXPOSURE)
+
 # TODO: verify this info (this will forever be here)
 
 
@@ -290,7 +292,7 @@ async def setup(ctx: 'Ctx'):
         ctx
     )  # TODO: put this in the ctx and rename the current ``connection``
 
-    setupExtensions(ctx, extensions)
+    setupExtensions(ctx, cfg.extensions)
 
     async def _update():
         await update(ctx, conn)
@@ -305,7 +307,6 @@ async def update(ctx: 'Ctx', conn: 'GConnection'):
     # the fuck was i thinking?
     # i spent a fucking day on debbuging this shit
     if lib.xcb_connection_has_error(ctx.connection) or ctx.closed:
-        print(lib.xcb_connection_has_error(ctx.connection), ctx.closed)
         conn.disconnect()
         return
 
