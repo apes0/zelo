@@ -26,14 +26,13 @@ from typing import TYPE_CHECKING
 from .. import events
 from .gctx import Ctx as GCtx
 import trio
+from ...watcher import watch
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
     from lib.backends.generic import GConnection, GWindow
 
 # this is mainly based on this code: https://github.com/mcpcpc/xwm/blob/main/xwm.c
-
-DELAY = 0.01  # TODO: is there a more proper way to do this?
 
 handlers = {}
 
@@ -282,26 +281,40 @@ ignore = [9, 10]  # list of events to ignore
 # TODO: verify this info (this will forever be here)
 
 
-async def loop(ctx: 'Ctx'):
+async def setup(ctx: 'Ctx'):
     ctx.dname = ffi.NULL
     ctx.screenp = intp(0)
     ctx.gctx = GCtx(ctx)
 
-    conn: GConnection = Connection(ctx)
+    conn: GConnection = Connection(
+        ctx
+    )  # TODO: put this in the ctx and rename the current ``connection``
 
     setupExtensions(ctx, extensions)
 
-    async with trio.open_nursery() as nurs:
-        ctx.nurs = nurs
-        while not lib.xcb_connection_has_error(ctx.connection) and not ctx.closed:
-            event = lib.xcb_poll_for_event(ctx.connection)
-            if event == ffi.NULL:
-                await trio.sleep(DELAY)
-                continue
-            eventType: int = event.response_type & ~0x80
-            if handler := handlers.get(eventType, None):
-                nurs.start_soon(handler, event, ctx)
-            elif eventType not in ignore:
-                print(f'!!! No handler for: {eventType}')
+    async def _update():
+        await update(ctx, conn)
 
-    conn.disconnect()
+    print(lib.xcb_get_file_descriptor(ctx.connection))
+
+    watch(lib.xcb_get_file_descriptor(ctx.connection), _update)
+
+
+async def update(ctx: 'Ctx', conn: 'GConnection'):
+    # used to be ``not lib.xcb_connection_has_error(ctx.connection) and not ctx.closed``...
+    # the fuck was i thinking?
+    # i spent a fucking day on debbuging this shit
+    if lib.xcb_connection_has_error(ctx.connection) or ctx.closed:
+        print(lib.xcb_connection_has_error(ctx.connection), ctx.closed)
+        conn.disconnect()
+        return
+
+    while True:
+        event = lib.xcb_poll_for_event(ctx.connection)
+        if event == ffi.NULL:
+            return
+        eventType: int = event.response_type & ~0x80
+        if handler := handlers.get(eventType, None):
+            ctx.nurs.start_soon(handler, event, ctx)
+        elif eventType not in ignore:
+            print(f'!!! No handler for: {eventType}')

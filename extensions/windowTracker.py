@@ -50,7 +50,7 @@ class Tracker:
         self.exts: dict[GDisplay, Extension] = {}
         self.updates: dict[GDisplay, UpdateType] = {}
         self.mains = {}
-        self.windows = []  # i prefer a list here rather than a dequeue
+        self.windows: list[GWindow] = []  # i prefer a list here rather than a dequeue
 
         for display in ctx.screen.displays:
             ext = tiler(ctx, {**args, 'display': display})
@@ -66,6 +66,15 @@ class Tracker:
             event.addListener(lambda *a: self.update())
 
     def update(self):
+        # cleaning up the window list
+        # TODO: maybe it would be better if i just had a list of all windows and reordered them in there
+        newWins = []
+        for win in self.windows:
+            if win.ignore or not win.mapped:
+                continue
+            newWins.append(win)
+        self.windows = newWins
+
         windows: dict[GDisplay, dict[int, GWindow]] = {}
         window: GWindow
         for id, window in self.ctx.windows.items():

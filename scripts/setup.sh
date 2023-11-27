@@ -8,7 +8,7 @@ mypath=${0:a:h}
 cd $mypath
 
 chmod +x ./keysyms.sh
-zsh keysyms.sh
+zsh keysyms.sh # do we need to run this?
 
 sudo ./Xsession.sh
 # i think this is all?

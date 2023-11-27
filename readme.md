@@ -26,6 +26,9 @@ That being said, these are the currently available extensions:
 
 # Installation
 
+> [!NOTE]
+> You will experience a small slow down when you run the window manager for the first time or after an update.
+
 ## Debian or Ubuntu
 
 There is currently an install script, located in ``scripts/setup.sh``, but it works only on Debian
@@ -41,7 +44,12 @@ If you are running anything unsupported by the install script, you need to do th
 
 - run ``./scripts/keysyms.sh``
 
-- ***(Optionally)*** run ``sudo ./scripts/Xsession.sh`` to add the window manager to your xsession directory and also add it to /bin
+> [!TIP]
+> ***(Optionally)*** run ``sudo ./scripts/Xsession.sh`` to add the window manager to your xsession directory and also add it to /bin
+
+# Updating
+
+To update, run ``./scripts/update.sh``. It will keep all the changes you have applied.
 
 # Bugs
 
