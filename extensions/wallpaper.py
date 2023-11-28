@@ -32,17 +32,30 @@ class Wallpaper(Extension):
                 self.display.y,
             )
 
+            self.img.draw()
+
         else:
             cap = cv2.VideoCapture(self.wall)
             self.fps = cap.get(cv2.CAP_PROP_FPS)
             ret = True
-            self.frames = []
+            self.frames: list[GImage] = []
 
             while True:
                 ret, frame = cap.read()
                 if not ret:
                     break
-                self.frames.append(frame)
+
+                self.frames.append(
+                    Image(
+                        self.ctx,
+                        self.ctx.root,
+                        frame,
+                        self.display.width,
+                        self.display.height,
+                        self.display.x,
+                        self.display.y,
+                    )
+                )
 
             cap.release()
             ctx.nurs.start_soon(self.drawVideo)
@@ -58,13 +71,5 @@ class Wallpaper(Extension):
     async def drawVideo(self, *a):
         while True:
             for frame in self.frames:
-                self.img: GImage = Image(
-                    self.ctx,
-                    self.ctx.root,
-                    frame,
-                    self.display.width,
-                    self.display.height,
-                    self.display.x,
-                    self.display.y,
-                )
+                frame.draw()
                 await trio.sleep(1 / self.fps)

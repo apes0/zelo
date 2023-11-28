@@ -82,7 +82,7 @@ class Image(GImage):
             )
 
             prev = pos
-        self.draw()
+        lib.xcb_flush(ctx.connection)
 
     def draw(self):
         lib.xcb_copy_area(
