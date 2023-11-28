@@ -71,5 +71,6 @@ class Wallpaper(Extension):
     async def drawVideo(self, *a):
         while True:
             for frame in self.frames:
-                frame.draw()
+                self.img = frame
+                self.img.draw()
                 await trio.sleep(1 / self.fps)
