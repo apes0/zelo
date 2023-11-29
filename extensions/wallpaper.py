@@ -21,43 +21,23 @@ class Wallpaper(Extension):
         self.video = False
         super().__init__(ctx, cfg)
 
+        self.img = Image(
+            self.ctx,
+            self.ctx.root,
+            None,
+            self.display.width,
+            self.display.height,
+            self.display.x,
+            self.display.y,
+        )
+
         if not self.video:
-            self.img: GImage = Image(
-                ctx,
-                ctx.root,
-                cv2.imread(self.wall),
-                self.display.width,
-                self.display.height,
-                self.display.x,
-                self.display.y,
-            )
-
+            self.img.set(cv2.imread(self.wall))
             self.img.draw()
-
         else:
-            cap = cv2.VideoCapture(self.wall)
-            self.fps = cap.get(cv2.CAP_PROP_FPS)
-            ret = True
-            self.frames: list[GImage] = []
+            self.cap = cv2.VideoCapture(self.wall)
+            self.fps = self.cap.get(cv2.CAP_PROP_FPS)
 
-            while True:
-                ret, frame = cap.read()
-                if not ret:
-                    break
-
-                self.frames.append(
-                    Image(
-                        self.ctx,
-                        self.ctx.root,
-                        frame,
-                        self.display.width,
-                        self.display.height,
-                        self.display.x,
-                        self.display.y,
-                    )
-                )
-
-            cap.release()
             ctx.nurs.start_soon(self.drawVideo)
 
         createNotify.addListener(self.drawImg)
@@ -69,8 +49,15 @@ class Wallpaper(Extension):
         self.img.draw()
 
     async def drawVideo(self, *a):
+        cur = trio.current_time()
         while True:
-            for frame in self.frames:
-                self.img = frame
-                self.img.draw()
-                await trio.sleep(1 / self.fps)
+            await trio.sleep_until(cur := cur + 1 / self.fps)
+            ret, frame = self.cap.read()
+
+            if not ret:
+                # idk how good this is but works well so its whatever :)
+                self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                continue
+
+            self.img.set(frame)
+            self.img.draw()

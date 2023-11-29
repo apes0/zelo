@@ -19,7 +19,7 @@ class Image(GImage):
         self,
         ctx: 'Ctx',
         window: 'Window',
-        img: np.ndarray,
+        img: np.ndarray | None,
         width: int,
         height: int,
         x: int,
@@ -32,14 +32,8 @@ class Image(GImage):
 
         self.windowId = window.id
 
-        img = cv2.resize(img, (width, height))
-
-        self.height, self.width, px = img.shape
-
-        if px == 3:
-            img = np.dstack(
-                (img, np.ones((self.height, self.width, 1), dtype=np.uint8) * 255)
-            )
+        self.width = width
+        self.height = height
 
         self.gc = lib.xcb_generate_id(ctx.connection)
         self.pixmap = lib.xcb_generate_id(ctx.connection)
@@ -55,9 +49,21 @@ class Image(GImage):
 
         lib.xcb_create_gc(ctx.connection, self.gc, self.pixmap, 0, ffi.NULL)
 
+        if img is not None:
+            self.set(img)
+
+    def set(self, img):
+        img = cv2.resize(img, (self.width, self.height))
+
+        _, _, px = img.shape
+
+        if px == 3:
+            img = np.dstack(
+                (img, np.ones((self.height, self.width, 1), dtype=np.uint8) * 255)
+            )
         self.parts = (
             self.width * self.height * 4
-        ) // lib.xcb_get_maximum_request_length(ctx.connection) + 2
+        ) // lib.xcb_get_maximum_request_length(self.ctx.connection) + 2
         # this works with +2 for some reason
         pos = 0
         prev = 0
@@ -67,22 +73,22 @@ class Image(GImage):
             # TODO: use the scanline_pad stuff
             pos += size
             image = lib.xcb_image_create_native(
-                ctx.connection,
+                self.ctx.connection,
                 self.width,
                 round(pos) - round(prev),
                 lib.XCB_IMAGE_FORMAT_Z_PIXMAP,
-                ctx.screen.screen.root_depth,
+                self.ctx.screen.screen.root_depth,
                 ffi.NULL,
                 self.width * (round(pos) - round(prev)) * 4,
                 uchararr(img[round(prev) : round(pos), :, :].tobytes()),
             )
 
             lib.xcb_image_put(
-                ctx.connection, self.pixmap, self.gc, image, 0, round(prev), 0
+                self.ctx.connection, self.pixmap, self.gc, image, 0, round(prev), 0
             )
 
             prev = pos
-        lib.xcb_flush(ctx.connection)
+        lib.xcb_flush(self.ctx.connection)
 
     def draw(self):
         lib.xcb_copy_area(

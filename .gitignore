@@ -165,3 +165,6 @@ xcb_cffi.*
 
 #profiling
 program.prof
+
+# my dumb jupyter stuff lol
+*.ipynb

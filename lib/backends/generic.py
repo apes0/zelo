@@ -134,7 +134,7 @@ class GImage:
         self,
         ctx: 'Ctx',
         window: GWindow,
-        img: np.ndarray,
+        img: np.ndarray | None,
         width: int,
         height: int,
         x: int,
@@ -143,6 +143,9 @@ class GImage:
         raise NotImplementedError
 
     def draw(self):
+        raise NotImplementedError
+
+    def set(self, img):
         raise NotImplementedError
 
 
