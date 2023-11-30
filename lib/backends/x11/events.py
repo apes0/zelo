@@ -297,8 +297,6 @@ async def setup(ctx: 'Ctx'):
     async def _update():
         await update(ctx, conn)
 
-    print(lib.xcb_get_file_descriptor(ctx.connection))
-
     watch(lib.xcb_get_file_descriptor(ctx.connection), _update)
 
 

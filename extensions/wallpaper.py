@@ -1,4 +1,4 @@
-from lib.extension import Extension, perDisplay
+from lib.extension import Extension, single
 from typing import TYPE_CHECKING
 from lib.backends.events import createNotify, mapRequest, unmapNotify, destroyNotify
 from lib.api.drawer import Image
@@ -7,33 +7,36 @@ import trio
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
-    from lib.backends.generic import GImage, GDisplay
+    from lib.backends.generic import GImage
+
+# TODO: support multiple wallpapers for each screen
 
 
-# TODO: slower for video with perDisplay with more and more displays
-
-
-@perDisplay
+@single
 class Wallpaper(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.wall: str
-        self.display: GDisplay
         self.video = False
         super().__init__(ctx, cfg)
 
-        self.img = Image(
-            self.ctx,
-            self.ctx.root,
-            None,
-            self.display.width,
-            self.display.height,
-            self.display.x,
-            self.display.y,
-        )
+        self.imgs: list[GImage] = [
+            Image(
+                self.ctx,
+                self.ctx.root,
+                None,
+                display.width,
+                display.height,
+                display.x,
+                display.y,
+            )
+            for display in ctx.screen.displays
+        ]
 
         if not self.video:
-            self.img.set(cv2.imread(self.wall))
-            self.img.draw()
+            _img = cv2.imread(self.wall)
+            for img in self.imgs:
+                img.set(_img)
+                img.draw()
         else:
             self.cap = cv2.VideoCapture(self.wall)
             self.fps = self.cap.get(cv2.CAP_PROP_FPS)
@@ -46,12 +49,12 @@ class Wallpaper(Extension):
         destroyNotify.addListener(self.drawImg)
 
     async def drawImg(self, *a):
-        self.img.draw()
+        for img in self.imgs:
+            img.draw()
 
     async def drawVideo(self, *a):
         cur = trio.current_time()
         while True:
-            await trio.sleep_until(cur := cur + 1 / self.fps)
             ret, frame = self.cap.read()
 
             if not ret:
@@ -59,5 +62,8 @@ class Wallpaper(Extension):
                 self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 continue
 
-            self.img.set(frame)
-            self.img.draw()
+            for img in self.imgs:
+                img.set(frame)
+                img.draw()
+
+            await trio.sleep_until(cur := cur + 1 / self.fps)
