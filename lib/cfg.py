@@ -44,8 +44,8 @@ cfg.extensions = {
     Workspaces: {
         'prev': ((Key('left'), Key('super_l')), Mod('control')),
         'next': ((Key('right'), Key('super_l')), Mod('control')),
+        #    Bar: {'width': 100, 'height': 100, 'x': 10, 'y': 10},
     },
-    #    Bar: {'width': 100, 'height': 100, 'x': 10, 'y': 10},
 }
 
 # startup

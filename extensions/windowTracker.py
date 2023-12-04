@@ -50,7 +50,7 @@ class Tracker:
         self.exts: dict[GDisplay, Extension] = {}
         self.updates: dict[GDisplay, UpdateType] = {}
         self.mains = {}
-        self.windows: list[GWindow] = []  # i prefer a list here rather than a dequeue
+        self.focusQueue: list[GWindow] = []
 
         for display in ctx.screen.displays:
             ext = tiler(ctx, {**args, 'display': display})
@@ -67,126 +67,81 @@ class Tracker:
 
     def findMain(self, dpy: 'GDisplay'):
         self.mains[dpy] = None  # if we havent found another
-        for window in reversed(self.windows):
+        for window in self.focusQueue:
             if (
                 getDisplay(self.ctx, window.x, window.y) == dpy
                 and not window.ignore
                 and window.mapped
             ):
-                self.mains[dpy] = window
-                break
+                return window
 
     def update(self):
-        # cleaning up the window list
-        # TODO: maybe it would be better if i just had a list of all windows and reordered them in there
-        newWins = []
-        for win in self.windows:
-            if win.ignore or not win.mapped:
-                continue
-            newWins.append(win)
-        self.windows = newWins
-
         windows: dict[GDisplay, dict[int, GWindow]] = {}
-        window: GWindow
-        for id, window in self.ctx.windows.items():
-            display = getDisplay(self.ctx, window.x, window.y)
-            if not window.mapped or window.ignore or not display:
-                continue
-            windows[display] = {**windows.get(display, {}), window.id: window}
 
-        for display, _windows in windows.items():
-            main = self.mains.get(display)
-            # if there is no root, there are no secondaries
-            if not main:
+        for win in self.ctx.windows.values():
+            if not win.mapped or win.ignore or win.id == self.ctx._root:
                 continue
-            self.updates[display](_windows, main)
 
-    async def mapWindow(self, window: 'GWindow'):
-        if not window.mapped:
+            dpy = getDisplay(self.ctx, win.x, win.y)
+
+            if not dpy:
+                continue
+
+            windows[dpy] = {**windows.get(dpy, {}), win.id: win}
+
+        for dpy, update in self.updates.items():
+            if main := self.mains.get(dpy):
+                update(windows.get(dpy, {}), main)
+
+    async def mapWindow(self, win: 'GWindow'):
+        if not win.mapped:
+            win.map()
+            win.setFocus(True)
+
             # this is a bit of a hack to get windows to be on the correct screen
             x, y = self.ctx.mouse.location()
-            display = getDisplay(self.ctx, x, y)
+            dpy = getDisplay(self.ctx, x, y)
 
             if (
-                not display
-            ):  # never should happen, but just in case it does, this is here (also it makes pylance stop complaining)
+                not dpy
+            ):  # never should happen, but just in case it does, this is here (also it makes pylances top complaining)
                 return
 
-            window.x = display.x  # kinda a hack
-            window.y = display.y
+            self.mains[dpy] = win
 
-            self.windows.append(window)
-            window.map()
-            window.setFocus(True)
-
-            if not window.ignore:
-                self.mains[display] = window
-
-            self.update()
-
-    async def unmapWindow(self, _window: 'GWindow'):
-        if _window.parent:
-            self.mains[
-                getDisplay(self.ctx, _window.parent.x, _window.parent.y)
-            ] = _window.parent
-            _window.parent.setFocus(True)
-            self.update()
-            return
-
-        window = None
-
-        if not self.ctx.focused:
-            for window in self.windows:
-                if window.mapped:
-                    window.setFocus(True)
-                    break
-
-        dpy = getDisplay(self.ctx, _window.x, _window.y)
-
-        if not dpy:
-            return
-
-        self.findMain(dpy)
-
+            win.x = dpy.x  # kinda a hack
+            win.y = dpy.y
         self.update()
 
-    async def destroyNotify(self, _window: 'GWindow'):
-        if _window.parent and _window.parent != self.ctx.root:
-            self.mains[
-                getDisplay(self.ctx, _window.parent.x, _window.parent.y)
-            ] = _window.parent
-            _window.parent.setFocus(True)
-            self.update()
-            return
+    async def unmapWindow(self, win: 'GWindow'):
+        dpy = getDisplay(self.ctx, win.x, win.y)
+        if dpy:  # aways gonna happen i assume, but idk
+            if win.id == self.mains[dpy].id:
+                new = self.findMain(dpy)
+                self.mains[dpy] = new
+                if new:
+                    new.setFocus(True)
+        self.update()
 
-        if not self.ctx.focused:
-            for window in self.windows:
-                if window.mapped:
-                    window.setFocus(True)
-                    break
-
-        dpy = getDisplay(self.ctx, _window.x, _window.y)
-
-        if not dpy:
-            return
-
-        if not self.mains.get(dpy):
-            self.findMain(dpy)
-
+    async def destroyNotify(self, win: 'GWindow'):
+        dpy = getDisplay(self.ctx, win.x, win.y)
+        if dpy:  # aways gonna happen i assume, but idk
+            if win.id == self.mains[dpy].id:
+                new = self.findMain(dpy)
+                self.mains[dpy] = new
+                if new:
+                    new.setFocus(True)
         self.update()
 
     async def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
         if old:
-            oldDisplay = getDisplay(self.ctx, old.x, old.y)
-            if oldDisplay:
-                self.findMain(oldDisplay)
+            if old in self.focusQueue:
+                self.focusQueue.remove(old)
+            self.focusQueue.append(old)
 
-        if new and not new.ignore:
-            newDisplay = getDisplay(self.ctx, new.x, new.y)
-            if newDisplay:
-                self.mains[newDisplay] = new
-
-        if old and old.mapped and new is not None:
-            self.windows.append(old)
+        if new:
+            newDpy = getDisplay(self.ctx, new.x, new.y)
+            if newDpy:
+                self.mains[newDpy] = new
 
         self.update()
