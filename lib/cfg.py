@@ -6,7 +6,7 @@ from extensions.tiler import Tiler
 from extensions.workspaces import Workspaces
 from extensions.mouseFocus import MouseFocus
 from extensions.wallpaper import Wallpaper
-from extensions.shotcuts import Shortcuts
+from extensions.shortcuts import Shortcuts
 from extensions.fakeMonitors import FakeDisplays
 from extensions.bar import Bar
 
@@ -22,7 +22,7 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     ((Key('t'),), Mod('control')): lambda ctx: spawn('alacritty'),
     ((Key('s'),), Mod('control')): lambda ctx: stop(ctx),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
-    ((Key('x'),), Mod('mod1')): lambda ctx: ctx.focused.close()
+    ((Key('x'),), Mod('control')): lambda ctx: ctx.focused.close()
     if ctx.focused
     else None,
 }
@@ -44,6 +44,10 @@ cfg.extensions = {
     Workspaces: {
         'prev': ((Key('left'), Key('super_l')), Mod('control')),
         'next': ((Key('right'), Key('super_l')), Mod('control')),
+        'move': (
+            (Key('m'), Key('super_l')),
+            Mod('control'),
+        ),  # TODO: this doesnt work :/
         #    Bar: {'width': 100, 'height': 100, 'x': 10, 'y': 10},
     },
 }

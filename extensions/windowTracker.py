@@ -58,8 +58,8 @@ class Tracker:
             self.updates[display] = getattr(ext, updateFn)
 
         mapRequest.addListener(self.mapWindow)
-        unmapNotify.addListener(self.unmapWindow)
-        destroyNotify.addListener(self.destroyNotify)
+        unmapNotify.addListener(self.removeWindow)
+        destroyNotify.addListener(self.removeWindow)
         focusChange.addListener(self.focusChange)
 
         for event in customEvents:
@@ -91,6 +91,14 @@ class Tracker:
 
         for dpy, update in self.updates.items():
             if main := self.mains.get(dpy):
+                if main.ignore or not main.mapped:
+                    main = self.findMain(dpy)
+
+                    if main:
+                        self.mains[dpy] = main
+                    else:
+                        continue
+
                 update(windows.get(dpy, {}), main)
 
     async def mapWindow(self, win: 'GWindow'):
@@ -113,20 +121,10 @@ class Tracker:
             win.y = dpy.y
         self.update()
 
-    async def unmapWindow(self, win: 'GWindow'):
+    async def removeWindow(self, win: 'GWindow'):
         dpy = getDisplay(self.ctx, win.x, win.y)
         if dpy:  # aways gonna happen i assume, but idk
-            if win.id == self.mains[dpy].id:
-                new = self.findMain(dpy)
-                self.mains[dpy] = new
-                if new:
-                    new.setFocus(True)
-        self.update()
-
-    async def destroyNotify(self, win: 'GWindow'):
-        dpy = getDisplay(self.ctx, win.x, win.y)
-        if dpy:  # aways gonna happen i assume, but idk
-            if win.id == self.mains[dpy].id:
+            if self.mains.get(dpy) and win.id == self.mains[dpy].id:
                 new = self.findMain(dpy)
                 self.mains[dpy] = new
                 if new:

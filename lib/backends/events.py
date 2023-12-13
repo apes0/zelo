@@ -1,4 +1,5 @@
 from typing import Callable, TYPE_CHECKING
+import traceback
 
 from .generic import GButton, GKey, GMod, GWindow
 
@@ -7,6 +8,14 @@ if TYPE_CHECKING:
 
 # these are the generic events, which we export, these should be used instead of directly using the
 # backend's event, both wayland and x11 should support all of these
+
+
+async def caller(fn, *args):
+    try:
+        await fn(*args)
+    except:
+        # TODO: do something here
+        traceback.print_exc()
 
 
 class Event:
@@ -28,7 +37,7 @@ class Event:
             ), f'argument #{n} must be of type {_type}, instead of {type(args[n])}'
 
         for fn in self.listeners:
-            ctx.nurs.start_soon(fn, *args)
+            ctx.nurs.start_soon(caller, fn, *args)
 
 
 # you might be able to tell that all of these appear to be the same as the x11 events, you would be
