@@ -66,12 +66,11 @@ class Workspaces(Extension):  # TODO: make me work with the window tracker's foc
         self.windows[self.current] = wins
 
     def show(self):
-        print(self.windows, self.focused, self.toMove)
+        for win in self.windows.get(self.current, []):
+            win.map()
+
         focused = self.focused.get(self.current)
         if focused:
             focused.setFocus(True)
-
-        for win in self.windows.get(self.current, []):
-            win.map()
 
         self.toMove = {}

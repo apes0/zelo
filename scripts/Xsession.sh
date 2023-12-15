@@ -7,7 +7,6 @@ echo $mydir
 
 path="/bin/zelo"
 
-#TODO: How the fuck do i make this start apps in ~
 file="#!/bin/bash
 while [ true ]
 do
