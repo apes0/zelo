@@ -180,17 +180,19 @@ async def unmapNotify(event, ctx: 'Ctx'):
     _id = event.window
     win: GWindow = ctx.getWindow(_id)
 
+    # NOTE: we shouldn't actually delete here as we can unmap without destroying the window
+
     if ctx.focused and _id == ctx.focused.id:
         win.mapped = False
         win.setFocus(False)
-        del ctx.windows[_id]
+    #        del ctx.windows[_id]
 
     elif (
         _id in ctx.windows
     ):  # always returns true for the focused window, thats why its an elif
         win.mapped = False
         win.focused = False
-        del ctx.windows[_id]
+    #        del ctx.windows[_id]
 
     events.destroyNotify.trigger(ctx, win)
 

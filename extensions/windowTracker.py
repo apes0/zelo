@@ -2,7 +2,7 @@
 # NOTE: i literally made this just because of the workspaces hah
 
 from lib.extension import Extension
-from lib.backends.events import mapRequest, unmapNotify, destroyNotify, focusChange
+from lib.backends.events import mapRequest, destroyNotify, focusChange
 
 from typing import TYPE_CHECKING, Callable
 
@@ -58,7 +58,6 @@ class Tracker:
             self.updates[display] = getattr(ext, updateFn)
 
         mapRequest.addListener(self.mapWindow)
-        unmapNotify.addListener(self.removeWindow)
         destroyNotify.addListener(self.removeWindow)
         focusChange.addListener(self.focusChange)
 

@@ -12,12 +12,13 @@ class Workspaces(Extension):  # TODO: make me work with the window tracker's foc
         self.next: tuple
         self.prev: tuple
         self.move: tuple
-        self.spaces = {}
-        self.focuses = {}
-        self.current = 0
-        self.windows = []
-        self.toMove = {}
+
         super().__init__(ctx, cfg)
+
+        self.current = 0
+        self.toMove = {}
+        self.windows = {}
+        self.focused = {}
 
         shortcuts: Shortcuts = Shortcuts(  # type:ignore
             ctx,
@@ -50,39 +51,27 @@ class Workspaces(Extension):  # TODO: make me work with the window tracker's foc
         self.show()
 
     def hide(self):
-        windows = []
-
         if self.ctx.focused and not self.toMove.get(self.ctx.focused.id):
-            self.focuses[self.current] = self.ctx.focused
+            self.focused[self.current] = self.ctx.focused
+            self.ctx.focused.setFocus(False)
 
-        for window in self.ctx.windows.values():
-            if (
-                window.mapped
-                and not window.ignore
-                and not self.toMove.get(window.id, False)
-            ):
-                windows.append(window)
+        wins = []
+        for win in self.ctx.windows.values():
+            if not win.mapped or win.id in self.toMove.keys():
+                continue
 
-        self.spaces[self.current] = {window.id: window for window in windows}
+            win.unmap()
+            wins.append(win)
 
-        for window in windows:
-            window.unmap()
+        self.windows[self.current] = wins
 
     def show(self):
-        print(self.focuses)
-        self.windows = list(self.spaces.get(self.current, {}).values())
-
-        for window in self.windows:
-            window.map()
-
-        for win, move in self.toMove.items():
-            if not move:
-                continue
-            self.windows.append(self.ctx.getWindow(win))
-
-        self.toMove = {}
-
-        if focused := self.focuses.get(self.current):
+        print(self.windows, self.focused, self.toMove)
+        focused = self.focused.get(self.current)
+        if focused:
             focused.setFocus(True)
 
-        self.ctx.windows = {win.id: win for win in self.windows}
+        for win in self.windows.get(self.current, []):
+            win.map()
+
+        self.toMove = {}
