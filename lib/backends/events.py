@@ -19,22 +19,24 @@ async def caller(fn, *args):
 
 
 class Event:
-    def __init__(self, *types: type) -> None:
+    def __init__(self, name: str, *types: type) -> None:
         self.listeners: list[Callable] = []
+        self.name = name
         self.types = types
 
     def addListener(self, fn: Callable):
         self.listeners.append(fn)
 
     def trigger(self, ctx: 'Ctx', *args):
+        #        print(f'triggering {self.name} with {args}')
         # check types
         assert len(self.types) == len(
             args
-        ), f'There need to be exactly {len(self.types)} arguments for this event, instead of {len(args)}.'
+        ), f'There need to be exactly {len(self.types)} arguments for event {self.name}, instead of {len(args)}.'
         for n, _type in enumerate(self.types):
             assert issubclass(
                 args[n].__class__, _type
-            ), f'argument #{n} must be of type {_type}, instead of {type(args[n])}'
+            ), f'argument #{n} must be of type {_type}, instead of {type(args[n])} for event {self.name}'
 
         for fn in self.listeners:
             ctx.nurs.start_soon(caller, fn, *args)
@@ -43,17 +45,17 @@ class Event:
 # you might be able to tell that all of these appear to be the same as the x11 events, you would be
 # right, the original code was xcb only, so, because i dont wanna change anything, i did this
 
-keyPress = Event(GKey, GMod, GWindow)
-keyRelease = Event(GKey, GMod, GWindow)
+keyPress = Event('keyPress', GKey, GMod, GWindow)
+keyRelease = Event('keyRelease', GKey, GMod, GWindow)
 # ? maybe include the x and y coordinates, but idk
-buttonPress = Event(GButton, GMod, GWindow)
-buttonRelease = Event(GButton, GMod, GWindow)
-mapRequest = Event(GWindow)
-unmapNotify = Event(GWindow)
-destroyNotify = Event(GWindow)
-createNotify = Event(GWindow)
-configureNotify = Event(GWindow)
-configureRequest = Event(GWindow)
-enterNotify = Event(GWindow)
-leaveNotify = Event(GWindow)
-focusChange = Event(GWindow | None, GWindow | None)  # old, new
+buttonPress = Event('buttonPress', GButton, GMod, GWindow)
+buttonRelease = Event('buttonRelease', GButton, GMod, GWindow)
+mapRequest = Event('mapRequest', GWindow)
+unmapNotify = Event('unmapNotify', GWindow)
+destroyNotify = Event('destroyNotify', GWindow)
+createNotify = Event('createNotify', GWindow)
+configureNotify = Event('configureNotify', GWindow)
+configureRequest = Event('configureRequest', GWindow)
+enterNotify = Event('enterNotify', GWindow)
+leaveNotify = Event('leaveNotify', GWindow)
+focusChange = Event('focusChange', GWindow | None, GWindow | None)  # old, new

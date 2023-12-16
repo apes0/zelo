@@ -57,7 +57,7 @@ class GWindow:
     def unmap(self):
         raise NotImplementedError
 
-    def setFocus(self, focus):
+    def setFocus(self, focus: bool):
         raise NotImplementedError
 
     def configure(

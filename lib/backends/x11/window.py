@@ -3,7 +3,7 @@ from xcb_cffi import ffi, lib
 from .types import uintarr
 from typing import TYPE_CHECKING
 from ...cfg import cfg
-from ..events import focusChange, unmapNotify
+from ..events import focusChange, unmapNotify, destroyNotify
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
@@ -123,5 +123,7 @@ class Window(GWindow):
         lib.xcb_flush(self.ctx.connection)
 
     def close(self):
+        unmapNotify.trigger(self.ctx, self)
+        destroyNotify.trigger(self.ctx, self)
         lib.xcb_kill_client(self.ctx.connection, self.id)
         lib.xcb_flush(self.ctx.connection)

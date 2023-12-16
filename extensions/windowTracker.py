@@ -58,14 +58,13 @@ class Tracker:
             self.updates[display] = getattr(ext, updateFn)
 
         mapRequest.addListener(self.mapWindow)
-        destroyNotify.addListener(self.removeWindow)
+        destroyNotify.addListener(self.destroyNotify)
         focusChange.addListener(self.focusChange)
 
         for event in customEvents:
             event.addListener(lambda *a: self.update())
 
     def findMain(self, dpy: 'GDisplay'):
-        self.mains[dpy] = None  # if we havent found another
         for window in self.focusQueue:
             if (
                 getDisplay(self.ctx, window.x, window.y) == dpy
@@ -92,11 +91,11 @@ class Tracker:
             if main := self.mains.get(dpy):
                 if main.ignore or not main.mapped:
                     main = self.findMain(dpy)
-
-                    if main:
-                        self.mains[dpy] = main
-                    else:
+                    self.mains[dpy] = main
+                    if not main:
                         continue
+
+                    main.setFocus(True)
 
                 update(windows.get(dpy, {}), main)
 
@@ -120,7 +119,7 @@ class Tracker:
             win.y = dpy.y
         self.update()
 
-    async def removeWindow(self, win: 'GWindow'):
+    async def destroyNotify(self, win: 'GWindow'):
         dpy = getDisplay(self.ctx, win.x, win.y)
         if dpy:  # aways gonna happen i assume, but idk
             if self.mains.get(dpy) and win.id == self.mains[dpy].id:
@@ -128,6 +127,9 @@ class Tracker:
                 self.mains[dpy] = new
                 if new:
                     new.setFocus(True)
+
+        if win in self.focusQueue:
+            self.focusQueue.remove(win)
         self.update()
 
     async def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):

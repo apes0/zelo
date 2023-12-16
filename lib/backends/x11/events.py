@@ -194,7 +194,7 @@ async def unmapNotify(event, ctx: 'Ctx'):
         win.focused = False
     #        del ctx.windows[_id]
 
-    events.destroyNotify.trigger(ctx, win)
+    events.unmapNotify.trigger(ctx, win)
 
 
 @handler(lib.XCB_MOTION_NOTIFY)
