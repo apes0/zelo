@@ -31,7 +31,6 @@ class Window(GWindow):
     def unmap(self):
         lib.xcb_unmap_window(self.ctx.connection, self.id)
         lib.xcb_flush(self.ctx.connection)
-        unmapNotify.trigger(self.ctx, self)
         self.mapped = False
 
     def setFocus(self, focus: bool):
@@ -123,7 +122,5 @@ class Window(GWindow):
         lib.xcb_flush(self.ctx.connection)
 
     def close(self):
-        unmapNotify.trigger(self.ctx, self)
-        destroyNotify.trigger(self.ctx, self)
         lib.xcb_kill_client(self.ctx.connection, self.id)
         lib.xcb_flush(self.ctx.connection)

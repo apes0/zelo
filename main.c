@@ -1,10 +1,4 @@
-from cffi import FFI
-
-ffibuilder = FFI()
-
-ffibuilder.set_source(
-    'test',
-    '''
+#include <stdio.h>
 #include <pango/pango.h>
 #include <pango/pangoft2.h>
 
@@ -21,25 +15,9 @@ int main()
 
     pango_layout_set_font_description(layout, desc);
     pango_font_description_free(desc);
-    pango_layout_set_text(layout, "Fuck you, Pango!", -1);
+    pango_layout_set_text(layout, "Hello, Pango!", -1);
 
+    /* Render the layout to a FreeType bitmap */
     FT_Bitmap bitmap;
     pango_ft2_render_layout(&bitmap, layout, 0, 0);
-    
-    return 0;
 }
-    ''',
-    libraries=['pango', 'pangoft2', 'fontconfig', 'freetype'],
-)
-
-ffibuilder.cdef(
-    '''
-void main();
-    '''
-)
-
-ffibuilder.compile(target='*')
-
-from test import lib
-
-lib.main()

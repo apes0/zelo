@@ -11,13 +11,14 @@ Anything marked with "?" is optional.
 This plugin adds the ability to focus windows when clicking on a window.
 The default X11 behaviour for this is having the focus be on the window over which the mouse is.
 
-This plugin takes no arguments currently.
+- ``buttons``? - a list of ``Button``s which change the focus.
+- ``mod`` - a modifier, required for the focus to change (idk why you would ever want this).
 
 ## shortcuts
 
 Manages shortcuts.
 
-- ``shortcuts`` - a dictionary with the structure of ``((Key, ...), Mod): function``.
+- ``shortcuts``? - a dictionary with the structure of ``((Key, ...), Mod): function``.
 
 When the keys and modifier for a shortcut are pressed, the function for them gets called.
 

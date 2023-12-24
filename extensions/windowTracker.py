@@ -2,7 +2,7 @@
 # NOTE: i literally made this just because of the workspaces hah
 
 from lib.extension import Extension
-from lib.backends.events import mapRequest, destroyNotify, focusChange
+from lib.backends.events import mapRequest, destroyNotify, focusChange, unmapNotify
 
 from typing import TYPE_CHECKING, Callable
 
@@ -60,6 +60,7 @@ class Tracker:
         mapRequest.addListener(self.mapWindow)
         destroyNotify.addListener(self.destroyNotify)
         focusChange.addListener(self.focusChange)
+        unmapNotify.addListener(self.unmapWindow)
 
         for event in customEvents:
             event.addListener(lambda *a: self.update())
@@ -98,6 +99,14 @@ class Tracker:
                     main.setFocus(True)
 
                 update(windows.get(dpy, {}), main)
+
+    async def unmapWindow(self, win: 'GWindow'):
+        if self.ctx.focused and win.id == self.ctx.focused.id:
+            dpy = getDisplay(self.ctx, win.x, win.y)
+            if dpy:
+                self.mains[dpy] = self.findMain(dpy)
+                self.mains[dpy].setFocus(True)
+        self.update()
 
     async def mapWindow(self, win: 'GWindow'):
         if not win.mapped:

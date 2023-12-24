@@ -12,7 +12,7 @@ This is a window manager written in python. I made it primarily because i don't 
 
 # extensions
 
-See [extensions](./extensions/readme.md) for a guide on configuring extensions and what they do.
+See [extensions/readme.md](./extensions/readme.md) for a guide on configuring extensions and what they do.
 
 # Installation
 

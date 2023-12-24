@@ -8,9 +8,6 @@ if TYPE_CHECKING:
     from lib.ctx import Ctx
     from lib.backends.generic import GButton, GWindow, GMod
 
-# i found what enter notify and leave notify do here: (on line 853)
-# https://gitlab.gnome.org/GNOME/mutter/-/blob/main/src/x11/events.c
-
 
 class MouseFocus(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:

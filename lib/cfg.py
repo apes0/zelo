@@ -47,7 +47,7 @@ cfg.extensions = {
         'move': (
             (Key('m'), Key('super_l')),
             Mod('control'),
-        ),  # TODO: this doesnt work :/
+        ),
         #    Bar: {'width': 100, 'height': 100, 'x': 10, 'y': 10},
     },
 }
