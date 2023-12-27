@@ -122,5 +122,10 @@ class Window(GWindow):
         lib.xcb_flush(self.ctx.connection)
 
     def close(self):
+        lib.xcb_destroy_window(self.ctx.connection, self.id)
+        lib.xcb_flush(self.ctx.connection)
+
+    def kill(self):
+        # the nuclear option
         lib.xcb_kill_client(self.ctx.connection, self.id)
         lib.xcb_flush(self.ctx.connection)

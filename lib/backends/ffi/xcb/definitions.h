@@ -888,6 +888,7 @@ xcb_get_geometry_cookie_t xcb_get_geometry(xcb_connection_t *conn, xcb_drawable_
 xcb_get_geometry_reply_t *xcb_get_geometry_reply(xcb_connection_t *conn, xcb_get_geometry_cookie_t cookie, xcb_generic_error_t **e);
 xcb_generic_event_t *xcb_poll_for_event(xcb_connection_t *c);
 int xcb_get_file_descriptor(xcb_connection_t *c);
+xcb_void_cookie_t xcb_destroy_window(xcb_connection_t *c, xcb_window_t window);
 
 // weird values
 
