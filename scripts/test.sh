@@ -21,7 +21,9 @@ progs=('glxgears' 'ulauncher' 'alacritty')
 
 while [ true ]
 do
-    clear
+#    clear
+    echo 
+    echo starting new session
     python3 main.py
 #    [ $? == 1 ] && rm xcb_cffi.* 
 #    echo opening profile

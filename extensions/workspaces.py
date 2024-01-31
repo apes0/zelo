@@ -27,7 +27,7 @@ class Workspaces(Extension):  # TODO: make me work with the window tracker's foc
                 'shortcuts': {
                     self.next: arun(ctx, self.nextSpace),
                     self.prev: arun(ctx, self.prevSpace),
-                    self.move: arun(ctx, self.toggleMove),
+                    self.move: self.toggleMove,
                 }
             },
         )

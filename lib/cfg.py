@@ -55,32 +55,31 @@ cfg.extensions = {
             (Key('m'), Key('super_l')),
             Mod('control'),
         ),
-        #    Bar: {'width': 100, 'height': 100, 'x': 10, 'y': 10},
     },
-    Widget: {
-        'widgets': {
-            Bar: {
-                'x': Ratio(0.05, width=True),
-                'y': Ratio(0.02, height=True),
-                'width': Ratio(0.9, width=True),
-                'height': Ratio(0.1, height=True),
-                'back': theme,
-                'widgets': {
-                    Clock: {
-                        'font': 'Ubuntu 23',
-                        'fmt': '%X',
-                        'fore': theme,
-                        'back': theme,
-                    },
-                    # NowPlaying: {
-                    #     'font': 'Ubuntu 23',
-                    #     'fore': theme,
-                    #     'back': theme,
-                    # },
-                },
-            }
-        }
-    },
+    #    Widget: {
+    #        'widgets': {
+    #            Bar: {
+    #                'x': Ratio(0.05, width=True),
+    #                'y': Ratio(0.02, height=True),
+    #                'width': Ratio(0.9, width=True),
+    #                'height': Ratio(0.1, height=True),
+    #                'back': theme,
+    #                'widgets': {
+    #                    Clock: {
+    #                        'font': 'Ubuntu 23',
+    #                        'fmt': '%X',
+    #                        'fore': theme,
+    #                        'back': theme,
+    #                    },
+    #                    # NowPlaying: {
+    #                    #     'font': 'Ubuntu 23',
+    #                    #     'fore': theme,
+    #                    #     'back': theme,
+    #                    # },
+    #                },
+    #            }
+    #        }
+    #    },
     #    Animation: {},
 }
 

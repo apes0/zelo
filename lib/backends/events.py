@@ -35,10 +35,11 @@ class Event:
         # TODO: make this faster (prolly will have to use a dictionary)
 
     async def trigger(self, ctx: 'Ctx', *args):
-        # print(f'triggering {self.name} with {args} (block: {self.block})')
-
         if self.block:
+            print(f'skipping {self.name} with {args} because of block')
             return
+
+        print(f'triggering {self.name} with {args})')
 
         # check types
 

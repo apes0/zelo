@@ -120,8 +120,8 @@ class Window(GWindow):
                 async def fn():
                     focusChange.block = True
                     await old.setFocus(False)
-                    self.ctx.focused = self
                     focusChange.block = False
+                    self.ctx.focused = self
 
                     await focusChange.trigger(self.ctx, old, self)
 
