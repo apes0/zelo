@@ -113,15 +113,9 @@ class Tracker:
 
             # this is a bit of a hack to get windows to be on the correct screen
             x, y = self.ctx.mouse.location()
-            dpy = getDisplay(self.ctx, x, y)
 
-            if (
-                not dpy
-            ):  # never should happen, but just in case it does, this is here (also it makes pylances top complaining)
-                return
-
-            win.x = dpy.x  # kinda a hack
-            win.y = dpy.y
+            win.x = x  # kinda a hack
+            win.y = y
 
         await self.update()
 

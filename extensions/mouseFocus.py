@@ -8,6 +8,8 @@ if TYPE_CHECKING:
     from lib.ctx import Ctx
     from lib.backends.generic import GButton, GWindow, GMod
 
+# TODO: figure out why we cant use window.ignore?
+
 
 class MouseFocus(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
@@ -27,8 +29,8 @@ class MouseFocus(Extension):
 
     async def mapRequest(self, _win: 'GWindow'):
         for win in self.ctx.windows.values():
-            if win.ignore:
-                continue
+            #            if win.ignore:
+            #                continue
 
             for button in self.buttons:
                 button.grab(self.ctx, win, self.mod)
@@ -41,8 +43,8 @@ class MouseFocus(Extension):
 
     async def focusChange(self, old: 'GWindow', new: 'GWindow'):
         for win in self.ctx.windows.values():
-            if win.ignore:
-                continue
+            #            if win.ignore:
+            #                continue
 
             for button in self.buttons:
                 if win == new:
