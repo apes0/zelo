@@ -41,6 +41,7 @@ class Key(GKey):
             self.lable = lable.lower()
             self.key: int | None = self.__class__.cache.get(lable)
         else:
+            self.lable = ''
             self.key = code
             for lable, key in self.__class__.cache.items():
                 if key == code:
@@ -52,7 +53,6 @@ class Key(GKey):
             self.__class__.syms = lib.xcb_key_symbols_alloc(ctx.connection)
         syms = self.__class__.syms
         assert syms, 'Couldn\'t allocate key symbols (for some reason)'
-        # FIXME: this fails on bigger screen sizes (i tried 1280x720) ((what the fuck is going on lol))
         # NOTE: this is adapted from qtile's implementation
         keysym: int | None = keys.get(self.lable)
         assert (
@@ -61,7 +61,7 @@ class Key(GKey):
         code = lib.xcb_key_symbols_get_keycode(syms, keysym)
         assert code, f'Couldn\'t find keycode for {self.lable}...'
         self.key = code[0]
-        self.__class__.cache[self.lable] = code
+        self.__class__.cache[self.lable] = self.key
         # lib.xcb_key_symbols_free(syms)  # ? idk how efficient this is lol
 
     def grab(self, ctx: 'Ctx', *modifiers: Mod):
@@ -97,7 +97,7 @@ class Key(GKey):
         lib.xcb_ungrab_key(ctx.connection, self.key, ctx._root, mod)
         lib.xcb_flush(ctx.connection)
 
-    def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod):  # TODO: no workie
+    def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod):  # FIXME: no workie
         if not self.key:
             self.load(ctx)
 
@@ -119,7 +119,9 @@ class Key(GKey):
 
         ctx.gctx.sendEvent(event, window)
 
-    def release(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod):
+    def release(
+        self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod
+    ):  # FIXME: no workie
         if not self.key:
             self.load(ctx)
 

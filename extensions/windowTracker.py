@@ -4,7 +4,7 @@
 from lib.extension import Extension
 from lib.backends.events import mapRequest, destroyNotify, focusChange, unmapNotify
 
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Coroutine
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -34,7 +34,20 @@ def getDisplay(ctx: 'Ctx', x: int, y: int):
     return display
 
 
-UpdateType = Callable[[dict[int, 'GWindow'], 'GWindow'], None]
+def perDisplay(ctx: 'Ctx', wins: list['GWindow']):
+    out: dict['GDisplay', list['GWindow']] = {}
+    for win in wins:
+        dpy = getDisplay(ctx, win.x, win.y)
+
+        if not dpy:
+            continue
+
+        out[dpy] = [*out.get(dpy, []), win]
+
+    return out
+
+
+UpdateType = Callable[[list['GWindow']], Coroutine]
 
 
 class Tracker:
@@ -49,7 +62,6 @@ class Tracker:
         self.ctx: 'Ctx' = ctx
         self.exts: dict[GDisplay, Extension] = {}
         self.updates: dict[GDisplay, UpdateType] = {}
-        self.mains = {}
         self.focusQueue: list[GWindow] = []
 
         for display in ctx.screen.displays:
@@ -65,53 +77,39 @@ class Tracker:
         for event in customEvents:
             event.addListener(lambda *a: self.update())
 
-    def findMain(self, dpy: 'GDisplay'):
-        for window in self.focusQueue:
-            if (
-                getDisplay(self.ctx, window.x, window.y) == dpy
-                and not window.ignore
-                and window.mapped
-            ):
-                return window
+    async def findFocus(self):
+        if self.ctx.focused:
+            return
 
-    def update(self):
-        windows: dict[GDisplay, dict[int, GWindow]] = {}
+        for win in self.focusQueue:
+            if not win.ignore and not win.focused and win.mapped:
+                await win.setFocus(True)
+                return
 
-        for win in self.ctx.windows.values():
-            if not win.mapped or win.ignore or win.id == self.ctx._root:
-                continue
+    async def update(self):
+        ordered: dict['GDisplay', list['GWindow']] = {}
 
-            dpy = getDisplay(self.ctx, win.x, win.y)
+        for dpy, wins in perDisplay(self.ctx, self.focusQueue).items():
+            for win in wins:
+                if not win.mapped or win.ignore or win.id == self.ctx._root:
+                    continue
 
-            if not dpy:
-                continue
+                ordered[dpy] = [*ordered.get(dpy, []), win]
 
-            windows[dpy] = {**windows.get(dpy, {}), win.id: win}
-
-        for dpy, update in self.updates.items():
-            if main := self.mains.get(dpy):
-                if main.ignore or not main.mapped:
-                    main = self.findMain(dpy)
-                    self.mains[dpy] = main
-                    if not main:
-                        continue
-
-                    main.setFocus(True)
-
-                update(windows.get(dpy, {}), main)
+        for dpy, queue in ordered.items():
+            await self.updates[dpy](queue.copy())
 
     async def unmapWindow(self, win: 'GWindow'):
-        if self.ctx.focused and win.id == self.ctx.focused.id:
-            dpy = getDisplay(self.ctx, win.x, win.y)
-            if dpy:
-                self.mains[dpy] = self.findMain(dpy)
-                self.mains[dpy].setFocus(True)
-        self.update()
+        dpy = getDisplay(self.ctx, win.x, win.y)
+        if dpy:
+            await self.findFocus()
+
+        await self.update()
 
     async def mapWindow(self, win: 'GWindow'):
         if not win.mapped:
-            win.map()
-            win.setFocus(True)
+            await win.map()
+            await win.setFocus(True)
 
             # this is a bit of a hack to get windows to be on the correct screen
             x, y = self.ctx.mouse.location()
@@ -122,34 +120,24 @@ class Tracker:
             ):  # never should happen, but just in case it does, this is here (also it makes pylances top complaining)
                 return
 
-            self.mains[dpy] = win
-
             win.x = dpy.x  # kinda a hack
             win.y = dpy.y
-        self.update()
+
+        await self.update()
 
     async def destroyNotify(self, win: 'GWindow'):
-        dpy = getDisplay(self.ctx, win.x, win.y)
-        if dpy:  # aways gonna happen i assume, but idk
-            if self.mains.get(dpy) and win.id == self.mains[dpy].id:
-                new = self.findMain(dpy)
-                self.mains[dpy] = new
-                if new:
-                    new.setFocus(True)
-
         if win in self.focusQueue:
             self.focusQueue.remove(win)
-        self.update()
+
+        await self.findFocus()
+
+        await self.update()
 
     async def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
-        if old:
-            if old in self.focusQueue:
-                self.focusQueue.remove(old)
-            self.focusQueue.append(old)
+        for win in [old, new]:
+            if win:
+                if win in self.focusQueue:
+                    self.focusQueue.remove(win)
+                self.focusQueue.append(win)
 
-        if new:
-            newDpy = getDisplay(self.ctx, new.x, new.y)
-            if newDpy:
-                self.mains[newDpy] = new
-
-        self.update()
+        await self.update()

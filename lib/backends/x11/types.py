@@ -43,6 +43,7 @@ destroyNotifyTC = Caster('xcb_destroy_notify_event_t*')
 motionNotifyTC = Caster('xcb_motion_notify_event_t*')
 mapNotifyTC = Caster('xcb_map_notify_event_t *')
 unmapNotifyTC = Caster('xcb_unmap_notify_event_t *')
+ExposeTC = Caster('xcb_expose_event_t *')
 # requests
 atomNameRequestTC = Caster('xcb_get_atom_name_request_t *')
 genericErrorTC = Caster('xcb_generic_error_t*')

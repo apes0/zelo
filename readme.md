@@ -16,9 +16,6 @@ See [extensions/readme.md](./extensions/readme.md) for a guide on configuring ex
 
 # Installation
 
-> [!NOTE]
-> You will experience a small slow down when you run the window manager for the first time or after an update.
-
 ## Debian or Ubuntu
 
 There is currently an install script, located in ``scripts/setup.sh``, but it works only on Debian

@@ -1,6 +1,6 @@
 from lib.backends.generic import GWindow
 from lib.extension import Extension, single
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 from itertools import combinations
 from lib.backends.events import keyPress, keyRelease
 from lib.api.keys import Mod
@@ -8,6 +8,13 @@ from lib.api.keys import Mod
 if TYPE_CHECKING:
     from lib.backends.generic import GKey, GMod
     from lib.ctx import Ctx
+
+
+def arun(ctx: 'Ctx', fn: Callable):
+    def arunner(*args):
+        ctx.nurs.start_soon(fn, *args)
+
+    return arunner
 
 
 @single

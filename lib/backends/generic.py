@@ -4,9 +4,11 @@ from typing import TYPE_CHECKING, Callable
 import numpy as np
 
 if TYPE_CHECKING:
+    from .events import Event
     from ..ctx import Ctx
 
 # these are definitions for what functions and classes the backends should have
+# NOTE: some methods are async when they dont use async functions - this is just for consistency
 
 CData = _cffi_backend._CDataBase  # cffi.FFI.CData
 
@@ -17,6 +19,9 @@ CData = _cffi_backend._CDataBase  # cffi.FFI.CData
 class GConnection:
     def __init__(self) -> None:
         self.conn: cffi.FFI.CData
+
+    def __repr__(self) -> str:
+        return '<Connection>'
 
     def disconnect(self):
         raise NotImplementedError
@@ -29,7 +34,22 @@ class GCtx:
         self.ctx = ctx
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return f'<GCtx>'
+
     def sendEvent(self, event, window: 'GWindow') -> None:
+        raise NotImplementedError
+
+    def createWindow(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        borderWidth: int,
+        parent: 'GWindow',
+        ignore: bool,
+    ) -> 'GWindow':
         raise NotImplementedError
 
 
@@ -49,23 +69,52 @@ class GWindow:
         self.mapped = False
         self.ignore: bool
         self.parent: GWindow | None
+
+        # events:
+
+        self.keyPress: 'Event'
+        self.keyRelease: 'Event'
+        self.buttonPress: 'Event'
+        self.buttonRelease: 'Event'
+        self.mapRequest: 'Event'
+        self.mapNotify: 'Event'
+        self.unmapNotify: 'Event'
+        self.destroyNotify: 'Event'
+        self.createNotify: 'Event'
+        self.configureNotify: 'Event'
+        self.configureRequest: 'Event'
+        self.enterNotify: 'Event'
+        self.leaveNotify: 'Event'
+        self.redraw: 'Event'
+
         raise NotImplementedError
 
-    def map(self):
+    def __repr__(self) -> str:
+        return f'<Window {self.id}>'
+
+    async def map(self):
         raise NotImplementedError
 
-    def unmap(self):
+    async def unmap(self):
         raise NotImplementedError
 
-    def setFocus(self, focus: bool):
+    async def setFocus(self, focus: bool):
         raise NotImplementedError
 
-    def configure(
-        self, newX=None, newY=None, newWidth=None, newHeight=None, newBorderWidth=None
+    async def configure(
+        self,
+        newX=None,
+        newY=None,
+        newWidth=None,
+        newHeight=None,
+        newBorderWidth=None,
     ):
         raise NotImplementedError
 
-    def close(self):
+    async def close(self):
+        raise NotImplementedError
+
+    async def kill(self):
         raise NotImplementedError
 
 
@@ -75,6 +124,9 @@ class GMod:
         self.mod: int
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return f'<Modifier {self.mod}>'
+
 
 # keys
 class GKey:
@@ -82,6 +134,9 @@ class GKey:
         self.lable: str = lable
         self.key: int | None = None
         raise NotImplementedError
+
+    def __repr__(self) -> str:
+        return f'<Key {self.lable} ({self.key})>'
 
     def load(self, ctx: 'Ctx'):
         raise NotImplementedError
@@ -106,6 +161,9 @@ class GButton:
         self.button: int
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return f'<Button {self.lable} ({self.button})>'
+
     def grab(self, ctx: 'Ctx', window: GWindow, *mods: GMod):
         raise NotImplementedError
 
@@ -118,6 +176,9 @@ class GMouse:
     def __init__(self, ctx: 'Ctx') -> None:
         pass
         raise NotImplementedError
+
+    def __repr__(self) -> str:
+        return '<Mouse>'
 
     def location(self) -> tuple[int, int]:
         raise NotImplementedError
@@ -142,10 +203,19 @@ class GImage:
     ) -> None:
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return '<Image>'
+
     def draw(self):
         raise NotImplementedError
 
-    def set(self, img):
+    def set(self, img: np.ndarray):
+        raise NotImplementedError
+
+    def destroy(self):
+        raise NotImplementedError
+
+    def move(self, x: int, y: int):
         raise NotImplementedError
 
 
@@ -170,7 +240,53 @@ class GRectangle:  # ? maybe implement this for any polygon and then just use th
         self.rect: CData
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return '<Rectangle>'
+
     def draw(self):
+        raise NotImplementedError
+
+    def resize(self, width: int, height: int):
+        raise NotImplementedError
+
+    def move(self, x: int, y: int):
+        raise NotImplementedError
+
+
+# drawer
+class GText:
+    def __init__(
+        self,
+        ctx: 'Ctx',
+        win: 'GWindow',
+        x: int,
+        y: int,
+        text: str | None,
+        font: str,
+        fore: int = 0xFFFFFF,
+        back: int = 0x000000,
+    ) -> None:
+        self.x: int
+        self.y: int
+        self.text: str
+        self.font: str
+        self.image: GImage
+        self.width: int
+        self.height: int
+
+    def __repr__(self) -> str:
+        return f'<Text {self.text} with font {self.font}>'
+
+    def draw(self):
+        raise NotImplementedError
+
+    def set(self, text: str):
+        raise NotImplementedError
+
+    def destroy(self):
+        raise NotImplementedError
+
+    def move(self, x: int, y: int):
         raise NotImplementedError
 
 
@@ -184,6 +300,9 @@ class GScreen:
         self.displays: list[GDisplay] = []
         raise NotImplementedError
 
+    def __repr__(self) -> str:
+        return '<Screen ({self.height} x {self.width})>'
+
 
 # screen
 class GDisplay:
@@ -193,6 +312,9 @@ class GDisplay:
         self.width: int
         self.height: int
         raise NotImplementedError
+
+    def __repr__(self) -> str:
+        return '<Display ({self.x}, {self.y})>'
 
 
 # eventLoop

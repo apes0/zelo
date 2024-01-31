@@ -1,3 +1,10 @@
+# TODO: as stated in lib.backends.ffi, figure out how to compile in this directory
+
+import sys
+import os
+
+sys.path.append(os.path.dirname((os.path.realpath(__file__))))
+
 from lib.backends.ffi import load
 from lib.ctx import Ctx
 from lib import watcher

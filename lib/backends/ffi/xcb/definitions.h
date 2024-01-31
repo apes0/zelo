@@ -821,6 +821,27 @@ typedef struct xcb_get_geometry_reply_t
     unsigned char pad0[2];
 } xcb_get_geometry_reply_t;
 
+typedef struct xcb_expose_event_t
+{
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    xcb_window_t window;
+    unsigned short x;
+    unsigned short y;
+    unsigned short width;
+    unsigned short height;
+    unsigned short count;
+    unsigned char pad1[2];
+} xcb_expose_event_t;
+
+typedef enum xcb_window_class_t
+{
+    XCB_WINDOW_CLASS_COPY_FROM_PARENT = 0,
+    XCB_WINDOW_CLASS_INPUT_OUTPUT = 1,
+    XCB_WINDOW_CLASS_INPUT_ONLY = 2
+} xcb_window_class_t;
+
 // functions
 
 xcb_connection_t *xcb_connect(const char *displayname, int *screenp);
@@ -889,6 +910,8 @@ xcb_get_geometry_reply_t *xcb_get_geometry_reply(xcb_connection_t *conn, xcb_get
 xcb_generic_event_t *xcb_poll_for_event(xcb_connection_t *c);
 int xcb_get_file_descriptor(xcb_connection_t *c);
 xcb_void_cookie_t xcb_destroy_window(xcb_connection_t *c, xcb_window_t window);
+void xcb_image_destroy(xcb_image_t *image);
+xcb_void_cookie_t xcb_create_window(xcb_connection_t *conn, unsigned char depth, xcb_window_t wid, xcb_window_t parent, short x, short y, unsigned short width, unsigned short height, unsigned short border_width, unsigned short _class, xcb_visualid_t visual, unsigned int value_mask, const void *value_list);
 
 // weird values
 
@@ -897,6 +920,8 @@ unsigned int XCB_GRAB_MODE_ASYNC = 1;
 unsigned int XCB_NONE = 0;
 unsigned int XCB_GRAB_ANY = 0; // just for testing the keyboard :)
 #define XCB_CURRENT_TIME 0L
+#define XCB_COPY_FROM_PARENT 0L
+
 // these events will never appear in cpp, so i just took the definitions from the docs
 #define XCB_RANDR_NOTIFY 1
 #define XCB_KEY_PRESS 2

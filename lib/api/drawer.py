@@ -5,3 +5,4 @@ loaded = load("drawer")
 
 Image: type[GImage] = loaded.Image
 Rectangle: type[GRectangle] = loaded.Rectangle
+Text: type[GText] = loaded.Text

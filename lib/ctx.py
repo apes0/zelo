@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import trio
 from .api.window import Window
@@ -6,6 +6,7 @@ from .api.window import Window
 if TYPE_CHECKING:
     from .backends.generic import CData, GScreen, GWindow, GMouse, GCtx
     from .extension import Extension
+    from .backends.events import Event
 
 
 class Ctx:
@@ -34,3 +35,36 @@ class Ctx:
             window.ignore = False  # probably true if we are missing it lol
             self.windows[_id] = window
         return window
+
+    async def waitFor(self, event: 'Event') -> list[Any]:
+        # returns the arguments for the event that has been triggered
+        ev = trio.Event()
+        args = []
+
+        async def finish(*_args):
+            ev.set()
+            args.extend(_args)
+
+        event.addListener(finish)
+
+        await ev.wait()
+
+        event.removeListener(finish)
+
+        return args
+
+    def createWindow(
+        self,
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        borderWidth: int,
+        parent: 'GWindow | None' = None,
+        ignore: bool = False,
+    ) -> 'GWindow':
+        if not parent:
+            parent = self.root
+        win = self.gctx.createWindow(x, y, width, height, borderWidth, parent, ignore)
+        self.windows[win.id] = win
+        return win

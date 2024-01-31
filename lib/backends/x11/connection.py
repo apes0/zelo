@@ -48,6 +48,7 @@ class Connection(GConnection):
             | lib.XCB_EVENT_MASK_STRUCTURE_NOTIFY
             | lib.XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
             | lib.XCB_EVENT_MASK_PROPERTY_CHANGE
+            | lib.XCB_EVENT_MASK_EXPOSURE
         )
 
         lib.xcb_randr_select_input(
@@ -70,19 +71,35 @@ class Connection(GConnection):
         )  # TODO: export as plugin/config option (still havent decided which one i prefer more, but this is universal from what i understand)
 
         # TODO: get x, y, border width, width, height here
-        req = lib.xcb_query_tree_reply(ctx.connection, lib.xcb_query_tree(ctx.connection, ctx._root), ffi.NULL)
+        req = lib.xcb_query_tree_reply(
+            ctx.connection, lib.xcb_query_tree(ctx.connection, ctx._root), ffi.NULL
+        )
         win = lib.xcb_query_tree_children(req)
-        requests = {win[n]: (lib.xcb_get_window_attributes(ctx.connection, win[n]), lib.xcb_get_geometry(ctx.connection, win[n])) for n in range(req.children_len)}
+        requests = {
+            win[n]: (
+                lib.xcb_get_window_attributes(ctx.connection, win[n]),
+                lib.xcb_get_geometry(ctx.connection, win[n]),
+            )
+            for n in range(req.children_len)
+        }
 
         for _id, req in requests.items():
-            attrs = lib.xcb_get_window_attributes_reply(ctx.connection, req[0], ffi.NULL)
+            attrs = lib.xcb_get_window_attributes_reply(
+                ctx.connection, req[0], ffi.NULL
+            )
             mapped = attrs.map_state != lib.XCB_MAP_STATE_UNMAPPED
-            
+
             x, y, height, width, borderWidth = 0, 0, 0, 0, 0
-            
+
             if mapped:
                 geometry = lib.xcb_get_geometry_reply(ctx.connection, req[1], ffi.NULL)
-                x, y, height, width, borderWidth = geometry.x, geometry.y, geometry.height, geometry.width, geometry.border_width
+                x, y, height, width, borderWidth = (
+                    geometry.x,
+                    geometry.y,
+                    geometry.height,
+                    geometry.width,
+                    geometry.border_width,
+                )
 
             win = Window(height, width, borderWidth, _id, ctx)
             win.x = x

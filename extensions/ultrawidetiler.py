@@ -26,12 +26,12 @@ class Tiler(Extension):
         self.display: GDisplay
         super().__init__(ctx, cfg)
 
-    def update(self, windows: dict[int, 'GWindow'], _main: 'GWindow'):
+    async def update(self, windows: list['GWindow']):
         size = 1 / max(len(windows), 1)
         x = self.spacing
         width = round((self.display.width) * size - self.spacing * 2)
-        for window in windows.values():
-            window.configure(
+        for window in windows:
+            await window.configure(
                 newX=x + self.display.x,
                 newY=self.spacing + self.display.y,
                 newHeight=self.ctx.screen.height - 2 * self.spacing,

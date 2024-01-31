@@ -1,28 +1,32 @@
 from types import ModuleType
+from functools import partial
 from typing import Callable
 from cffi import FFI
 import os
 from importlib import import_module
 
-# NOTE: personally, i would name it 'xcbcffi', but there is already a module with that name and i
-# don't want to use snake case for modules..., so ye, its gonna be in snake case
-xcb = "xcb_cffi"
-wayland = "libwayland_cffi"
+# NOTE: personally, i would name it 'xcbcffi' (or 'xcbCffi'), but there is already a module with that name and i
+# don't want to use camel case for modules..., so ye, its gonna be in snake case
+
+xcb = 'xcb_cffi'
+wayland = 'libwayland_cffi'
+cairo = 'cairo_cffi'
 
 wrappers = {xcb: 'lib.backends.x11', wayland: 'lib.backends.wayland'}
 
 
-def buildX():
+def build(name, libraries, out):
+    # TODO: how to compile this elsewhere
     ffibuilder = FFI()
 
-    ffibuilder.set_source(
-        xcb,
+    ffibuilder.set_source_pkgconfig(
+        out,
+        libraries,
         open(
             os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), 'ffi', 'xcb', 'source.c'
+                os.path.dirname(os.path.abspath(__file__)), 'ffi', name, 'source.c'
             )
         ).read(),
-        libraries=['xcb', 'xcb-util', 'xcb-image', 'xcb-keysyms', 'xcb-randr'],
     )
 
     ffibuilder.cdef(
@@ -30,7 +34,7 @@ def buildX():
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
                 'ffi',
-                'xcb',
+                name,
                 'definitions.h',
             )
         ).read(),
@@ -39,22 +43,35 @@ def buildX():
     ffibuilder.compile(verbose=True, target='*')
 
 
+buildX = partial(
+    build, 'xcb', ['xcb', 'xcb-util', 'xcb-image', 'xcb-keysyms', 'xcb-randr'], xcb
+)
+buildCairo = partial(
+    build, 'cairo', ['pango', 'pangoft2', 'fontconfig', 'freetype2'], cairo
+)
+
+
 def buildWayland():
     pass
+
+
+def assertModule(imp, build):
+    try:
+        _lib = import_module(imp)
+    except:
+        build()
 
 
 runningX = (
     True  # TODO: actually check if x is running, this is for future wayland support
 )
 
-imp, build = (xcb, buildX) if runningX else (wayland, buildWayland)
+imp, _build = (xcb, buildX) if runningX else (wayland, buildWayland)
 imp: str
-build: Callable
+_build: Callable
 
-try:
-    _lib = import_module(imp)
-except:
-    build()
+assertModule(imp, _build)  # assert that we have the xcb/wayland module
+assertModule(cairo, buildCairo)  # assert that we have the cairo module
 
 
 def load(

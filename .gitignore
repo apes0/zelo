@@ -161,7 +161,7 @@ cython_debug/
 .vscode/
 
 #cffi
-xcb_cffi.*
+*_cffi.*
 
 #profiling
 program.prof

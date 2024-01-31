@@ -1,6 +1,7 @@
 from lib.extension import Extension
 from typing import TYPE_CHECKING
-from extensions.shortcuts import Shortcuts
+from extensions.shortcuts import Shortcuts, arun
+from lib.utils import multiple
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -24,9 +25,9 @@ class Workspaces(Extension):  # TODO: make me work with the window tracker's foc
             ctx,
             {
                 'shortcuts': {
-                    self.next: self.nextSpace,
-                    self.prev: self.prevSpace,
-                    self.move: self.toggleMove,
+                    self.next: arun(ctx, self.nextSpace),
+                    self.prev: arun(ctx, self.prevSpace),
+                    self.move: arun(ctx, self.toggleMove),
                 }
             },
         )
@@ -38,39 +39,38 @@ class Workspaces(Extension):  # TODO: make me work with the window tracker's foc
 
         self.toMove[ctx.focused.id] = not self.toMove.get(ctx.focused.id, False)
 
-    def nextSpace(self, ctx):
-        self.hide()
+    async def nextSpace(self, ctx):
+        await self.hide()
         self.current += 1
-        self.show()
+        await self.show()
 
-    def prevSpace(self, ctx):
+    async def prevSpace(self, ctx):
         if not self.current:
             return
-        self.hide()
+        await self.hide()
         self.current -= 1
-        self.show()
+        await self.show()
 
-    def hide(self):
+    async def hide(self):
         if self.ctx.focused and not self.toMove.get(self.ctx.focused.id):
             self.focused[self.current] = self.ctx.focused
-            self.ctx.focused.setFocus(False)
 
         wins = []
+
         for win in self.ctx.windows.values():
-            if not win.mapped or win.id in self.toMove.keys():
+            if not win.mapped or win.ignore or win.id in self.toMove.keys():
                 continue
 
-            win.unmap()
+            await win.unmap()
             wins.append(win)
 
         self.windows[self.current] = wins
 
-    def show(self):
-        for win in self.windows.get(self.current, []):
-            win.map()
+    async def show(self):
+        await multiple(*[win.map() for win in self.windows.get(self.current, [])])
 
         focused = self.focused.get(self.current)
         if focused:
-            focused.setFocus(True)
+            await focused.setFocus(True)
 
         self.toMove = {}

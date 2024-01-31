@@ -1,13 +1,13 @@
 from lib.extension import Extension, single
 from typing import TYPE_CHECKING
-from lib.backends.events import createNotify, mapRequest, unmapNotify, destroyNotify
-from lib.api.drawer import Image
+from lib.backends.events import redraw
+from lib.api.drawer import Image, Text
 import cv2
 import trio
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
-    from lib.backends.generic import GImage
+    from lib.backends.generic import GImage, GWindow
 
 # TODO: support multiple wallpapers for each screen
 
@@ -37,18 +37,19 @@ class Wallpaper(Extension):
             for img in self.imgs:
                 img.set(_img)
                 img.draw()
+            del _img
         else:
             self.cap = cv2.VideoCapture(self.wall)
             self.fps = self.cap.get(cv2.CAP_PROP_FPS)
 
             ctx.nurs.start_soon(self.drawVideo)
 
-        createNotify.addListener(self.drawImg)
-        mapRequest.addListener(self.drawImg)
-        unmapNotify.addListener(self.drawImg)
-        destroyNotify.addListener(self.drawImg)
+        redraw.addListener(self.drawImg)
 
-    async def drawImg(self, *a):
+    async def drawImg(self, win: 'GWindow'):
+        if win.id != self.ctx._root:
+            return
+
         for img in self.imgs:
             img.draw()
 

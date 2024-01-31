@@ -1,7 +1,7 @@
 from typing import Callable, TYPE_CHECKING
 import traceback
-
 from .generic import GButton, GKey, GMod, GWindow
+import trio
 
 if TYPE_CHECKING:
     from ..ctx import Ctx
@@ -10,8 +10,9 @@ if TYPE_CHECKING:
 # backend's event, both wayland and x11 should support all of these
 
 
-async def caller(fn, *args):
+async def caller(fn, *args, task_status: trio._core._run._TaskStatus):
     try:
+        task_status.started()
         await fn(*args)
     except:
         # TODO: do something here
@@ -23,23 +24,35 @@ class Event:
         self.listeners: list[Callable] = []
         self.name = name
         self.types = types
+        self.block = False
+        # NOTE: i dont like this that much, but it makes the api more reasonable to use
 
     def addListener(self, fn: Callable):
         self.listeners.append(fn)
 
-    def trigger(self, ctx: 'Ctx', *args):
-        #        print(f'triggering {self.name} with {args}')
+    def removeListener(self, fn: Callable):
+        self.listeners.remove(fn)
+        # TODO: make this faster (prolly will have to use a dictionary)
+
+    async def trigger(self, ctx: 'Ctx', *args):
+        # print(f'triggering {self.name} with {args} (block: {self.block})')
+
+        if self.block:
+            return
+
         # check types
+
         assert len(self.types) == len(
             args
         ), f'There need to be exactly {len(self.types)} arguments for event {self.name}, instead of {len(args)}.'
+
         for n, _type in enumerate(self.types):
             assert issubclass(
                 args[n].__class__, _type
             ), f'argument #{n} must be of type {_type}, instead of {type(args[n])} for event {self.name}'
 
         for fn in self.listeners:
-            ctx.nurs.start_soon(caller, fn, *args)
+            await ctx.nurs.start(caller, fn, *args)
 
 
 # you might be able to tell that all of these appear to be the same as the x11 events, you would be
@@ -51,6 +64,7 @@ keyRelease = Event('keyRelease', GKey, GMod, GWindow)
 buttonPress = Event('buttonPress', GButton, GMod, GWindow)
 buttonRelease = Event('buttonRelease', GButton, GMod, GWindow)
 mapRequest = Event('mapRequest', GWindow)
+mapNotify = Event('mapNotify', GWindow)
 unmapNotify = Event('unmapNotify', GWindow)
 destroyNotify = Event('destroyNotify', GWindow)
 createNotify = Event('createNotify', GWindow)
@@ -59,3 +73,4 @@ configureRequest = Event('configureRequest', GWindow)
 enterNotify = Event('enterNotify', GWindow)
 leaveNotify = Event('leaveNotify', GWindow)
 focusChange = Event('focusChange', GWindow | None, GWindow | None)  # old, new
+redraw = Event('redraw', GWindow)  # exposure notify for x

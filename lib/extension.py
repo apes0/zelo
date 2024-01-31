@@ -1,4 +1,6 @@
+import traceback
 from typing import TYPE_CHECKING, Any, Callable
+from lib.utils import get
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -7,13 +9,18 @@ if TYPE_CHECKING:
 
 
 class Extension:
-    def __init__(self, ctx: 'Ctx', cfg: dict) -> None:
+    def __init__(self, ctx: 'Ctx', cfg: dict, resolve=[]) -> None:
         self.ctx = ctx
         self.listeners = {}
+        self.resolve = resolve
         self.conf(cfg)
 
     def conf(self, cfg: dict):
         self.__dict__ = {**self.__dict__, **cfg}
+
+        for lable in self.resolve:
+            if obj := self.__dict__[lable]:
+                self.__dict__[lable] = get(obj, self, field=lable)
 
     def addListener(self, event: int, fn: Callable):
         self.listeners[event] = fn
@@ -21,10 +28,13 @@ class Extension:
 
 def setupExtensions(ctx: 'Ctx', extensions: dict):
     for extension, cfg in extensions.items():
-        if ext := ctx.extensions.get(extension):
-            ext.conf(cfg)
-            continue
-        ctx.extensions[extension] = extension(ctx, cfg)
+        try:
+            if ext := ctx.extensions.get(extension):
+                ext.conf(cfg)
+                continue
+            ctx.extensions[extension] = extension(ctx, cfg)
+        except:
+            traceback.print_exc()
 
 
 def single(ext: type[Extension]) -> Extension:
