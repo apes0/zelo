@@ -105,15 +105,14 @@ class Tracker:
         await self.update()
 
     async def mapWindow(self, win: 'GWindow'):
-        if not win.mapped and win.width and win.height:
-            await win.map()
-            await win.setFocus(True)
+        await win.map()
+        await win.setFocus(True)
 
-            # this is a bit of a hack to get windows to be on the correct screen
-            x, y = self.ctx.mouse.location()
+        # this is a bit of a hack to get windows to be on the correct screen
+        x, y = self.ctx.mouse.location()
 
-            win.x = x  # kinda a hack
-            win.y = y
+        win.x = x  # kinda a hack
+        win.y = y
 
         await self.update()
 

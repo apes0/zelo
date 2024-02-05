@@ -81,7 +81,7 @@ cfg.extensions = {
             }
         }
     },
-    Log: {'file': 'log'},
+    #    Log: {'file': 'log'},
     #    Animation: {},
 }
 
