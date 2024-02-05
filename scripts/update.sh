@@ -22,5 +22,5 @@ git stash pop
 
 grep -lr '<<<<<<<' . | xargs git checkout --theirs
 
-
+cd ..
 python3 -m lib.backends.ffi # compile everything that was changed

@@ -13,15 +13,16 @@ class Bar(Widget):
         self.width: int
         self.widgets: dict[type[Widget], dict]
 
-        super().__init__(ctx, cfg, resolve=['back', 'height', 'width', 'x', 'y'])
+        super().__init__(
+            ctx,
+            cfg,
+            resolve={'back': int, 'height': int, 'width': int, 'x': int, 'y': int},
+        )
 
         self.insts: list[Widget] = []
 
         for widget, cfg in self.widgets.items():
             self.insts.append(widget(ctx, {**cfg, 'win': self.win, 'x': 0, 'y': 0}))
-
-        self.width = int(self.width)
-        self.height = int(self.height)
 
         self.rect = Rectangle(ctx, self.win, 0, 0, self.width, self.height, self.back)
 

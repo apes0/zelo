@@ -57,14 +57,15 @@ class Ratio:
         )
 
 
-def get(obj: Theme | Ratio | float, root: 'Extension', field):
+def get(obj: Theme | Ratio | float, root: 'Extension', field, _type):
     # a function to resolve Ratio / Theme / *
+    out = obj
     if isinstance(obj, Theme):
-        return obj.__dict__[field]
-    if isinstance(obj, Ratio):
+        out = obj.__dict__[field]
+    elif isinstance(obj, Ratio):
         if dpy := root.__dict__.get('display'):
-            return obj.getRatio(dpy)
+            out = obj.getRatio(dpy)
         else:
-            return obj.default(root.ctx)
-    else:
-        return obj
+            out = obj.default(root.ctx)
+
+    return _type(out)

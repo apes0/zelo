@@ -17,7 +17,7 @@ class Clock(Widget):
         self.fore: int = 0xFFFFFF
         self.back: int = 0x000000
 
-        super().__init__(ctx, cfg, resolve=['fore', 'back'])
+        super().__init__(ctx, cfg, resolve={'fore': int, 'back': int})
 
         self.text = Text(
             ctx,

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class Extension:
-    def __init__(self, ctx: 'Ctx', cfg: dict, resolve=[]) -> None:
+    def __init__(self, ctx: 'Ctx', cfg: dict, resolve={}) -> None:
         self.ctx = ctx
         self.listeners = {}
         self.resolve = resolve
@@ -19,9 +19,9 @@ class Extension:
     def conf(self, cfg: dict):
         self.__dict__ = {**self.__dict__, **cfg}
 
-        for lable in self.resolve:
+        for lable, _type in self.resolve.items():
             if obj := self.__dict__[lable]:
-                self.__dict__[lable] = get(obj, self, field=lable)
+                self.__dict__[lable] = get(obj, self, lable, _type)
 
     def addListener(self, event: int, fn: Callable):
         self.listeners[event] = fn

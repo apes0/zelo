@@ -39,15 +39,11 @@ class Tiler(Extension):
         self.border: int
         self.spacing: int
         self.display: GDisplay
-        super().__init__(ctx, cfg, resolve=['border', 'spacing'])
 
-        self.border = int(self.border)
-        self.spacing = int(self.spacing)
+        super().__init__(ctx, cfg, resolve={'border': int, 'spacing': int})
 
     async def update(self, windows: list['GWindow']):
         main: 'GWindow' = windows.pop()  # this doesnt error for some reason?
-
-        # ? what the fuck is going on here lmao
 
         size = 1 / max(
             len(windows), 1

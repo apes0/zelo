@@ -58,7 +58,7 @@ class NowPlaying(Widget):
         self.fore: int
         self.back: int
 
-        super().__init__(ctx, cfg, resolve=['fore', 'back'])
+        super().__init__(ctx, cfg, resolve={'fore': int, 'back': int})
 
         self.text = Text(ctx, self.win, 0, 0, None, self.font, self.fore, self.back)
         self.rect = Rectangle(ctx, self.win, 0, 0, self.width, 1, self.back)

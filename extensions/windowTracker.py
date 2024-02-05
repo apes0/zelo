@@ -100,14 +100,12 @@ class Tracker:
             await self.updates[dpy](queue.copy())
 
     async def unmapWindow(self, win: 'GWindow'):
-        dpy = getDisplay(self.ctx, win.x, win.y)
-        if dpy:
-            await self.findFocus()
+        await self.findFocus()
 
         await self.update()
 
     async def mapWindow(self, win: 'GWindow'):
-        if not win.mapped:
+        if not win.mapped and win.width and win.height:
             await win.map()
             await win.setFocus(True)
 
@@ -120,7 +118,7 @@ class Tracker:
         await self.update()
 
     async def destroyNotify(self, win: 'GWindow'):
-        if win in self.focusQueue:
+        while win in self.focusQueue:
             self.focusQueue.remove(win)
 
         await self.findFocus()
@@ -130,7 +128,7 @@ class Tracker:
     async def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
         for win in [old, new]:
             if win:
-                if win in self.focusQueue:
+                while win in self.focusQueue:
                     self.focusQueue.remove(win)
                 self.focusQueue.append(win)
 
