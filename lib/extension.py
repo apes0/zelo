@@ -1,6 +1,7 @@
 import traceback
 from typing import TYPE_CHECKING, Any, Callable
 from lib.utils import get
+import logging
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -34,7 +35,7 @@ def setupExtensions(ctx: 'Ctx', extensions: dict):
                 continue
             ctx.extensions[extension] = extension(ctx, cfg)
         except:
-            traceback.print_exc()
+            logging.error(traceback.format_exc())
 
 
 def single(ext: type[Extension]) -> Extension:

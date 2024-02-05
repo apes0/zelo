@@ -1,3 +1,4 @@
+from extensions.log import Log
 from lib.utils import Ratio, Theme, spawn, stop
 from lib.api.keys import Key, Mod
 from lib._cfg import Cfg
@@ -26,9 +27,9 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     ((Key('t'),), Mod('control')): lambda ctx: spawn('alacritty'),
     ((Key('s'),), Mod('control')): lambda ctx: stop(ctx),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
-    ((Key('x'),), Mod('control')): lambda ctx: ctx.nurs.start_soon(ctx.focused.close)
-    if ctx.focused
-    else None,
+    ((Key('x'),), Mod('control')): lambda ctx: (
+        ctx.nurs.start_soon(ctx.focused.close) if ctx.focused else None
+    ),
 }
 
 # ? maybe export this to a plugin
@@ -56,30 +57,31 @@ cfg.extensions = {
             Mod('control'),
         ),
     },
-    #    Widget: {
-    #        'widgets': {
-    #            Bar: {
-    #                'x': Ratio(0.05, width=True),
-    #                'y': Ratio(0.02, height=True),
-    #                'width': Ratio(0.9, width=True),
-    #                'height': Ratio(0.1, height=True),
-    #                'back': theme,
-    #                'widgets': {
-    #                    Clock: {
-    #                        'font': 'Ubuntu 23',
-    #                        'fmt': '%X',
-    #                        'fore': theme,
-    #                        'back': theme,
-    #                    },
-    #                    # NowPlaying: {
-    #                    #     'font': 'Ubuntu 23',
-    #                    #     'fore': theme,
-    #                    #     'back': theme,
-    #                    # },
-    #                },
-    #            }
-    #        }
-    #    },
+    Widget: {
+        'widgets': {
+            Bar: {
+                'x': Ratio(0.05, width=True),
+                'y': Ratio(0.02, height=True),
+                'width': Ratio(0.9, width=True),
+                'height': Ratio(0.1, height=True),
+                'back': theme,
+                'widgets': {
+                    Clock: {
+                        'font': 'Ubuntu 23',
+                        'fmt': '%X',
+                        'fore': theme,
+                        'back': theme,
+                    },
+                    NowPlaying: {
+                        'font': 'Ubuntu 23',
+                        'fore': theme,
+                        'back': theme,
+                    },
+                },
+            }
+        }
+    },
+    Log: {'file': 'log'},
     #    Animation: {},
 }
 

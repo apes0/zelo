@@ -8,8 +8,6 @@ if TYPE_CHECKING:
     from lib.ctx import Ctx
     from lib.backends.generic import GButton, GWindow, GMod
 
-# TODO: figure out why we cant use window.ignore?
-
 
 class MouseFocus(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
@@ -23,17 +21,23 @@ class MouseFocus(Extension):
 
         super().__init__(ctx, cfg)
 
+        for win in ctx.windows.values():
+            if win.ignore:
+                continue
+
+            for button in self.buttons:
+                button.grab(ctx, win, self.mod)
+
         buttonPress.addListener(self.buttonPress)
         mapRequest.addListener(self.mapRequest)
         focusChange.addListener(self.focusChange)
 
-    async def mapRequest(self, _win: 'GWindow'):
-        for win in self.ctx.windows.values():
-            #            if win.ignore:
-            #                continue
+    async def mapRequest(self, win: 'GWindow'):
+        if win.ignore:
+            return
 
-            for button in self.buttons:
-                button.grab(self.ctx, win, self.mod)
+        for button in self.buttons:
+            button.grab(self.ctx, win, self.mod)
 
     async def buttonPress(self, button: 'GButton', mod: 'GMod', window: 'GWindow'):
         for button in self.buttons:
@@ -41,14 +45,9 @@ class MouseFocus(Extension):
 
         await window.setFocus(True)
 
-    async def focusChange(self, old: 'GWindow', new: 'GWindow'):
-        for win in self.ctx.windows.values():
-            #            if win.ignore:
-            #                continue
-
-            for button in self.buttons:
-                if win == new:
-                    button.ungrab(self.ctx, win, self.mod)
-                    continue
-
-                button.grab(self.ctx, win, self.mod)
+    async def focusChange(self, old: 'GWindow | None', new: 'GWindow| None'):
+        for button in self.buttons:
+            if old:
+                button.grab(self.ctx, old, self.mod)
+            if new:
+                button.ungrab(self.ctx, new, self.mod)

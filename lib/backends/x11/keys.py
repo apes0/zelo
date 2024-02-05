@@ -106,8 +106,6 @@ class Key(GKey):
         for _mod in modifiers:
             mod |= _mod.mod
 
-        print(mod, self.key)
-
         event = keyEvent()
         event.response_type = lib.XCB_BUTTON_PRESS
         event.detail = self.key

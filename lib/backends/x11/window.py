@@ -97,7 +97,8 @@ class Window(GWindow):
         color: int
         # act is the function to be called *after* everything is done
         # its used so that we dont have any conflicts
-        act: Coroutine
+        act: Coroutine | None = None
+
         if focus:
             color = cfg.focusedColor
             lib.xcb_set_input_focus(
@@ -147,7 +148,8 @@ class Window(GWindow):
 
         lib.xcb_flush(self.ctx.connection)
 
-        await act  # type: ignore
+        if act:
+            await act
 
         # no waiting to do here :)
 

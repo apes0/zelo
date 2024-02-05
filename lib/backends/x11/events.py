@@ -1,3 +1,4 @@
+import logging
 from .keys import Key, Mod
 from .mouse import Button
 from lib.extension import setupExtensions
@@ -140,7 +141,9 @@ async def clientMessage(event, ctx: 'Ctx'):
     event = clientMessageTC(event)
     data = event.data
     data = {8: data.data8, 16: data.data16, 32: data.data32}[event.format]
-    print(event.type, [n for n in data])
+
+
+#    print(event.type, [n for n in data])
 
 
 #    ctx.atomStore.handle(ctx, event.type, data, event.window)
@@ -211,25 +214,27 @@ async def unmapNotify(event, ctx: 'Ctx'):
 async def motionNotify(event, ctx: 'Ctx'):
     # TODO: when does this get called???
     event = motionNotifyTC(event)
-    print(
-        event.detail,
-        event.root,
-        event.event,
-        event.child,
-        event.root_x,
-        event.root_y,
-        event.event_x,
-        event.event_y,
-        event.state,
-    )
+
+
+#    print(
+#        event.detail,
+#        event.root,
+#        event.event,
+#        event.child,
+#        event.root_x,
+#        event.root_y,
+#        event.event_x,
+#        event.event_y,
+#        event.state,
+#    )
 
 
 @handler(0)
 async def error(event, ctx: 'Ctx'):
     event = genericErrorTC(event)
-    # print(
-    #    f'ERROR!!! {event.error_code} ({event.major_code}.{event.minor_code}) for resource {event.resource_id}'
-    # )
+    logging.error(
+        f'{event.error_code} ({event.major_code}.{event.minor_code}) for resource {event.resource_id}'
+    )
     # TODO: xcb-util-errors
 
 
@@ -298,7 +303,9 @@ async def leaveNotify(event, ctx: 'Ctx'):
 @handler(lib.XCB_RANDR_NOTIFY)
 async def randrNotify(event, ctx: 'Ctx'):
     event = randrNotifyTC(event)
-    print(event.response_type, event.subCode)
+
+
+#    print(event.response_type, event.subCode)
 
 
 @handler(lib.XCB_EXPOSE)
@@ -356,4 +363,4 @@ async def update(ctx: 'Ctx', conn: 'GConnection'):
         if handler := handlers.get(eventType, None):
             ctx.nurs.start_soon(handler, event, ctx)
         elif eventType not in ignore:
-            print(f'!!! No handler for: {eventType}')
+            logging.warn(f'No handler for: {eventType}')
