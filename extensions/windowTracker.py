@@ -62,7 +62,9 @@ class Tracker:
         self.ctx: 'Ctx' = ctx
         self.exts: dict[GDisplay, Extension] = {}
         self.updates: dict[GDisplay, UpdateType] = {}
-        self.focusQueue: list[GWindow] = []
+        self.focusQueue: list[GWindow] = [
+            win for win in ctx.windows.values() if win.mapped and not win.ignore
+        ]
 
         for display in ctx.screen.displays:
             ext = tiler(ctx, {**args, 'display': display})

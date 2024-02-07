@@ -1,5 +1,5 @@
 import subprocess
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 import os
 import trio
 
@@ -57,7 +57,7 @@ class Ratio:
         )
 
 
-def get(obj: Theme | Ratio | float, root: 'Extension', field, _type):
+def get(obj: Theme | Ratio | Any, root: 'Extension', field, _type):
     # a function to resolve Ratio / Theme / *
     out = obj
     if isinstance(obj, Theme):

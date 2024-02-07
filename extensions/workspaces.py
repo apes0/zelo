@@ -67,7 +67,13 @@ class Workspaces(Extension):  # TODO: make me work with the window tracker's foc
         self.windows[self.current] = wins
 
     async def show(self):
-        await multiple(*[win.map() for win in self.windows.get(self.current, [])])
+        await multiple(
+            *[
+                win.map()
+                for win in self.windows.get(self.current, [])
+                if not win.destroyed
+            ]
+        )
 
         focused = self.focused.get(self.current)
         if focused:

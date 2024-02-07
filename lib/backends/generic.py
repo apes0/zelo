@@ -68,6 +68,7 @@ class GWindow:
         self.focused = False
         self.mapped = False
         self.ignore: bool
+        self.destroyed: bool
         self.parent: GWindow | None
 
         # events:

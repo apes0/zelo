@@ -156,6 +156,7 @@ async def destroyNotify(event, ctx: 'Ctx'):
     # https://wiki.python.org/moin/TimeComplexity
     window: int = event.window
     win: GWindow = ctx.getWindow(window)
+    win.destroyed = True
 
     if ctx.focused and window == ctx.focused.id:
         win.mapped = False

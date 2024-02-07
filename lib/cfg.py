@@ -1,4 +1,4 @@
-from extensions.log import Log
+import logging
 from lib.utils import Ratio, Theme, spawn, stop
 from lib.api.keys import Key, Mod
 from lib._cfg import Cfg
@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
     from lib.backends.generic import GKey, GMod
+
+logging.basicConfig(level=logging.DEBUG)
 
 cfg = Cfg()
 

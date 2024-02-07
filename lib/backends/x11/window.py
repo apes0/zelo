@@ -56,6 +56,7 @@ class Window(GWindow):
         self.parent: Window | None = None
         self.focused: bool = False
         self.mapped: bool = False
+        self.destroyed: bool = False
         self.ignore = True  # set by override redirect (also we assume the worst, so we set it to true)
 
         # events:

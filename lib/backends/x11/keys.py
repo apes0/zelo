@@ -2,7 +2,7 @@ from lib.backends.generic import GKey, GMod, GWindow
 from .keysyms import keys
 from typing import TYPE_CHECKING
 from xcb_cffi import lib, ffi
-from .types import keyEvent, charpC
+from .types import keyEvent
 from ..generic import CData
 
 if TYPE_CHECKING:
@@ -13,6 +13,11 @@ modMap = {
     'shift': lib.XCB_MOD_MASK_SHIFT,
     'lock': lib.XCB_MOD_MASK_LOCK,
     'control': lib.XCB_MOD_MASK_CONTROL,
+    'alt': lib.XCB_MOD_MASK_1,
+    'numLk': lib.XCB_MOD_MASK_2,
+    'numLock': lib.XCB_MOD_MASK_2,
+    'super': lib.XCB_MOD_MASK_4,
+    'hyper': lib.XCB_MOD_MASK_4,
     'mod1': lib.XCB_MOD_MASK_1,
     'mod2': lib.XCB_MOD_MASK_2,
     'mod3': lib.XCB_MOD_MASK_3,
