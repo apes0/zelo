@@ -14,8 +14,8 @@ class Clock(Widget):
         self.fmt: str
         self.update = 1
         self.font: str
-        self.fore: int = 0xFFFFFF
-        self.back: int = 0x000000
+        self.fore: int = ctx.cfg.theme  # type: ignore
+        self.back: int = ctx.cfg.theme  # type: ignore
 
         super().__init__(ctx, cfg, resolve={'fore': int, 'back': int})
 

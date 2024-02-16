@@ -4,6 +4,7 @@ import trio
 from .api.window import Window
 
 if TYPE_CHECKING:
+    from ._cfg import Cfg
     from .backends.generic import CData, GScreen, GWindow, GMouse, GCtx
     from .extension import Extension
     from .backends.events import Event
@@ -25,6 +26,7 @@ class Ctx:
         self.extensions: dict[type, Extension] = {}  # list of loaded extensions
         self.closed = False
         self.nurs: trio.Nursery
+        self.cfg: 'Cfg'
 
     def getWindow(self, _id: int) -> 'GWindow':
         if _id == self._root:

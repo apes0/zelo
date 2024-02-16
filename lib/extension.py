@@ -1,6 +1,6 @@
 import traceback
 from typing import TYPE_CHECKING, Any, Callable
-from lib.utils import get
+from utils.fns import get
 import logging
 
 if TYPE_CHECKING:

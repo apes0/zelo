@@ -1,5 +1,3 @@
-# TODO: as stated in lib.backends.ffi, figure out how to compile in this directory
-
 import sys
 import os
 
@@ -18,7 +16,7 @@ async def main():
         ctx.nurs = nurs
         nurs.start_soon(watcher.setup, ctx)
         nurs.start_soon(load('events').setup, ctx)
-        await trio.sleep_forever()
+        # ? maybe init extensions here?
 
 
 trio.run(main)

@@ -14,12 +14,9 @@ class Widget(Extension):
         self.x: int
         self.y: int
 
-        super().__init__(ctx, cfg, resolve=resolve)
+        super().__init__(ctx, cfg, resolve={**resolve, 'x': int, 'y': int})
 
-        self.x = int(self.x)
-        self.y = int(self.y)
-        self.size: tuple[int, int] = (1, 1)
-
+        self._size: tuple[int, int] = (1, 1)
         self.win = ctx.createWindow(
             self.x, self.y, 1, 1, 0, parent=self.win, ignore=True
         )
@@ -34,4 +31,4 @@ class Widget(Extension):
         #        print(f'resizing to {width}x{height}')
         await self.win.configure(newWidth=width, newHeight=height)
 
-        self.size = (width, height)
+        self._size = (width, height)

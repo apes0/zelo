@@ -323,15 +323,17 @@ async def expose(event, ctx: 'Ctx'):
     await events.redraw.trigger(ctx, window)
 
 
-ignore = [9, 10, 14]  # list of events to ignore
+ignore = [9, 10, 14, 89]  # list of events to ignore
 # 9 - focus in - it just breaks shit, but i *might* need it
 # 10 - focus out - same as focus in
 # 14 - idk tbh (XCB_NO_EXPOSURE)
+# 89 - also dont know
 
 # TODO: verify this info (this will forever be here)
 
 
 async def setup(ctx: 'Ctx'):
+    # this is, in practice, the init function for the ctx
     ctx.dname = ffi.NULL
     ctx.screenp = intp(0)
     ctx.gctx = GCtx(ctx)
@@ -340,6 +342,7 @@ async def setup(ctx: 'Ctx'):
         ctx
     )  # TODO: put this in the ctx and rename the current ``connection``
 
+    ctx.cfg = cfg
     setupExtensions(ctx, cfg.extensions)
 
     async def _update():

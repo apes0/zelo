@@ -55,8 +55,8 @@ class NowPlaying(Widget):
         self.default = 'Nothing playing...'
         self.width: int = 200  # px
         self.font: str
-        self.fore: int
-        self.back: int
+        self.fore: int = ctx.cfg.theme  # type: ignore
+        self.back: int = ctx.cfg.theme  # type: ignore
 
         super().__init__(ctx, cfg, resolve={'fore': int, 'back': int})
 

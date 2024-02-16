@@ -1,19 +1,21 @@
 import logging
-from lib.utils import Ratio, Theme, spawn, stop
+from utils.layout import Layout
+from utils.ratio import Ratio
+from utils.theme import Theme
+from utils.fns import spawn, stop
 from lib.api.keys import Key, Mod
 from lib._cfg import Cfg
 
-from extensions.tiler import Tiler
+from extensions.vstack import Tiler
 from extensions.workspaces import Workspaces
 from extensions.mouseFocus import MouseFocus
 from extensions.wallpaper import Wallpaper
 from extensions.shortcuts import Shortcuts
-from extensions.fakeMonitors import FakeDisplays
 from extensions.widget import Widget
 from extensions.widgets.clock import Clock
 from extensions.widgets.nowPlaying import NowPlaying
 from extensions.widgets.hbar import Bar
-from extensions.animation import Animation
+from extensions.mouse import Mouse
 
 from typing import TYPE_CHECKING, Callable
 
@@ -34,21 +36,35 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     ),
 }
 
-# ? maybe export this to a plugin
-cfg.focusedColor = 0x9999D6
-cfg.unfocusedColor = 0x393966
-# unfocusedColor = 0x1CEEEE
-# focusedColor = 0xC0FFEE
+wall = 'wall.png'
 
-theme = Theme(cfg.focusedColor, cfg.unfocusedColor)
+theme = Theme(0x9999D6, 0x393966, [])
+cfg.theme = theme
+
+cfg.focusedColor = theme.fore
+cfg.unfocusedColor = theme.back
+
+# ? maybe export this to a plugin
+cfg.focusedColor = theme.fore
+cfg.unfocusedColor = theme.back
+
+# layouts
+
+main = Layout()
+bar, main = main.hsplit(0.175, 0.025)
+main.unspace()
 
 # extensions and their config
 
 cfg.extensions = {
-    FakeDisplays: {'displays': [[480, 480]]},  # just here for testing with xephyr
-    Tiler: {'mainSize': 2 / 3, 'border': Ratio(0.015), 'spacing': Ratio(0.02)},
+    Tiler: {
+        'mainSize': 2 / 3,
+        'border': 5,
+        'spacing': 10,
+        'topSpacing': main.y,
+    },
     MouseFocus: {},
-    Wallpaper: {'wall': 'wall.png'},
+    Wallpaper: {'wall': wall},
     #    Wallpaper: {'wall': 'video.gif', 'video': True},
     Shortcuts: {'shortcuts': keys},
     Workspaces: {
@@ -62,28 +78,23 @@ cfg.extensions = {
     Widget: {
         'widgets': {
             Bar: {
-                'x': Ratio(0.05, width=True),
-                'y': Ratio(0.02, height=True),
-                'width': Ratio(0.9, width=True),
-                'height': Ratio(0.1, height=True),
-                'back': theme,
+                'x': bar.x,
+                'y': bar.y,
+                'width': bar.width,
+                'height': bar.height,
                 'widgets': {
                     Clock: {
                         'font': 'Ubuntu 23',
                         'fmt': '%X',
-                        'fore': theme,
-                        'back': theme,
                     },
                     NowPlaying: {
                         'font': 'Ubuntu 23',
-                        'fore': theme,
-                        'back': theme,
                     },
                 },
             }
         }
     },
-    #    Log: {'file': 'log'},
+    Mouse: {},
     #    Animation: {},
 }
 

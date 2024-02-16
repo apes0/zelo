@@ -5,9 +5,8 @@ cd $mypath
 
 # idk how good this
 
-git add *
-
 git fetch
+git add *
 
 files=$(git diff --name-only | grep -Po 'lib/backends/ffi/\K([^/])*/.*' | grep -o '^[^/]*')
 
@@ -17,6 +16,7 @@ do
 done
 
 git stash
+git add *
 git merge
 git stash pop
 

@@ -1,18 +1,7 @@
 
 # Zelo
 
-This is a window manager written in python. I made it primarily because i don't like how gnome manages windows.
-
-# Support
-
-- only x11, but i am going to work on wayland support
-- extensions
-- no ewmh currently
-- no icccm currently
-
-# extensions
-
-See [extensions/readme.md](./extensions/readme.md) for a guide on configuring extensions and what they do.
+This is an X11 window manager written in python.
 
 # Installation
 
@@ -38,23 +27,24 @@ If you are running anything unsupported by the install script, you need to do th
 
 To update, run ``./scripts/update.sh``. It will keep all the changes you have applied.
 
+# Configuring
+
+The configuration is held in ``cfg.py``, there you can put shortcuts, extensions and their config, and what to be run when the window manager starts. I might add more info about how to configure the window manager.
+
+Currently, the following docs are available:
+
+- [extensions/readme.md](./extensions/readme.md) for a guide on configuring extensions and what they do
+- [utils/readme.md](./utils/readme.md) for the usage of the utility functions
+- [extensions/widgets/readme.md](./extensions/widgets/readme.md) for the usage of widgets
+
 # Bugs
 
 This is a section dedicated to bugs that i know of and will think about solving.
 
 - qt apps do not work, unless you delete ``~/.local/lib/python3.10/site-packages/cv2/qt/plugins/platforms/libqxcb.so`` (not sure if it's just on my system)
 - apps that cannot be resized are kinda jank and dont really work well
-- x11 image is ignoring redraw stuff
-- no "graceful" stopping of apps
 - mouse themeing doesn't work for some reason
-
-# Configuring
-
-The configuration is held in ``cfg.py``, there you can put shortcuts, extensions and their config, and what to be run when the window manager starts. I might add more info about how to configure the window manager.
-
-# Docs
-
-Currently there are only docs for configuring extensions, but nothing else.
+- right clicking sometimes doesn't work
 
 # Images
 

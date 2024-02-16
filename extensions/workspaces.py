@@ -1,7 +1,7 @@
 from lib.extension import Extension
 from typing import TYPE_CHECKING
 from extensions.shortcuts import Shortcuts, arun
-from lib.utils import multiple
+from utils.fns import multiple
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx

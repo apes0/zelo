@@ -38,9 +38,29 @@ class Tiler(Extension):
         self.mainSize: float
         self.border: int
         self.spacing: int
+        self.topSpacing: int = 0
+        self.bottomSpacing: int = 0
+        self.leftSpacing: int = 0
+        self.rightSpacing: int = 0
         self.display: GDisplay
 
-        super().__init__(ctx, cfg, resolve={'border': int, 'spacing': int})
+        super().__init__(
+            ctx,
+            cfg,
+            resolve={
+                'border': int,
+                'spacing': int,
+                'topSpacing': int,
+                'bottomSpacing': int,
+                'leftSpacing': int,
+                'rightSpacing': int,
+            },
+        )
+
+        self.x = self.display.x + self.leftSpacing
+        self.y = self.display.y + self.topSpacing
+        self.width = self.display.width - self.leftSpacing - self.rightSpacing
+        self.height = self.display.height - self.topSpacing - self.bottomSpacing
 
     async def update(self, windows: list['GWindow']):
         main: 'GWindow' = windows.pop()  # this doesnt error for some reason?
@@ -50,21 +70,21 @@ class Tiler(Extension):
         )  # get the size of the side windows as a fraction
         y = self.spacing  # start the y coordinate at ``self.spacing`` pixels down
         _height = (
-            self.display.height * size - (2 + size) * self.spacing
+            self.height * size - (2 + size) * self.spacing
         )  # calculate the height of each side window
         height = round(_height)  # round it to a whole number
         offset = _height - height  # get the error from the rounded version
         width = round(
-            self.display.width * (1 - self.mainSize) - self.spacing * 3
+            self.width * (1 - self.mainSize) - self.spacing * 3
         )  # calculate the width of every side window
         x = round(
-            self.display.width * self.mainSize + self.spacing
+            self.width * self.mainSize + self.spacing
         )  # calculate the x coordinate of the side windows
 
         for window in windows:
             await window.configure(
-                newX=x + self.display.x,
-                newY=round(y) + self.display.y,
+                newX=x + self.x,
+                newY=round(y) + self.y,
                 newHeight=height,
                 newWidth=width,
                 newBorderWidth=self.border,
@@ -73,10 +93,10 @@ class Tiler(Extension):
 
         mainSize = self.mainSize if windows else 1
         await main.configure(
-            newX=self.spacing + self.display.x,
-            newY=self.spacing + self.display.y,
-            newWidth=round(self.display.width * mainSize - 3 * self.spacing),
-            newHeight=self.display.height - 3 * self.spacing,
+            newX=self.spacing + self.x,
+            newY=self.spacing + self.y,
+            newWidth=round(self.width * mainSize - 3 * self.spacing),
+            newHeight=self.height - 3 * self.spacing,
             newBorderWidth=self.border,
         )
 

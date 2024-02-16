@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 class Bar(Widget):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
-        self.back: int
+        self.back: int = ctx.cfg.theme  # type:ignore
         self.height: int
         self.width: int
         self.widgets: dict[type[Widget], dict]
@@ -38,12 +38,12 @@ class Bar(Widget):
         await self.move()
 
     async def move(self):
-        s = sum([widget.size[0] for widget in self.insts])
+        s = sum([widget._size[0] for widget in self.insts])
         spacing = (self.width - s) / (max(len(self.insts), 1) + 1)
         assert spacing > 0, 'The bar is too small...'
         x = spacing
 
         for widget in self.insts:
-            y = (self.height - widget.size[1]) // 2
+            y = (self.height - widget._size[1]) // 2
             await widget.win.configure(newX=round(x), newY=y)
-            x += spacing + widget.size[0]
+            x += spacing + widget._size[0]

@@ -64,12 +64,6 @@ class Connection(GConnection):
 
         ctx.mouse = Mouse(ctx)
 
-        ctx.mouse.setCursor(
-            ctx.root,
-            'cursor',
-            'left_ptr',
-        )  # TODO: export as plugin/config option (still havent decided which one i prefer more, but this is universal from what i understand)
-
         # TODO: get x, y, border width, width, height here
         req = lib.xcb_query_tree_reply(
             ctx.connection, lib.xcb_query_tree(ctx.connection, ctx._root), ffi.NULL

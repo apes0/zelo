@@ -133,12 +133,12 @@ class Mouse(GMouse):
             font,
             cursorId,
             cursorId + 1,
-            (fore >> 16) % 256,
-            (fore >> 8) % 256,
-            fore % 256,
-            (back >> 16) % 256,
-            (back >> 8) % 256,
-            back % 256,
+            ((fore >> 16) % 256)*257,
+            ((fore >> 8) % 256) *257,
+            (fore % 256)*257,
+            ((back >> 16) % 256)*257,
+            ((back >> 8) % 256)*257,
+            (back % 256)*257,
         )
 
         mask = lib.XCB_CW_CURSOR
