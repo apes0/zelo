@@ -1,12 +1,10 @@
 #!/bin/zsh
 
 mypath=${0:a:h}
-cd $mypath
-
+cd "$mypath/.."
 # idk how good this
 
 git fetch
-git add *
 
 files=$(git diff --name-only | grep -Po 'lib/backends/ffi/\K([^/])*/.*' | grep -o '^[^/]*')
 
@@ -20,7 +18,7 @@ git add *
 git merge
 git stash pop
 
-grep -lr '<<<<<<<' . | xargs git checkout --theirs
+# here we do this so that the update script doesnt override itself lol
+grep -lr '<<<<''<<<' . | xargs git checkout --theirs
 
-cd ..
 python3 -m lib.backends.ffi # compile everything that was changed

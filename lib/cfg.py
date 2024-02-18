@@ -14,7 +14,7 @@ from extensions.shortcuts import Shortcuts
 from extensions.widget import Widget
 from extensions.widgets.clock import Clock
 from extensions.widgets.nowPlaying import NowPlaying
-from extensions.widgets.hbar import Bar
+from extensions.widgets.bar import Bar
 from extensions.mouse import Mouse
 
 from typing import TYPE_CHECKING, Callable
