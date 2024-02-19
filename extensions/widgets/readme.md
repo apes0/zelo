@@ -34,6 +34,9 @@ This widget shows what is playing right now.
 - ``fore``? - the foreground color
 - ``back``? - the background color
 
+> [!NOTE]
+> This requires the ``dbus`` module to be installed. To install it, run ``pip3 install dbus``
+
 ## text
 
 This widget shows a clock.

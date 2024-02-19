@@ -16,7 +16,7 @@ If you are running anything unsupported by the install script, you need to do th
 
 - dowload the following dependencies: ``libxcb-util-dev libx11-xcb-dev libxcb-keysyms1-dev libxcb-image0-dev libxcb-randr0-dev python3``
 
-- run ``pip3 install -r requirements.py`` or install the following modules from your package manager: ``python3-cffi python3-opencv``
+- run ``pip3 install -r requirements.py`` or install the following modules from your package manager: ``python3-cffi python3-opencv python3-trio``
 
 - run ``./scripts/keysyms.sh``
 

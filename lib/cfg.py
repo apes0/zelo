@@ -6,7 +6,7 @@ from utils.fns import spawn, stop
 from lib.api.keys import Key, Mod
 from lib._cfg import Cfg
 
-from extensions.vstack import Tiler
+from extensions.tiler import Tiler
 from extensions.workspaces import Workspaces
 from extensions.mouseFocus import MouseFocus
 from extensions.wallpaper import Wallpaper
@@ -15,6 +15,7 @@ from extensions.widget import Widget
 from extensions.widgets.clock import Clock
 from extensions.widgets.nowPlaying import NowPlaying
 from extensions.widgets.bar import Bar
+from extensions.widgets.text import Text
 from extensions.mouse import Mouse
 
 from typing import TYPE_CHECKING, Callable
@@ -61,7 +62,7 @@ cfg.extensions = {
         'mainSize': 2 / 3,
         'border': 5,
         'spacing': 10,
-        'topSpacing': main.y,
+        #        'topSpacing': main.y,
     },
     MouseFocus: {},
     Wallpaper: {'wall': wall},
@@ -83,13 +84,15 @@ cfg.extensions = {
                 'width': bar.width,
                 'height': bar.height,
                 'widgets': {
-                    Clock: {
-                        'font': 'Ubuntu 23',
-                        'fmt': '%X',
-                    },
-                    NowPlaying: {
-                        'font': 'Ubuntu 23',
-                    },
+                    # Clock: {
+                    #     'font': 'Ubuntu 33',
+                    #     'fmt': '%X',
+                    # },
+                    # NowPlaying: {
+                    #     'font': 'Ubuntu 33',
+                    #     'width': 400,
+                    # },
+                    Text: {'text': 'Hello World!', 'font': 'Ubuntu 33'},
                 },
             }
         }
