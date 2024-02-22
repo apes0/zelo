@@ -2,10 +2,12 @@ import subprocess
 from typing import TYPE_CHECKING, Any
 import os
 import trio
+
 from .theme import Theme
 from .ratio import Ratio
 
 if TYPE_CHECKING:
+    from lib.backends.generic import GWindow
     from lib.ctx import Ctx
     from lib.extension import Extension
 
@@ -41,3 +43,11 @@ def get(obj: Theme | Ratio | Any, root: 'Extension', field, _type):
     if _type:
         out = _type(out)
     return out
+
+
+def toCursor(ctx: 'Ctx', win: 'GWindow'):
+    async def afn():
+        x, y = ctx.mouse.location()
+        await win.configure(newX=x, newY=y)
+
+    ctx.nurs.start_soon(afn)

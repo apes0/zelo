@@ -35,7 +35,7 @@ This widget shows what is playing right now.
 - ``back``? - the background color
 
 > [!NOTE]
-> This requires the ``dbus`` module to be installed. To install it, run ``pip3 install dbus``
+> This requires the ``dbus-python`` module to be installed. To install it, run ``pip3 install dbus-python``
 
 ## text
 

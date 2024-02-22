@@ -10,8 +10,8 @@ class Text(Widget):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.text: str
         self.font: str
-        self.fore: int = ctx.cfg.theme  # type: ignore
-        self.back: int = ctx.cfg.theme  # type: ignore
+        self.fore: int = ctx.cfg.theme.fore
+        self.back: int = ctx.cfg.theme.back
 
         super().__init__(ctx, cfg, resolve={'fore': int, 'back': int})
 

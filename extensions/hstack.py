@@ -36,7 +36,7 @@ class Tiler(Extension):
     async def update(self, windows: list['GWindow']):
         x = self.spacing
         width = round(
-            (self.display.width - (2 + 2 * len(windows)) * self.spacing) / len(windows)
+            (self.display.width - (1 + 2 * len(windows)) * self.spacing) / len(windows)
         )
         for window in windows:
             await window.configure(

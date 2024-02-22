@@ -327,7 +327,7 @@ ignore = [9, 10, 14, 89]  # list of events to ignore
 # 9 - focus in - it just breaks shit, but i *might* need it
 # 10 - focus out - same as focus in
 # 14 - idk tbh (XCB_NO_EXPOSURE)
-# 89 - also dont know
+# 89 - also dont know, but i think its something to do with randr
 
 # TODO: verify this info (this will forever be here)
 

@@ -2,10 +2,11 @@ import logging
 from utils.layout import Layout
 from utils.ratio import Ratio
 from utils.theme import Theme
-from utils.fns import spawn, stop
+from utils.fns import spawn, stop, toCursor
 from lib.api.keys import Key, Mod
 from lib._cfg import Cfg
 
+from extensions.fakeMonitors import FakeDisplays
 from extensions.tiler import Tiler
 from extensions.workspaces import Workspaces
 from extensions.mouseFocus import MouseFocus
@@ -17,6 +18,7 @@ from extensions.widgets.nowPlaying import NowPlaying
 from extensions.widgets.bar import Bar
 from extensions.widgets.text import Text
 from extensions.mouse import Mouse
+from extensions.animation import Animation
 
 from typing import TYPE_CHECKING, Callable
 
@@ -34,6 +36,9 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
     ((Key('x'),), Mod('control')): lambda ctx: (
         ctx.nurs.start_soon(ctx.focused.close) if ctx.focused else None
+    ),
+    ((Key('m'),), Mod('control')): lambda ctx: (
+        toCursor(ctx, ctx.focused) if ctx.focused else None
     ),
 }
 
@@ -58,6 +63,7 @@ main.unspace()
 # extensions and their config
 
 cfg.extensions = {
+    #    FakeDisplays: {'displays': [[480, 480]]},
     Tiler: {
         'mainSize': 2 / 3,
         'border': 5,
@@ -84,17 +90,17 @@ cfg.extensions = {
                 'width': bar.width,
                 'height': bar.height,
                 'widgets': {
-                    # Clock: {
-                    #     'font': 'Ubuntu 33',
-                    #     'fmt': '%X',
-                    # },
-                    # NowPlaying: {
-                    #     'font': 'Ubuntu 33',
-                    #     'width': 400,
-                    # },
+                    Clock: {
+                        'font': 'Ubuntu 33',
+                        'fmt': '%X',
+                    },
+                    NowPlaying: {
+                        'font': 'Ubuntu 33',
+                        'width': 400,
+                    },
                     Text: {'text': 'Hello World!', 'font': 'Ubuntu 33'},
                 },
-            }
+            },
         }
     },
     Mouse: {},

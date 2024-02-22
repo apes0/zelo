@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 class Bar(Widget):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
-        self.back: int = ctx.cfg.theme  # type:ignore
+        self.back: int = ctx.cfg.theme.back
         self.height: int
         self.width: int
         self.widgets: dict[type[Widget], dict]

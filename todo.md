@@ -2,7 +2,6 @@
 # todo
 
 - Add wayland support
-- bars (when async)
 - make a function/constant for everything (for future wayland support)
 - use the icccm and ewmh extensions
 - reparenting and decorations
@@ -14,7 +13,8 @@
 - make button.press/release, just like key.press/release
 - actually implement GCtx lol
 - always use checked function for xcb to catch errors
-- add cursor themeing
 - make all scripts be bash
 - use Xvideo (x plugin, not porn) and implement a Video class for the x backend
+- errors
 - use xshm for images?
+- make animations work; maybe with a composer?
