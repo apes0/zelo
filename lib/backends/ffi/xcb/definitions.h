@@ -842,6 +842,28 @@ typedef enum xcb_window_class_t
     XCB_WINDOW_CLASS_INPUT_ONLY = 2
 } xcb_window_class_t;
 
+typedef struct xcb_query_extension_reply_t {
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    unsigned int length;
+    unsigned char present;
+    unsigned char major_opcode;
+    unsigned char first_event;
+    unsigned char first_error;
+} xcb_query_extension_reply_t;
+typedef struct xcb_extension_t xcb_extension_t;
+typedef struct xcb_get_modifier_mapping_cookie_t {
+    unsigned int sequence;
+} xcb_get_modifier_mapping_cookie_t;
+typedef struct xcb_get_modifier_mapping_reply_t {
+    unsigned char  response_type;
+    unsigned char  keycodes_per_modifier;
+    unsigned short sequence;
+    unsigned int length;
+    unsigned char  pad0[24];
+} xcb_get_modifier_mapping_reply_t;
+
 // functions
 
 xcb_connection_t *xcb_connect(const char *displayname, int *screenp);
@@ -912,6 +934,11 @@ int xcb_get_file_descriptor(xcb_connection_t *c);
 xcb_void_cookie_t xcb_destroy_window(xcb_connection_t *c, xcb_window_t window);
 void xcb_image_destroy(xcb_image_t *image);
 xcb_void_cookie_t xcb_create_window(xcb_connection_t *conn, unsigned char depth, xcb_window_t wid, xcb_window_t parent, short x, short y, unsigned short width, unsigned short height, unsigned short border_width, unsigned short _class, xcb_visualid_t visual, unsigned int value_mask, const void *value_list);
+xcb_void_cookie_t xcb_test_fake_input(xcb_connection_t *c, unsigned char type, unsigned char detail, unsigned int time, xcb_window_t root, short rootX, short rootY, unsigned char deviceid);
+const struct xcb_query_extension_reply_t* xcb_get_extension_data(xcb_connection_t *c, xcb_extension_t *ext);
+xcb_get_modifier_mapping_cookie_t xcb_get_modifier_mapping_unchecked(xcb_connection_t *c);
+xcb_get_modifier_mapping_reply_t *xcb_get_modifier_mapping_reply(xcb_connection_t *c, xcb_get_modifier_mapping_cookie_t cookie, xcb_generic_error_t **e);
+xcb_keycode_t *xcb_get_modifier_mapping_keycodes(const xcb_get_modifier_mapping_reply_t *R);
 
 // weird values
 

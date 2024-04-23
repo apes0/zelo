@@ -1,6 +1,7 @@
 from lib.extension import Extension
 from typing import TYPE_CHECKING
 from .windowTracker import track
+from utils.fns import multiple
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -81,23 +82,29 @@ class Tiler(Extension):
             self.width * self.mainSize + self.spacing
         )  # calculate the x coordinate of the side windows
 
+        fns = []
+
         for window in windows:
-            await window.configure(
-                newX=x + self.x,
-                newY=round(y) + self.y,
-                newHeight=height,
-                newWidth=width,
-                newBorderWidth=self.border,
+            fns.append(
+                window.configure(
+                    newX=x + self.x,
+                    newY=round(y) + self.y,
+                    newHeight=height,
+                    newWidth=width,
+                    newBorderWidth=self.border,
+                )
             )
             y += height + self.spacing * 2 + offset
 
         mainSize = self.mainSize if windows else 1
-        await main.configure(
-            newX=self.spacing + self.x,
-            newY=self.spacing + self.y,
-            newWidth=round(self.width * mainSize - 3 * self.spacing),
-            newHeight=self.height - 3 * self.spacing,
-            newBorderWidth=self.border,
+        fns.append(
+            main.configure(
+                newX=self.spacing + self.x,
+                newY=self.spacing + self.y,
+                newWidth=round(self.width * mainSize - 3 * self.spacing),
+                newHeight=self.height - 3 * self.spacing,
+                newBorderWidth=self.border,
+            )
         )
 
-        # multiple is broken here hh
+        await multiple(*fns)

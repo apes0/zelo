@@ -1,15 +1,17 @@
-from types import ModuleType
-from functools import partial
-from typing import Callable
-from cffi import FFI
 import os
+import sys
+from functools import partial
 from importlib import import_module
+from types import ModuleType
+from typing import Callable
+
+from cffi import FFI
 
 # NOTE: personally, i would name it 'xcbcffi' (or 'xcbCffi'), but there is already a module with that name and i
 # don't want to use camel case for modules..., so ye, its gonna be in snake case
 
 xcb = 'xcb_cffi'
-wayland = 'libwayland_cffi'
+wayland = 'wayland_cffi'
 cairo = 'cairo_cffi'
 
 wrappers = {xcb: 'lib.backends.x11', wayland: 'lib.backends.wayland'}
@@ -44,27 +46,39 @@ def build(name, libraries, out):
 
 
 buildX = partial(
-    build, 'xcb', ['xcb', 'xcb-util', 'xcb-image', 'xcb-keysyms', 'xcb-randr'], xcb
+    build,
+    'xcb',
+    [
+        'xcb',
+        'xcb-util',
+        'xcb-image',
+        'xcb-keysyms',
+        'xcb-randr',
+        'xcb-xinput',
+        'xcb-xtest',
+    ],
+    xcb,
 )
 buildCairo = partial(
     build, 'cairo', ['pango', 'pangoft2', 'fontconfig', 'freetype2'], cairo
 )
 
 
-def buildWayland():
-    pass
+buildWayland = partial(build, 'wayland', ['wayland-server'], wayland)
 
 
 def assertModule(imp, build):
     try:
+        # TODO: can we do this better?
         _lib = import_module(imp)
     except:
         build()
 
 
-runningX = (
-    True  # TODO: actually check if x is running, this is for future wayland support
-)
+# TODO: auto decide, without an arg?
+# TODO: make checks for each backend when we have more than wayland and x11
+
+runningX: bool = len(sys.argv) == 1 or sys.argv[1] != '--wayland'
 
 imp, _build = (xcb, buildX) if runningX else (wayland, buildWayland)
 imp: str

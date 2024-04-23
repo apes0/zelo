@@ -1,5 +1,6 @@
 import select
-from typing import Callable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
+
 import trio
 
 if TYPE_CHECKING:

@@ -2,9 +2,10 @@ from .types import uchararr, chararr, uintarr, rectangle
 import cv2
 import numpy as np
 from html import escape
-from xcb_cffi import ffi, lib
-from cairo_cffi.lib import render
-from ..generic import CData, GImage, GWindow, GRectangle, GText
+from .. import xcb
+from ..cairo import render
+from xcb_cffi import ffi
+from ..generic import GImage, GWindow, GRectangle, GText
 
 from typing import TYPE_CHECKING
 
@@ -37,21 +38,21 @@ class Image(GImage):
         self.width = width
         self.height = height
 
-        self.gc = lib.xcb_generate_id(ctx.connection)
-        self.pixmap = lib.xcb_generate_id(ctx.connection)
+        self.gc = xcb.xcbGenerateId(ctx.connection)
+        self.pixmap = xcb.xcbGenerateId(ctx.connection)
 
-        self.image: CData
+        self.image: xcb.XcbImageT
 
-        lib.xcb_create_pixmap(
+        xcb.xcbCreatePixmap(
             ctx.connection,
-            ctx.screen.screen.root_depth,
+            ctx.screen.screen.rootDepth,
             self.pixmap,
             self.windowId,
             self.width,
             self.height,
         )
 
-        lib.xcb_create_gc(ctx.connection, self.gc, self.pixmap, 0, ffi.NULL)
+        xcb.xcbCreateGc(ctx.connection, self.gc, self.pixmap, 0, xcb.NULL)
 
         if img is not None:
             self.set(img)
@@ -65,37 +66,37 @@ class Image(GImage):
             img = np.dstack(
                 (img, np.ones((self.height, self.width, 1), dtype=np.uint8) * 255)
             )
-        self.parts = (
-            self.width * self.height * 4
-        ) // lib.xcb_get_maximum_request_length(self.ctx.connection) + 2
+        self.parts = (self.width * self.height * 4) // xcb.xcbGetMaximumRequestLength(
+            self.ctx.connection
+        ) + 2
         # this works with +2 for some reason
         pos = 0
         prev = 0
         size = self.height / self.parts
 
         for _ in range(self.parts):
-            # TODO: use the scanline_pad stuff
+            # TODO: use the.scanlinePad stuff
             pos += size
-            self.image = lib.xcb_image_create_native(
+            self.image = xcb.xcbImageCreateNative(
                 self.ctx.connection,
                 self.width,
                 round(pos) - round(prev),
-                lib.XCB_IMAGE_FORMAT_Z_PIXMAP,
-                self.ctx.screen.screen.root_depth,
-                ffi.NULL,
+                xcb.XCBImageFormatZPixmap,
+                self.ctx.screen.screen.rootDepth,
+                xcb.NULL,
                 self.width * (round(pos) - round(prev)) * 4,
                 uchararr(img[round(prev) : round(pos), :, :].tobytes()),
             )
 
-            lib.xcb_image_put(
+            xcb.xcbImagePut(
                 self.ctx.connection, self.pixmap, self.gc, self.image, 0, round(prev), 0
             )
 
             prev = pos
-        lib.xcb_flush(self.ctx.connection)
+        xcb.xcbFlush(self.ctx.connection)
 
     def draw(self):
-        lib.xcb_copy_area(
+        xcb.xcbCopyArea(
             self.ctx.connection,
             self.pixmap,
             self.windowId,
@@ -108,11 +109,11 @@ class Image(GImage):
             self.height,
         )
 
-        lib.xcb_flush(self.ctx.connection)
+        xcb.xcbFlush(self.ctx.connection)
 
     def destroy(self):
-        lib.xcb_image_destroy(self.image)
-        lib.xcb_flush(self.ctx.connection)
+        xcb.xcbImageDestroy(self.image)
+        xcb.xcbFlush(self.ctx.connection)
 
     def move(self, x: int, y: int):
         self.x = x
@@ -216,19 +217,19 @@ class Rectangle(
         self.ctx = ctx
         self.rect = rectangle({'x': x, 'y': y, 'width': width, 'height': height})
 
-        self.gc = lib.xcb_generate_id(ctx.connection)
+        self.gc = xcb.xcbGenerateId(ctx.connection)
 
-        mask = lib.XCB_GC_FOREGROUND
+        mask = xcb.XCBGcForeground
         args = uintarr([color])
 
-        lib.xcb_create_gc(ctx.connection, self.gc, window.id, mask, args)
+        xcb.xcbCreateGc(ctx.connection, self.gc, window.id, mask, args)
 
     def draw(self):
-        lib.xcb_poly_fill_rectangle(
+        xcb.xcbPolyFillRectangle(
             self.ctx.connection, self.window.id, self.gc, 1, self.rect
         )
 
-        lib.xcb_flush(self.ctx.connection)
+        xcb.xcbFlush(self.ctx.connection)
 
     def resize(self, width: int, height: int):
         self.rect.width = width

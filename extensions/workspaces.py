@@ -7,7 +7,10 @@ if TYPE_CHECKING:
     from lib.ctx import Ctx
 
 
-class Workspaces(Extension):  # TODO: make me work with the window tracker's focus queue
+# TODO: unmap windows from different workspaces, when they remap themselves
+
+
+class Workspaces(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         # these take the same thing as a shortcut (because they are shortcuts)
         self.next: tuple
@@ -61,8 +64,9 @@ class Workspaces(Extension):  # TODO: make me work with the window tracker's foc
             if not win.mapped or win.ignore or win.id in self.toMove.keys():
                 continue
 
-            await win.unmap()
             wins.append(win)
+
+        await multiple(*[win.unmap() for win in wins])
 
         self.windows[self.current] = wins
 

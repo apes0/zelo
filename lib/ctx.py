@@ -1,13 +1,14 @@
 from typing import TYPE_CHECKING, Any
 
 import trio
+
 from .api.window import Window
 
 if TYPE_CHECKING:
     from ._cfg import Cfg
-    from .backends.generic import CData, GScreen, GWindow, GMouse, GCtx
-    from .extension import Extension
     from .backends.events import Event
+    from .backends.generic import CData, GCtx, GMouse, GScreen, GWindow
+    from .extension import Extension
 
 
 class Ctx:

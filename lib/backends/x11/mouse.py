@@ -1,4 +1,4 @@
-from xcb_cffi import ffi, lib
+from .. import xcb
 from .types import chararr, uintarr
 from ..generic import GButton, GMouse
 
@@ -94,15 +94,15 @@ class Mouse(GMouse):
         self.ctx = ctx
 
     def location(self) -> tuple[int, int]:
-        resp = lib.xcb_query_pointer_reply(
+        resp = xcb.xcbQueryPointerReply(
             self.ctx.connection,
-            lib.xcb_query_pointer(self.ctx.connection, self.ctx._root),
-            ffi.NULL,
+            xcb.xcbQueryPointer(self.ctx.connection, self.ctx._root),
+            xcb.NULL,
         )
 
         return (
-            resp.root_x,
-            resp.root_y,
+            resp.rootX,
+            resp.rootY,
         )  # ? idk if these are the values i need to return lol
 
     def setCursor(
@@ -115,18 +115,18 @@ class Mouse(GMouse):
     ):
         cursorId = cursors[name]
 
-        font = lib.xcb_generate_id(self.ctx.connection)
+        font = xcb.xcbGenerateId(self.ctx.connection)
 
-        lib.xcb_open_font(
+        xcb.xcbOpenFont(
             self.ctx.connection,
             font,
             len(_font),
             chararr(_font.encode()),
         )
 
-        cursor = lib.xcb_generate_id(self.ctx.connection)
+        cursor = xcb.xcbGenerateId(self.ctx.connection)
 
-        lib.xcb_create_glyph_cursor(
+        xcb.xcbCreateGlyphCursor(
             self.ctx.connection,
             cursor,
             font,
@@ -141,25 +141,25 @@ class Mouse(GMouse):
             (back % 256)*257,
         )
 
-        mask = lib.XCB_CW_CURSOR
+        mask = xcb.XCBCwCursor
         args = uintarr([cursor])
-        lib.xcb_change_window_attributes_checked(
+        xcb.xcbChangeWindowAttributesChecked(
             self.ctx.connection, window.id, mask, args
         )
 
-        lib.xcb_close_font(self.ctx.connection, font)
-        lib.xcb_free_cursor(self.ctx.connection, cursor)
+        xcb.xcbCloseFont(self.ctx.connection, font)
+        xcb.xcbFreeCursor(self.ctx.connection, cursor)
 
-        lib.xcb_flush(self.ctx.connection)
+        xcb.xcbFlush(self.ctx.connection)
 
 
 mappings = {
-    'any': lib.XCB_BUTTON_INDEX_ANY,
-    'left': lib.XCB_BUTTON_INDEX_1,
-    'right': lib.XCB_BUTTON_INDEX_2,
-    'middle': lib.XCB_BUTTON_INDEX_3,
-    'scroll_up': lib.XCB_BUTTON_INDEX_4,
-    'scroll_down': lib.XCB_BUTTON_INDEX_5,
+    'any': xcb.XCBButtonIndexAny,
+    'left': xcb.XCBButtonIndex1,
+    'right': xcb.XCBButtonIndex2,
+    'middle': xcb.XCBButtonIndex3,
+    'scroll_up': xcb.XCBButtonIndex4,
+    'scroll_down': xcb.XCBButtonIndex5,
 }
 
 
@@ -186,34 +186,34 @@ class Button(GButton):
         for _mod in mods:
             mod |= _mod.mod
 
-        lib.xcb_grab_button(
+        xcb.xcbGrabButton(
             ctx.connection,
             0,
             window.id,
-            lib.XCB_EVENT_MASK_BUTTON_PRESS,
-            lib.XCB_GRAB_MODE_ASYNC,
-            lib.XCB_GRAB_MODE_ASYNC,
-            lib.XCB_NONE,
+            xcb.XCBEventMaskButtonPress,
+            xcb.XCBGrabModeAsync,
+            xcb.XCBGrabModeAsync,
+            xcb.XCBNone,
             0,
             self.button,
             mod,
         )
 
-        lib.xcb_flush(ctx.connection)
+        xcb.xcbFlush(ctx.connection)
 
     def ungrab(self, ctx: 'Ctx', window: 'GWindow', *mods: 'GMod'):
         mod = 0
         for _mod in mods:
             mod |= _mod.mod
 
-        lib.xcb_ungrab_button(
+        xcb.xcbUngrabButton(
             ctx.connection,
             self.button,
             window.id,
             mod,
         )
 
-        lib.xcb_flush(ctx.connection)
+        xcb.xcbFlush(ctx.connection)
 
     def __hash__(self) -> int:
         return hash(self.lable)

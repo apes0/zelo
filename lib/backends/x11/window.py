@@ -1,6 +1,6 @@
 from functools import partial
 from ..generic import GWindow, GKey, GButton, GMod
-from xcb_cffi import ffi, lib
+from .. import xcb
 import trio
 from .types import uintarr
 from typing import TYPE_CHECKING, Callable, Coroutine
@@ -8,10 +8,6 @@ from ...cfg import cfg
 from ..events import (
     Event,
     focusChange,
-    unmapNotify,
-    mapNotify,
-    configureNotify,
-    destroyNotify,
 )
 
 if TYPE_CHECKING:
@@ -19,29 +15,22 @@ if TYPE_CHECKING:
     from ..events import Event
 
 
-async def runAndWait(ctx: 'Ctx', event: 'Event', check: Callable, fn: Callable):
-    if 0:
-        # TODO: figure this out aaaaaa
-        print(f'waiting')
-        ev = trio.Event()
+async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
+    ev = trio.Event()
 
-        async def wait(*args):
-            if check(*args):
-                ev.set()
-                return
+    async def wait(*args):
+        ev.set()
 
+    for event in events:
         event.addListener(wait)
 
-        fn()
-        lib.xcb_flush(ctx.connection)
+    fn()
+    xcb.xcbFlush(ctx.connection)
 
-        await ev.wait()
+    await ev.wait()
 
+    for event in events:
         event.removeListener(wait)
-        print(f'finished')
-    else:
-        fn()
-        lib.xcb_flush(ctx.connection)
 
 
 class Window(GWindow):
@@ -58,6 +47,7 @@ class Window(GWindow):
         self.mapped: bool = False
         self.destroyed: bool = False
         self.ignore = True  # set by override redirect (also we assume the worst, so we set it to true)
+        self.mine: bool = False
 
         # events:
 
@@ -77,14 +67,16 @@ class Window(GWindow):
         self.redraw = Event('redraw')  # exposure notify for x
 
     async def map(self):
-        fn = partial(lib.xcb_map_window, self.ctx.connection, self.id)
-        await runAndWait(self.ctx, mapNotify, lambda *args: args[0].id == self.id, fn)
+        fn = partial(xcb.xcbMapWindow, self.ctx.connection, self.id)
+        await runAndWait(self.ctx, [self.mapNotify, self.enterNotify, self.redraw], fn)
 
         self.mapped = True
 
     async def unmap(self):
-        fn = partial(lib.xcb_unmap_window, self.ctx.connection, self.id)
-        await runAndWait(self.ctx, unmapNotify, lambda *args: args[0].id == self.id, fn)
+        fn = partial(xcb.xcbUnmapWindow, self.ctx.connection, self.id)
+        await runAndWait(
+            self.ctx, [self.unmapNotify, self.destroyNotify, self.leaveNotify], fn
+        )
 
         self.mapped = False
 
@@ -102,11 +94,11 @@ class Window(GWindow):
 
         if focus:
             color = cfg.focusedColor
-            lib.xcb_set_input_focus(
+            xcb.xcbSetInputFocus(
                 self.ctx.connection,
-                lib.XCB_INPUT_FOCUS_POINTER_ROOT,  # seemingly fine?
+                xcb.XCBInputFocusPointerRoot,  # seemingly fine?
                 self.id,
-                lib.XCB_CURRENT_TIME,
+                xcb.XCBCurrentTime,
             )
 
             if not self.ctx.focused:
@@ -143,11 +135,11 @@ class Window(GWindow):
                 # print(f'unfocus on {self.id} with {color}')
 
         # ? maybe expose this to a separate function?
-        lib.xcb_change_window_attributes_checked(
-            self.ctx.connection, self.id, lib.XCB_CW_BORDER_PIXEL, uintarr([color])
+        xcb.xcbChangeWindowAttributesChecked(
+            self.ctx.connection, self.id, xcb.XCBCwBorderPixel, uintarr([color])
         )
 
-        lib.xcb_flush(self.ctx.connection)
+        xcb.xcbFlush(self.ctx.connection)
 
         if act:
             await act
@@ -163,11 +155,11 @@ class Window(GWindow):
         newBorderWidth: int | None = None,
     ):
         compare = {
-            (newX, 'x'): lib.XCB_CONFIG_WINDOW_X,
-            (newY, 'y'): lib.XCB_CONFIG_WINDOW_Y,
-            (newWidth, 'width'): lib.XCB_CONFIG_WINDOW_WIDTH,
-            (newHeight, 'height'): lib.XCB_CONFIG_WINDOW_HEIGHT,
-            (newBorderWidth, 'borderWidth'): lib.XCB_CONFIG_WINDOW_BORDER_WIDTH,
+            (newX, 'x'): xcb.XCBConfigWindowX,
+            (newY, 'y'): xcb.XCBConfigWindowY,
+            (newWidth, 'width'): xcb.XCBConfigWindowWidth,
+            (newHeight, 'height'): xcb.XCBConfigWindowHeight,
+            (newBorderWidth, 'borderWidth'): xcb.XCBConfigWindowBorderWidth,
         }
 
         vals = []
@@ -189,25 +181,23 @@ class Window(GWindow):
             return  # ? does this break shit - limp bizkit?
 
         fn = partial(
-            lib.xcb_configure_window,
+            xcb.xcbConfigureWindow,
             self.ctx.connection,
             self.id,
             changed,
             vals,
         )
 
-        await runAndWait(
-            self.ctx, configureNotify, lambda *args: args[0].id == self.id, fn
-        )
+        fn()
+
+    #        await runAndWait(self.ctx, [self.configureNotify], fn)
 
     async def close(self):
-        fn = partial(lib.xcb_destroy_window, self.ctx.connection, self.id)
+        fn = partial(xcb.xcbDestroyWindow, self.ctx.connection, self.id)
 
-        await runAndWait(
-            self.ctx, destroyNotify, lambda *args: args[0].id == self.id, fn
-        )
+        await runAndWait(self.ctx, [self.destroyNotify, self.leaveNotify], fn)
 
     async def kill(self):
         # the nuclear option
-        lib.xcb_kill_client(self.ctx.connection, self.id)
-        lib.xcb_flush(self.ctx.connection)
+        xcb.xcbKillClient(self.ctx.connection, self.id)
+        xcb.xcbFlush(self.ctx.connection)

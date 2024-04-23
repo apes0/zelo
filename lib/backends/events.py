@@ -1,8 +1,10 @@
 import logging
-from typing import Callable, TYPE_CHECKING
 import traceback
-from .generic import GButton, GKey, GMod, GWindow
+from typing import TYPE_CHECKING, Callable
+
 import trio
+
+from .generic import GButton, GKey, GMod, GWindow
 
 if TYPE_CHECKING:
     from ..ctx import Ctx

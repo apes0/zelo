@@ -1,5 +1,6 @@
 from typing import Any
 from xcb_cffi import ffi
+from ..base import Base
 
 
 class FFIType:
@@ -25,6 +26,9 @@ class Caster:
         self.type = _type
 
     def __call__(self, other) -> Any:
+        if isinstance(other, Base):
+            other = other.obj
+
         return ffi.cast(self.type, other)
 
 

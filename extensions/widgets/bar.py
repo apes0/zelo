@@ -11,7 +11,7 @@ class Bar(Widget):
         self.back: int = ctx.cfg.theme.back
         self.height: int
         self.width: int
-        self.widgets: dict[type[Widget], dict]
+        self.widgets: list[tuple[type[Widget], dict]]
 
         super().__init__(
             ctx,
@@ -21,7 +21,7 @@ class Bar(Widget):
 
         self.insts: list[Widget] = []
 
-        for widget, cfg in self.widgets.items():
+        for widget, cfg in self.widgets:
             self.insts.append(widget(ctx, {**cfg, 'win': self.win, 'x': 0, 'y': 0}))
 
         self.rect = Rectangle(ctx, self.win, 0, 0, self.width, self.height, self.back)

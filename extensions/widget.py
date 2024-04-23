@@ -8,8 +8,8 @@ if TYPE_CHECKING:
 
 class Widget(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
-        self.widgets: dict[type['WidgetType'], dict[str, Any]]
+        self.widgets: list[tuple[type['WidgetType'], dict[str, Any]]]
         super().__init__(ctx, cfg)
 
-        for widget, args in self.widgets.items():
+        for widget, args in self.widgets:
             widget(ctx=ctx, cfg={**args, 'win': ctx.root})

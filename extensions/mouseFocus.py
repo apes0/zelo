@@ -39,7 +39,7 @@ class MouseFocus(Extension):
         for button in self.buttons:
             button.grab(self.ctx, win, self.mod)
 
-    async def buttonPress(self, button: 'GButton', mod: 'GMod', window: 'GWindow'):
+    async def buttonPress(self, _button: 'GButton', mod: 'GMod', window: 'GWindow'):
         for button in self.buttons:
             button.ungrab(self.ctx, window, self.mod)
 

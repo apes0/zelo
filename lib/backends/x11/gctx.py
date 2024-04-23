@@ -1,6 +1,6 @@
 from ..generic import GCtx
 from typing import TYPE_CHECKING
-from xcb_cffi import ffi, lib
+from .. import xcb
 from .types import charpC, uintarr
 from .window import Window
 
@@ -14,14 +14,14 @@ class Ctx(GCtx):
         self.ctx = ctx
 
     def sendEvent(self, event, window: 'GWindow') -> None:
-        lib.xcb_send_event(
+        xcb.xcbSendEvent(
             self.ctx.connection,
             1,
             window.id,
-            lib.XCB_EVENT_MASK_KEY_PRESS | lib.XCB_EVENT_MASK_KEY_RELEASE,
+            xcb.XCBEventMaskKeyPress | xcb.XCBEventMaskKeyRelease,
             charpC(event),
         )
-        lib.xcb_flush(self.ctx.connection)
+        xcb.xcbFlush(self.ctx.connection)
 
     def createWindow(
         self,
@@ -33,10 +33,10 @@ class Ctx(GCtx):
         parent: Window,
         ignore: bool,
     ):
-        window = lib.xcb_generate_id(self.ctx.connection)
-        lib.xcb_create_window(
+        window = xcb.xcbGenerateId(self.ctx.connection)
+        xcb.xcbCreateWindow(
             self.ctx.connection,
-            lib.XCB_COPY_FROM_PARENT,
+            xcb.XCBCopyFromParent,
             window,
             parent.id,
             x,
@@ -44,14 +44,15 @@ class Ctx(GCtx):
             width,
             height,
             borderWidth,
-            lib.XCB_WINDOW_CLASS_INPUT_OUTPUT,
-            self.ctx.screen.screen.root_visual,
-            lib.XCB_CW_OVERRIDE_REDIRECT
-            | lib.XCB_CW_EVENT_MASK,  # TODO: maybe set masks idk
-            uintarr([ignore, lib.XCB_EVENT_MASK_EXPOSURE]),
+            xcb.XCBWindowClassInputOutput,
+            self.ctx.screen.screen.rootVisual,
+            xcb.XCBCwOverrideRedirect | xcb.XCBCwEventMask,  # TODO: maybe set masks idk
+            uintarr([ignore, xcb.XCBEventMaskExposure]),
         )
 
         win = Window(height, width, borderWidth, window, self.ctx)
+        # TODO: maybe move these to the args
         win.parent = parent
+        win.mine = True
 
         return win

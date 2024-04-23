@@ -18,3 +18,5 @@
 - errors
 - use xshm for images?
 - make animations work; maybe with a composer?
+- more backends (e.g. one for windows/macos?)
+- free floating

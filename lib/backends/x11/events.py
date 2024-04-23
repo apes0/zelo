@@ -2,7 +2,7 @@ import logging
 from .keys import Key, Mod
 from .mouse import Button
 from lib.extension import setupExtensions
-from xcb_cffi import ffi, lib
+from .. import xcb
 from .types import (
     intp,
     uintarr,
@@ -45,11 +45,11 @@ def handler(n):
     return decorator
 
 
-@handler(lib.XCB_CREATE_NOTIFY)
+@handler(xcb.XCBCreateNotify)
 async def createNotify(event, ctx: 'Ctx'):
-    event = createNotifyTC(event)
+    event = xcb.XcbCreateNotifyEventT(createNotifyTC(event))
     window = ctx.getWindow(event.window)
-    ignore = event.override_redirect
+    ignore = bool(event.overrideRedirect)
 
     window.ignore = ignore
     #    await window.configure(
@@ -57,7 +57,7 @@ async def createNotify(event, ctx: 'Ctx'):
     #        newY=max(0, event.y),
     #        newHeight=event.height,
     #        newWidth=event.width,
-    #        newBorderWidth=event.border_width,
+    #        newBorderWidth=event.borderWidth,
     #        #        wait=False,
     #    )
 
@@ -65,69 +65,69 @@ async def createNotify(event, ctx: 'Ctx'):
     await events.createNotify.trigger(ctx, window)
 
 
-@handler(lib.XCB_MAP_REQUEST)
+@handler(xcb.XCBMapRequest)
 async def mapRequest(event, ctx: 'Ctx'):
     # NOTE: its not our responsibility to map or focus the window, the tiler should do so
-    event = mapRequestTC(event)
+    event = xcb.XcbMapRequestEventT(mapRequestTC(event))
     _id: int = event.window
     window: GWindow = ctx.getWindow(_id)
     window.parent = ctx.getWindow(event.parent)
-    ctx.values[0] = lib.XCB_EVENT_MASK_ENTER_WINDOW | lib.XCB_EVENT_MASK_FOCUS_CHANGE
-    lib.xcb_change_window_attributes_checked(
-        ctx.connection, _id, lib.XCB_CW_EVENT_MASK, ctx.values
+    ctx.values[0] = xcb.XCBEventMaskEnterWindow | xcb.XCBEventMaskFocusChange
+    xcb.xcbChangeWindowAttributesChecked(
+        ctx.connection, _id, xcb.XCBCwEventMask, ctx.values
     )
 
     await window.mapRequest.trigger(ctx)
     await events.mapRequest.trigger(ctx, window)
 
 
-@handler(lib.XCB_CONFIGURE_REQUEST)
+@handler(xcb.XCBConfigureRequest)
 async def confRequest(event, ctx: 'Ctx'):
     # TODO: there is a parent field, so should i follow it?
-    event = confRequestTC(event)
+    event = xcb.XcbConfigureRequestEventT(confRequestTC(event))
     window = ctx.getWindow(event.window)
-    valueMask = event.value_mask
+    valueMask = event.valueMask
     change = []
     for mask, (value, lable) in {
-        lib.XCB_CONFIG_WINDOW_X: (event.x, 'x'),
-        lib.XCB_CONFIG_WINDOW_Y: (event.y, 'y'),
-        lib.XCB_CONFIG_WINDOW_WIDTH: (event.width, 'width'),
-        lib.XCB_CONFIG_WINDOW_HEIGHT: (event.height, 'height'),
-        lib.XCB_CONFIG_WINDOW_BORDER_WIDTH: (event.border_width, 'borderWidth'),
-        lib.XCB_CONFIG_WINDOW_SIBLING: (event.sibling, 'sibling'),
-        lib.XCB_CONFIG_WINDOW_STACK_MODE: (event.stack_mode, 'stackMode'),
+        xcb.XCBConfigWindowX: (event.x, 'x'),
+        xcb.XCBConfigWindowY: (event.y, 'y'),
+        xcb.XCBConfigWindowWidth: (event.width, 'width'),
+        xcb.XCBConfigWindowHeight: (event.height, 'height'),
+        xcb.XCBConfigWindowBorderWidth: (event.borderWidth, 'borderWidth'),
+        xcb.XCBConfigWindowSibling: (event.sibling, 'sibling'),
+        xcb.XCBConfigWindowStackMode: (event.stackMode, 'stackMode'),
     }.items():
         if mask & valueMask:
             change.append(max(value, 0))  # safety first :)
             window.__dict__[lable] = value
 
     vals = uintarr(change)
-    lib.xcb_configure_window(
+    xcb.xcbConfigureWindow(
         ctx.connection,
         event.window,
         valueMask,
         vals,
     )
 
-    lib.xcb_flush(ctx.connection)
+    xcb.xcbFlush(ctx.connection)
 
     await window.configureRequest.trigger(ctx)
     await events.configureRequest.trigger(ctx, window)
 
 
-@handler(lib.XCB_CONFIGURE_NOTIFY)
+@handler(xcb.XCBConfigureNotify)
 async def confNotify(event, ctx: 'Ctx'):
-    event = confNotifyTC(event)
+    event = xcb.XcbConfigureNotifyEventT(confNotifyTC(event))
     window: GWindow = ctx.getWindow(event.window)
-    ignore = event.override_redirect
-    window.ignore = ignore
+    ignore = event.overrideRedirect
+    window.ignore = bool(ignore)
 
     change = {
         event.x: 'x',
         event.y: 'y',
         event.width: 'width',
         event.height: 'height',
-        event.border_width: 'borderWdith',
+        event.borderWidth: 'borderWdith',
     }
     for val, lable in change.items():
         window.__dict__[lable] = val
@@ -136,11 +136,11 @@ async def confNotify(event, ctx: 'Ctx'):
     await events.configureNotify.trigger(ctx, window)
 
 
-@handler(lib.XCB_CLIENT_MESSAGE)
-async def clientMessage(event, ctx: 'Ctx'):
-    event = clientMessageTC(event)
-    data = event.data
-    data = {8: data.data8, 16: data.data16, 32: data.data32}[event.format]
+# @handler(xcb.XCBClientMessage)
+# async def clientMessage(event, ctx: 'Ctx'):
+#    event = xcb.XcbClientMessageEventT(clientMessageTC(event))
+#    data = event.data
+#    data = {8: data.data8, 16: data.data16, 32: data.data32}[event.format]
 
 
 #    print(event.type, [n for n in data])
@@ -149,9 +149,9 @@ async def clientMessage(event, ctx: 'Ctx'):
 #    ctx.atomStore.handle(ctx, event.type, data, event.window)
 
 
-@handler(lib.XCB_DESTROY_NOTIFY)
+@handler(xcb.XCBDestroyNotify)
 async def destroyNotify(event, ctx: 'Ctx'):
-    event = destroyNotifyTC(event)
+    event = xcb.XcbDestroyNotifyEventT(destroyNotifyTC(event))
     # NOTE: actually doesn't appear to be that slow, check this:
     # https://wiki.python.org/moin/TimeComplexity
     window: int = event.window
@@ -175,21 +175,21 @@ async def destroyNotify(event, ctx: 'Ctx'):
     await events.destroyNotify.trigger(ctx, win)
 
 
-@handler(lib.XCB_MAP_NOTIFY)
+@handler(xcb.XCBMapNotify)
 async def mapNotify(event, ctx: 'Ctx'):
-    event = mapNotifyTC(event)
+    event = xcb.XcbMapNotifyEventT(mapNotifyTC(event))
     _id = event.window
     win: GWindow = ctx.getWindow(_id)
-    ignore = event.override_redirect
-    win.ignore = ignore
+    ignore = event.overrideRedirect
+    win.ignore = bool(ignore)
 
     await win.mapNotify.trigger(ctx)
     await events.mapNotify.trigger(ctx, win)
 
 
-@handler(lib.XCB_UNMAP_NOTIFY)
+@handler(xcb.XCBUnmapNotify)
 async def unmapNotify(event, ctx: 'Ctx'):
-    event = unmapNotifyTC(event)
+    event = xcb.XcbUnmapNotifyEventT(unmapNotifyTC(event))
     _id = event.window
     win: GWindow = ctx.getWindow(_id)
 
@@ -211,7 +211,9 @@ async def unmapNotify(event, ctx: 'Ctx'):
     await events.unmapNotify.trigger(ctx, win)
 
 
-@handler(lib.XCB_MOTION_NOTIFY)
+(xcb.XCBMotionNotify)
+
+
 async def motionNotify(event, ctx: 'Ctx'):
     # TODO: when does this get called???
     event = motionNotifyTC(event)
@@ -222,26 +224,26 @@ async def motionNotify(event, ctx: 'Ctx'):
 #        event.root,
 #        event.event,
 #        event.child,
-#        event.root_x,
-#        event.root_y,
-#        event.event_x,
-#        event.event_y,
+#        event.rootX,
+#        event.rootY,
+#        event.eventX,
+#        event.eventY,
 #        event.state,
 #    )
 
 
 @handler(0)
 async def error(event, ctx: 'Ctx'):
-    event = genericErrorTC(event)
+    event = xcb.XcbGenericErrorT(genericErrorTC(event))
     logging.error(
-        f'{event.error_code} ({event.major_code}.{event.minor_code}) for resource {event.resource_id}'
+        f'{event.errorCode} ({event.majorCode}.{event.minorCode}) for resource {event.resourceId}'
     )
     # TODO: xcb-util-errors
 
 
-@handler(lib.XCB_KEY_PRESS)
+@handler(xcb.XCBKeyPress)
 async def keyPress(event, ctx: 'Ctx'):
-    event = keyPressTC(event)
+    event = xcb.XcbKeyPressEventT(keyPressTC(event))
     key = Key(code=event.detail)
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.child)
@@ -250,9 +252,9 @@ async def keyPress(event, ctx: 'Ctx'):
     await events.keyPress.trigger(ctx, key, mod, window)
 
 
-@handler(lib.XCB_KEY_RELEASE)
+@handler(xcb.XCBKeyRelease)
 async def keyRelease(event, ctx: 'Ctx'):
-    event = keyPressTC(event)
+    event = xcb.XcbKeyPressEventT(keyPressTC(event))
     key = Key(code=event.detail)
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.event)
@@ -261,9 +263,9 @@ async def keyRelease(event, ctx: 'Ctx'):
     await events.keyRelease.trigger(ctx, key, mod, window)
 
 
-@handler(lib.XCB_BUTTON_PRESS)
+@handler(xcb.XCBButtonPress)
 async def buttonPress(event, ctx: 'Ctx'):
-    event = buttonPressTC(event)
+    event = xcb.XcbButtonPressEventT(buttonPressTC(event))
     button = Button(button=event.detail)
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.event)
@@ -272,9 +274,9 @@ async def buttonPress(event, ctx: 'Ctx'):
     await events.buttonPress.trigger(ctx, button, mod, window)
 
 
-@handler(lib.XCB_BUTTON_RELEASE)
+@handler(xcb.XCBButtonRelease)
 async def buttonRelease(event, ctx: 'Ctx'):
-    event = buttonPressTC(event)
+    event = xcb.XcbButtonPressEventT(buttonPressTC(event))
     button = Button(button=event.detail)
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.event)
@@ -283,35 +285,35 @@ async def buttonRelease(event, ctx: 'Ctx'):
     await events.buttonRelease.trigger(ctx, button, mod, window)
 
 
-@handler(lib.XCB_ENTER_NOTIFY)
+@handler(xcb.XCBEnterNotify)
 async def enterNotify(event, ctx: 'Ctx'):
-    event = enterNotifyTC(event)
+    event = xcb.XcbEnterNotifyEventT(enterNotifyTC(event))
     window: GWindow = ctx.getWindow(event.event)
 
     await window.enterNotify.trigger(ctx)
     await events.enterNotify.trigger(ctx, window)
 
 
-@handler(lib.XCB_LEAVE_NOTIFY)
+@handler(xcb.XCBLeaveNotify)
 async def leaveNotify(event, ctx: 'Ctx'):
-    event = enterNotifyTC(event)
+    event = xcb.XcbEnterNotifyEventT(enterNotifyTC(event))
     window: GWindow = ctx.getWindow(event.event)
 
     await window.leaveNotify.trigger(ctx)
     await events.leaveNotify.trigger(ctx, window)
 
 
-@handler(lib.XCB_RANDR_NOTIFY)
+@handler(xcb.XCBRandrNotify)
 async def randrNotify(event, ctx: 'Ctx'):
-    event = randrNotifyTC(event)
+    event = randrNotifyTC(event)  # TODO: typing
 
 
-#    print(event.response_type, event.subCode)
+#    print(event.responseType, event.subCode)
 
 
-@handler(lib.XCB_EXPOSE)
+@handler(xcb.XCBExpose)
 async def expose(event, ctx: 'Ctx'):
-    event = ExposeTC(event)
+    event = xcb.XcbExposeEventT(ExposeTC(event))
 
     if event.count:
         return
@@ -334,7 +336,7 @@ ignore = [9, 10, 14, 89]  # list of events to ignore
 
 async def setup(ctx: 'Ctx'):
     # this is, in practice, the init function for the ctx
-    ctx.dname = ffi.NULL
+    ctx.dname = xcb.NULL
     ctx.screenp = intp(0)
     ctx.gctx = GCtx(ctx)
 
@@ -348,22 +350,19 @@ async def setup(ctx: 'Ctx'):
     async def _update():
         await update(ctx, conn)
 
-    watch(lib.xcb_get_file_descriptor(ctx.connection), _update)
+    watch(xcb.xcbGetFileDescriptor(ctx.connection), _update)
 
 
 async def update(ctx: 'Ctx', conn: 'GConnection'):
-    # used to be ``not lib.xcb_connection_has_error(ctx.connection) and not ctx.closed``...
-    # the fuck was i thinking?
-    # i spent a fucking day on debbuging this shit
-    if lib.xcb_connection_has_error(ctx.connection) or ctx.closed:
+    if xcb.xcbConnectionHasError(ctx.connection) or ctx.closed:
         conn.disconnect()
         return
 
     while True:
-        event = lib.xcb_poll_for_event(ctx.connection)
-        if event == ffi.NULL:
+        event = xcb.xcbPollForEvent(ctx.connection)
+        if event == xcb.NULL:
             return
-        eventType: int = event.response_type & ~0x80
+        eventType: int = event.responseType & ~0x80
         if handler := handlers.get(eventType, None):
             ctx.nurs.start_soon(handler, event, ctx)
         elif eventType not in ignore:

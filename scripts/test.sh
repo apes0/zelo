@@ -22,6 +22,8 @@ do
 #    clear
     echo 
     echo starting new session
+#    python3 -mcProfile -o program.prof main.py > program.prof
+#    python3 main.py --wayland
     python3 main.py
 #    [ $? == 1 ] && rm xcb_cffi.* 
 #    echo opening profile

@@ -8,4 +8,4 @@ class Theme:
         # get a color of some number with a pallet of an imaginary size
         actual = len(self.colors)
         ratio = actual / size
-        return round(col * ratio)
+        return self.colors[round(col * ratio)]

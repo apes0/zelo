@@ -19,4 +19,5 @@ async def main():
         # ? maybe init extensions here?
 
 
-trio.run(main)
+if __name__ == '__main__':
+    trio.run(main)

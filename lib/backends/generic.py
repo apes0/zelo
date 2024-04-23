@@ -1,11 +1,12 @@
-import cffi
-import _cffi_backend
 from typing import TYPE_CHECKING, Callable
+
+import _cffi_backend
+import cffi
 import numpy as np
 
 if TYPE_CHECKING:
-    from .events import Event
     from ..ctx import Ctx
+    from .events import Event
 
 # these are definitions for what functions and classes the backends should have
 # NOTE: some methods are async when they dont use async functions - this is just for consistency
@@ -70,6 +71,7 @@ class GWindow:
         self.ignore: bool
         self.destroyed: bool
         self.parent: GWindow | None
+        self.mine: bool
 
         # events:
 

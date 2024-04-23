@@ -39,7 +39,7 @@ class Layout:
             self.width * x - spacing * 2,
             self.height - spacing * 2,
         ), Layout(
-            self.x + spacing,
+            self.x + self.width * x + spacing,
             self.y + spacing,
             self.width * (1 - x) - spacing * 2,
             self.height - spacing * 2,
