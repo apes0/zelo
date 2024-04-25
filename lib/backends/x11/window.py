@@ -10,6 +10,9 @@ from ..events import (
     focusChange,
 )
 
+from logging import DEBUG
+from ...debcfg import log
+
 if TYPE_CHECKING:
     from ...ctx import Ctx
     from ..events import Event
@@ -70,6 +73,8 @@ class Window(GWindow):
         fn = partial(xcb.xcbMapWindow, self.ctx.connection, self.id)
         await runAndWait(self.ctx, [self.mapNotify, self.enterNotify, self.redraw], fn)
 
+        log('windows', DEBUG, f'mapped {self}')
+
         self.mapped = True
 
     async def unmap(self):
@@ -78,14 +83,11 @@ class Window(GWindow):
             self.ctx, [self.unmapNotify, self.destroyNotify, self.leaveNotify], fn
         )
 
+        log('windows', DEBUG, f'unmapped {self}')
+
         self.mapped = False
 
     async def setFocus(self, focus: bool):
-        # print(
-        #    self,
-        #    self.ctx.focused,
-        #    focus,
-        # )
         self.focused = focus
         color: int
         # act is the function to be called *after* everything is done
@@ -144,6 +146,8 @@ class Window(GWindow):
         if act:
             await act
 
+        log('windows', DEBUG, f'set {self}\'s focus to {focus}')
+
         # no waiting to do here :)
 
     async def configure(
@@ -190,14 +194,21 @@ class Window(GWindow):
 
         fn()
 
+        log('windows', DEBUG, f'configured {self} with x={newX or self.x}, y={newY or self.y}, w={newWidth or self.width}, h={newHeight or self.height}, border width={newBorderWidth or self.borderWidth}')
+
     #        await runAndWait(self.ctx, [self.configureNotify], fn)
 
     async def close(self):
         fn = partial(xcb.xcbDestroyWindow, self.ctx.connection, self.id)
 
         await runAndWait(self.ctx, [self.destroyNotify, self.leaveNotify], fn)
+        
+        log('windows', DEBUG, f'closed {self}')
 
     async def kill(self):
         # the nuclear option
+        # ? should we wait for something here lol?
         xcb.xcbKillClient(self.ctx.connection, self.id)
         xcb.xcbFlush(self.ctx.connection)
+        
+        log('windows', DEBUG, f'killed {self}')

@@ -1,4 +1,5 @@
-import logging
+from logging import ERROR
+from .debcfg import log
 import traceback
 from typing import TYPE_CHECKING, Any, Callable
 
@@ -36,7 +37,7 @@ def setupExtensions(ctx: 'Ctx', extensions: dict):
                 continue
             ctx.extensions[extension] = extension(ctx, cfg)
         except:
-            logging.error(traceback.format_exc())
+            log('extensions', ERROR, traceback.format_exc())
 
 
 def single(ext: type[Extension]) -> Extension:

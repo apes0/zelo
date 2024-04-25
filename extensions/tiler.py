@@ -71,15 +71,15 @@ class Tiler(Extension):
         )  # get the size of the side windows as a fraction
         y = self.spacing  # start the y coordinate at ``self.spacing`` pixels down
         _height = (
-            self.height * size - (2 + size) * self.spacing
-        )  # calculate the height of each side window
+            self.height - (1 + len(windows)) * (self.spacing) - 2*len(windows)*self.border
+        )*size  # calculate the height of each side window
         height = round(_height)  # round it to a whole number
         offset = _height - height  # get the error from the rounded version
         width = round(
-            self.width * (1 - self.mainSize) - self.spacing * 3
+            self.width * (1 - self.mainSize) - self.spacing - 2 * self.border
         )  # calculate the width of every side window
         x = round(
-            self.width * self.mainSize + self.spacing
+            self.width * self.mainSize
         )  # calculate the x coordinate of the side windows
 
         fns = []
@@ -94,15 +94,15 @@ class Tiler(Extension):
                     newBorderWidth=self.border,
                 )
             )
-            y += height + self.spacing * 2 + offset
+            y += height + self.spacing + offset + 2*self.border
 
         mainSize = self.mainSize if windows else 1
         fns.append(
             main.configure(
                 newX=self.spacing + self.x,
                 newY=self.spacing + self.y,
-                newWidth=round(self.width * mainSize - 3 * self.spacing),
-                newHeight=self.height - 3 * self.spacing,
+                newWidth=round(self.width * mainSize - 2 * self.spacing - 2 * self.border),
+                newHeight=self.height - 2 * self.spacing - 2 * self.border,
                 newBorderWidth=self.border,
             )
         )

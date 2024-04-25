@@ -2,7 +2,7 @@
 # NOTE: i literally made this just because of the workspaces hah
 
 from lib.extension import Extension
-from lib.backends.events import mapRequest, destroyNotify, focusChange, unmapNotify
+from lib.backends.events import mapRequest, destroyNotify, focusChange, unmapNotify, mapNotify
 
 from typing import TYPE_CHECKING, Callable, Coroutine
 
@@ -75,12 +75,14 @@ class Tracker:
         destroyNotify.addListener(self.destroyNotify)
         focusChange.addListener(self.focusChange)
         unmapNotify.addListener(self.unmapWindow)
+        mapNotify.addListener(self.mapNotify)
 
         for event in customEvents:
             event.addListener(lambda *a: self.update())
 
     async def findFocus(self):
-        if self.ctx.focused:
+        # just having a focused win is not enough here!!
+        if self.ctx.focused and self.ctx.focused.mapped and not self.ctx.focused.destroyed:
             return
 
         for win in self.focusQueue:
@@ -102,13 +104,21 @@ class Tracker:
             await self.updates[dpy](queue.copy())
 
     async def unmapWindow(self, win: 'GWindow'):
-        await self.findFocus()
-
+        if win == self.ctx.focused:
+            await self.findFocus()
+            return # the update func is gonna be called if we find a win, and if we dont - there are no wins
+        
         await self.update()
 
+    async def mapNotify(self, win: 'GWindow'):
+        if not win.focused:
+            await win.setFocus(True)
+
     async def mapWindow(self, win: 'GWindow'):
-        await win.map()
-        await win.setFocus(True)
+        if not win.mapped:
+            await win.map()
+
+            await win.setFocus(True)
 
         # this is a bit of a hack to get windows to be on the correct screen
         x, y = self.ctx.mouse.location()
@@ -123,8 +133,6 @@ class Tracker:
             self.focusQueue.remove(win)
 
         await self.findFocus()
-
-        await self.update()
 
     async def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
         for win in [old, new]:

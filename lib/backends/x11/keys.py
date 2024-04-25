@@ -5,6 +5,9 @@ from .. import xcb
 from .types import keyEvent
 from ..generic import CData
 
+from logging import DEBUG
+from ...debcfg import log
+
 if TYPE_CHECKING:
     from ...ctx import Ctx
 
@@ -94,7 +97,8 @@ class Key(GKey):
                     key,
                 ]
 
-    def grab(self, ctx: 'Ctx', *modifiers: Mod):
+    def grab(self, ctx: 'Ctx', *modifiers: Mod): # TODO: (un)grab on window
+        log('grab', DEBUG, f'grabbing {self} with modifiers {modifiers}')
         if not self.key:
             self.load(ctx)
 
@@ -116,6 +120,7 @@ class Key(GKey):
         xcb.xcbFlush(ctx.connection)
 
     def ungrab(self, ctx: 'Ctx', *modifiers: Mod):
+        log('grab', DEBUG, f'ungrabbing {self} with modifiers {modifiers}')
         if not self.key:
             self.load(ctx)
 
@@ -128,6 +133,7 @@ class Key(GKey):
         xcb.xcbFlush(ctx.connection)
 
     def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod, flush: bool = True):
+        log('press', DEBUG, f'pressing {self} with modifiers {modifiers}')
         if not self.key:
             self.load(ctx)
 
@@ -156,6 +162,7 @@ class Key(GKey):
     def release(
         self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod, flush: bool = True
     ):
+        log('press', DEBUG, f'releasing {self} with modifiers {modifiers}')
         if not self.key:
             self.load(ctx)
 

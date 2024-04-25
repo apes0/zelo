@@ -1,4 +1,3 @@
-import logging
 from typing import TYPE_CHECKING, Callable
 
 from extensions.animation import Animation
@@ -14,17 +13,24 @@ from extensions.widgets.clock import Clock
 from extensions.widgets.nowPlaying import NowPlaying
 from extensions.widgets.text import Text
 from extensions.workspaces import Workspaces
+
 from lib._cfg import Cfg
 from lib.api.keys import Key, Mod
+from lib.debcfg import cfg as debcfg
+
 from utils.fns import spawn, stop, toCursor
 from utils.layout import Layout
 from utils.ratio import Ratio
 from utils.theme import Theme
+from utils.log import logTerm, log
+
+#debcfg['all'] = True
+
+logTerm()
+log('log')
 
 if TYPE_CHECKING:
     from lib.backends.generic import GKey, GMod
-
-logging.basicConfig(level=logging.DEBUG)
 
 cfg = Cfg()
 
@@ -36,9 +42,9 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     ((Key('x'),), Mod('control')): lambda ctx: (
         ctx.nurs.start_soon(ctx.focused.close) if ctx.focused else None
     ),
-    ((Key('m'),), Mod('control')): lambda ctx: (
-        toCursor(ctx, ctx.focused) if ctx.focused else None
-    ),
+    # ((Key('m'),), Mod('control')): lambda ctx: (
+    #     toCursor(ctx, ctx.focused) if ctx.focused else None
+    # ),
 }
 
 wall = 'wall.png'

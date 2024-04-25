@@ -2,6 +2,9 @@ from .. import xcb
 from .types import chararr, uintarr
 from ..generic import GButton, GMouse
 
+from logging import DEBUG
+from ...debcfg import log
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -182,6 +185,7 @@ class Button(GButton):
                     break
 
     def grab(self, ctx: 'Ctx', window: 'GWindow', *mods: 'GMod'):
+        log('grab', DEBUG, f'grabbing {self} with modifiers {mods} on {window}')
         mod = 0
         for _mod in mods:
             mod |= _mod.mod
@@ -202,6 +206,7 @@ class Button(GButton):
         xcb.xcbFlush(ctx.connection)
 
     def ungrab(self, ctx: 'Ctx', window: 'GWindow', *mods: 'GMod'):
+        log('grab', DEBUG, f'ungrabbing {self} with modifiers {mods} on {window}')
         mod = 0
         for _mod in mods:
             mod |= _mod.mod

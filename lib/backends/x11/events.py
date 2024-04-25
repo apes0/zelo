@@ -1,4 +1,5 @@
-import logging
+from logging import ERROR, WARN
+from ...debcfg import log
 from .keys import Key, Mod
 from .mouse import Button
 from lib.extension import setupExtensions
@@ -235,7 +236,7 @@ async def motionNotify(event, ctx: 'Ctx'):
 @handler(0)
 async def error(event, ctx: 'Ctx'):
     event = xcb.XcbGenericErrorT(genericErrorTC(event))
-    logging.error(
+    log('errors', ERROR,
         f'{event.errorCode} ({event.majorCode}.{event.minorCode}) for resource {event.resourceId}'
     )
     # TODO: xcb-util-errors
@@ -366,4 +367,4 @@ async def update(ctx: 'Ctx', conn: 'GConnection'):
         if handler := handlers.get(eventType, None):
             ctx.nurs.start_soon(handler, event, ctx)
         elif eventType not in ignore:
-            logging.warn(f'No handler for: {eventType}')
+            log('others', WARN, f'No handler for: {eventType}')

@@ -168,3 +168,6 @@ program.prof
 
 # my dumb jupyter stuff lol
 *.ipynb
+
+# log from cfg
+log

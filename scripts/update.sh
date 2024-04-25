@@ -13,9 +13,9 @@ do
     find  . -name $file"_cffi.*" -exec rm {} \;
 done
 
-git stash
 git add *
-git merge
+git stash
+git pull
 git stash pop
 
 # here we do this so that the update script doesnt override itself lol

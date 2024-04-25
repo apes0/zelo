@@ -1,5 +1,11 @@
 import logging
 
+logger = logging.getLogger('zelo')
 
 def log(file: str, level: int = logging.DEBUG):
-    logging.basicConfig(filename=file, encoding='utf-8', level=level)
+    logger.setLevel(level)
+    fileHandler = logging.FileHandler(file)
+    logger.addHandler(fileHandler)
+
+def logTerm(level: int = logging.DEBUG):
+    logger.setLevel(level)

@@ -1,9 +1,10 @@
-import logging
 import traceback
 from typing import TYPE_CHECKING, Callable
 
 import trio
 
+from logging import ERROR, DEBUG
+from ..debcfg import log
 from .generic import GButton, GKey, GMod, GWindow
 
 if TYPE_CHECKING:
@@ -19,7 +20,7 @@ async def caller(fn, *args, task_status: trio._core._run._TaskStatus):
         await fn(*args)
     except:
         # TODO: do something here
-        logging.error(traceback.format_exc())
+        log('events', ERROR, traceback.format_exc())
 
 
 class Event:
@@ -39,10 +40,10 @@ class Event:
 
     async def trigger(self, ctx: 'Ctx', *args):
         if self.block:
-            logging.debug(f'skipping {self.name} with {args} because of block')
+            log('events', DEBUG, f'skipping {self.name} with {args} because of block')
             return
 
-        logging.debug(f'triggering {self.name} with {args})')
+        log('events', DEBUG, f'triggering {self.name} with {args}')
 
         # check types
 

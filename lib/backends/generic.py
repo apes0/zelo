@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .events import Event
 
 # these are definitions for what functions and classes the backends should have
+# TODO: logging?
 # NOTE: some methods are async when they dont use async functions - this is just for consistency
 
 CData = _cffi_backend._CDataBase  # cffi.FFI.CData

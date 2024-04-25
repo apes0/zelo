@@ -17,6 +17,7 @@
 - use Xvideo (x plugin, not porn) and implement a Video class for the x backend
 - errors
 - use xshm for images?
+- properly redraw
 - make animations work; maybe with a composer?
 - more backends (e.g. one for windows/macos?)
 - free floating
