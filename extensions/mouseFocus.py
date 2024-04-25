@@ -13,8 +13,8 @@ class MouseFocus(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.buttons: list[GButton] = [
             Button('left'),
-#            Button('right'),
-#            Button('middle'),
+            Button('right'),
+            Button('middle'),
         ]
 
         self.mod: GMod = Mod('any')
