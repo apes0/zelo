@@ -8,10 +8,9 @@ from lib.ctx import Ctx
 from lib import watcher
 import trio
 
-ctx = Ctx()
-
 
 async def main():
+    ctx = Ctx()
     async with trio.open_nursery() as nurs:
         ctx.nurs = nurs
         nurs.start_soon(watcher.setup, ctx)

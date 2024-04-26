@@ -21,3 +21,7 @@
 - make animations work; maybe with a composer?
 - more backends (e.g. one for windows/macos?)
 - free floating
+- custom config paths
+- more tiling methods
+- scrolling!! (i wanna try it out)
+- maybe use layouts for tiling, might also make it possible to resize arbitrary windows on the fly

@@ -105,9 +105,8 @@ class Window(GWindow):
 
             if not self.ctx.focused:
                 # if there is not other window that is focused, we dont have anything to do
-                self.ctx.focused = self
                 act = focusChange.trigger(self.ctx, None, self)
-                # print(f'focus on {self.id}, current: {None} with {color}')
+                self.ctx.focused = self
 
             elif self.ctx.focused.id != self.id:
                 # if there is a window that is focused, unfocus it first, then focus our window
@@ -117,23 +116,19 @@ class Window(GWindow):
                     focusChange.block = True
                     await old.setFocus(False)
                     focusChange.block = False
-                    self.ctx.focused = self
 
                     await focusChange.trigger(self.ctx, old, self)
+                    self.ctx.focused = self
 
                 act = fn()
-
-                # print(
-                #    f'focus on {self.id}, current: {self.ctx.focused.id} with {color}'
-                # )
 
         else:
             color = cfg.unfocusedColor
             # if the id of the focused is our id, and only then, we need to unfocus the window,
             # otherwise, if the ids arent the same, then we are already unfocused
             if self.ctx.focused and self.ctx.focused.id == self.id:
-                self.ctx.focused = None
                 act = focusChange.trigger(self.ctx, self, None)
+                self.ctx.focused = None
                 # print(f'unfocus on {self.id} with {color}')
 
         # ? maybe expose this to a separate function?

@@ -1,15 +1,16 @@
 from typing import Callable
-import traceback
 from .pres import Pre
 import os
 import importlib
 
-def catch(fn, err):
+# TODO: aaaaaa i need typing 
+
+async def catch(fn, err, *args):
     try:
-        fn()
+        await fn(*args)
         return False
-    except:
-        print(f'{err}: \n{traceback.format_exc()}')
+    except BaseException as e:
+        print(f'{err}: {e}')
         return True
 
 tests = []
@@ -19,23 +20,31 @@ class Test:
         self.lable = lable
         self.preq = preq
         self._test = test
-        self.success: bool = False
         tests.append(self)
     
-    def test(self):
-        for pre in self.preq:
-            if catch(pre.start, f'Test {self.lable}: prerequesite {pre.lable} failed to start'):
-                return
+    async def test(self, nurs):
+        for i, pre in enumerate(self.preq):
+            if await catch(pre.run, f'{self.lable}: {pre.lable} failed', nurs):
+                await self.cleanUp(nurs, end=i)
+                return False
 
-        if catch(self._test(), f'Test {self.lable} failed'):
-            return
-
-        for pre in self.preq:
-            if catch(pre.stop, f'Test {self.lable}: prerequesite {pre.lable} failed to stop'):
-                return
+        if await catch(self._test, f'{self.lable} failed', self):
+            await self.cleanUp(nurs)
+            return False
         
-        self.success = True
+        print(f'{self.lable} succeeded!')
+        await self.cleanUp(nurs)
+        return True
 
+    async def cleanUp(self, nurs, end=-1):
+        for pre in reversed(self.preq[:end]):
+            await catch(pre.stop, f'{self.lable}: {pre.lable} failed to stop', nurs)
+
+def test(lable, preq):
+    def deco(fn):
+        return Test(lable, preq, fn)
+    
+    return deco
 
 def load():
     dirname = os.path.dirname(__file__)
