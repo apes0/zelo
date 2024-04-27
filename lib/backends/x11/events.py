@@ -73,6 +73,8 @@ async def mapRequest(event, ctx: 'Ctx'):
     _id: int = event.window
     window: GWindow = ctx.getWindow(_id)
     window.parent = ctx.getWindow(event.parent)
+    # TODO: this is the only instance of ctx.values in the code, so we should remove it
+    # its just a leftover from the initial code and i think i can remove it
     ctx.values[0] = xcb.XCBEventMaskEnterWindow | xcb.XCBEventMaskFocusChange
     xcb.xcbChangeWindowAttributesChecked(
         ctx.connection, _id, xcb.XCBCwEventMask, ctx.values

@@ -178,7 +178,6 @@ class GButton:
 # mouse
 class GMouse:
     def __init__(self, ctx: 'Ctx') -> None:
-        pass
         raise NotImplementedError
 
     def __repr__(self) -> str:

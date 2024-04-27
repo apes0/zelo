@@ -22,8 +22,8 @@ def loop(ctx: 'Ctx'):
         try:
             changed, _, _ = select.select(watches.keys(), [], [])
         except OSError:
-            return # just ignore the warning for the bad fd lol
-        
+            return  # just ignore the warning for the bad fd lol
+
         for fd in changed:
             trio.from_thread.run(watches[fd])
 

@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from lib.ctx import Ctx
 
 # TODO: export what types of variables can be editted
-
+# FIXME: some extensions cannot be reused for some reason?
 
 class Extension:
     def __init__(self, ctx: 'Ctx', cfg: dict, resolve={}) -> None:

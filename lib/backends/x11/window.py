@@ -2,7 +2,7 @@ from functools import partial
 from ..generic import GWindow, GKey, GButton, GMod
 from .. import xcb
 import trio
-from .types import uintarr
+from .types import uintarr, intarr
 from typing import TYPE_CHECKING, Callable, Coroutine
 from ...cfg import cfg
 from ..events import (

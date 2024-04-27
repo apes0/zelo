@@ -1,6 +1,8 @@
 # A class for tilers to use, because its really annoying to keep track of windows
 # NOTE: i literally made this just because of the workspaces hah
 
+from logging import DEBUG
+from lib.debcfg import log
 from lib.extension import Extension
 from lib.backends.events import mapRequest, destroyNotify, focusChange, unmapNotify, mapNotify
 
@@ -45,6 +47,16 @@ def perDisplay(ctx: 'Ctx', wins: list['GWindow']):
         out[dpy] = [*out.get(dpy, []), win]
 
     return out
+
+def removeAll(l: list['GWindow'], win: 'GWindow'):
+    i = 0
+
+    while i < len(l):
+        if l[i].id == win.id:
+            l.pop(i)
+            continue
+
+        i += 1
 
 
 UpdateType = Callable[[list['GWindow']], Coroutine]
@@ -104,41 +116,34 @@ class Tracker:
             await self.updates[dpy](queue.copy())
 
     async def unmapWindow(self, win: 'GWindow'):
-        if win == self.ctx.focused:
+        if self.ctx.focused and win.id == self.ctx.focused.id:
             await self.findFocus()
             return # the update func is gonna be called if we find a win, and if we dont - there are no wins
         
         await self.update()
 
     async def mapNotify(self, win: 'GWindow'):
-        if not win.focused:
-            await win.setFocus(True)
+        await win.setFocus(True)
+        #? can the window be focused if its not mapped? (it shouldnt but idk)
 
     async def mapWindow(self, win: 'GWindow'):
-        if not win.mapped:
-            await win.map()
-
-            await win.setFocus(True)
-
         # this is a bit of a hack to get windows to be on the correct screen
         x, y = self.ctx.mouse.location()
 
-        win.x = x  # kinda a hack
+        win.x = x
         win.y = y
 
-        await self.update()
+        await win.map() # This will set its focus, so we shouldn't need a focus change
 
     async def destroyNotify(self, win: 'GWindow'):
-        while win in self.focusQueue:
-            self.focusQueue.remove(win)
+        removeAll(self.focusQueue, win)
 
         await self.findFocus()
 
     async def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
         for win in [old, new]:
             if win:
-                while win in self.focusQueue:
-                    self.focusQueue.remove(win)
+                removeAll(self.focusQueue, win)
                 self.focusQueue.append(win)
 
         await self.update()
