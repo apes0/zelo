@@ -64,7 +64,6 @@ class Tiler(Extension):
         self.height = self.display.height - self.topSpacing - self.bottomSpacing
 
     async def update(self, windows: list['GWindow']):
-        print(len(windows), len(set(windows)), windows)
         main: 'GWindow' = windows.pop()  # this doesnt error for some reason?
 
         size = 1 / max(

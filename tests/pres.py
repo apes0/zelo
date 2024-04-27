@@ -123,7 +123,6 @@ async def killWins(pre: Pre, nurs: trio.Nursery, done: trio.Event):
 
 @pre('startWm')
 async def startWm(pre: Pre, nurs: trio.Nursery, done: trio.Event):
-    print(pre.args[0].__dict__)
     cfg.__dict__ = pre.args[0].__dict__.copy()  # new cfg
 
     async def main(task_status):
