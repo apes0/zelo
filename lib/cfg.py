@@ -13,6 +13,7 @@ from extensions.widgets.clock import Clock
 from extensions.widgets.nowPlaying import NowPlaying
 from extensions.widgets.text import Text
 from extensions.workspaces import Workspaces
+from extensions.winfo import Winfo
 
 from lib._cfg import Cfg
 from lib.api.keys import Key, Mod
@@ -115,6 +116,7 @@ cfg.extensions = {
         ]
     },
     Mouse: {},
+    Winfo: {},
     #    Animation: {},
 }
 

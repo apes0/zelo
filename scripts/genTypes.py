@@ -35,7 +35,7 @@ NULL = ffi.NULL
 
 # types
 '''
-    for _type in set(chain.from_iterable(ffi.list_types())):
+    for _type in sorted(set(chain.from_iterable(ffi.list_types()))):
         try:
             obj = ffi.new(f'{_type}*')
 
@@ -78,9 +78,9 @@ from xcb_cffi import lib, ffi
 
 open('./lib/backends/xcb.py', 'w').write(generate('xcb', lib, ffi))
 
-from wayland_cffi import lib, ffi
+# from wayland_cffi import lib, ffi
 
-open('./lib/backends/waylandServer.py', 'w').write(generate('wayland', lib, ffi))
+# open('./lib/backends/waylandServer.py', 'w').write(generate('wayland', lib, ffi))
 
 from cairo_cffi import lib, ffi
 

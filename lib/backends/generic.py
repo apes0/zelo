@@ -37,7 +37,7 @@ class GCtx:
         raise NotImplementedError
 
     def __repr__(self) -> str:
-        return f'<GCtx>'
+        return '<GCtx>'
 
     def sendEvent(self, event, window: 'GWindow') -> None:
         raise NotImplementedError
@@ -95,6 +95,12 @@ class GWindow:
 
     def __repr__(self) -> str:
         return f'<Window {self.id}>'
+
+    async def toTop(self):
+        raise NotImplementedError
+        
+    async def toBottom(self):
+        raise NotImplementedError
 
     async def map(self):
         raise NotImplementedError

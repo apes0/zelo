@@ -25,3 +25,4 @@
 - more tiling methods
 - scrolling!! (i wanna try it out)
 - maybe use layouts for tiling, might also make it possible to resize arbitrary windows on the fly
+- fix typing for extension resolves

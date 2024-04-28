@@ -7,7 +7,7 @@ from .theme import Theme
 from .ratio import Ratio
 
 if TYPE_CHECKING:
-    from lib.backends.generic import GWindow
+    from lib.backends.generic import GWindow, GDisplay
     from lib.ctx import Ctx
     from lib.extension import Extension
 
@@ -51,3 +51,13 @@ def toCursor(ctx: 'Ctx', win: 'GWindow'):
         await win.configure(newX=x, newY=y)
 
     ctx.nurs.start_soon(afn)
+
+def getDisplay(ctx: 'Ctx', x: int, y: int):
+    display: 'GDisplay | None' = None
+
+    for _display in ctx.screen.displays:
+        if x - _display.x < _display.width and y - _display.y < _display.height:
+            display = _display
+            break
+
+    return display

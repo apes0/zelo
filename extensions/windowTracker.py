@@ -3,8 +3,9 @@
 
 from logging import DEBUG
 from lib.debcfg import log
+from utils.fns import getDisplay
 from lib.extension import Extension
-from lib.backends.events import mapRequest, destroyNotify, focusChange, unmapNotify, mapNotify
+from lib.backends.events import mapRequest, destroyNotify, focusChange, unmapNotify, mapNotify, configureNotify
 
 from typing import TYPE_CHECKING, Callable, Coroutine
 
@@ -24,16 +25,6 @@ def track(updateFn: str, custom: list = []):
 
     return deco
 
-
-def getDisplay(ctx: 'Ctx', x: int, y: int):
-    display: GDisplay | None = None
-
-    for _display in ctx.screen.displays:
-        if x - _display.x < _display.width and y - _display.y < _display.height:
-            display = _display
-            break
-
-    return display
 
 
 def perDisplay(ctx: 'Ctx', wins: list['GWindow']):
@@ -88,6 +79,7 @@ class Tracker:
         focusChange.addListener(self.focusChange)
         unmapNotify.addListener(self.unmapWindow)
         mapNotify.addListener(self.mapNotify)
+        configureNotify.addListener(self.confNotify)
 
         for event in customEvents:
             event.addListener(lambda *a: self.update())
@@ -95,6 +87,7 @@ class Tracker:
     async def findFocus(self):
         # just having a focused win is not enough here!!
         if self.ctx.focused and self.ctx.focused.mapped and not self.ctx.focused.destroyed:
+            await self.update()
             return
 
         for win in self.focusQueue:
@@ -122,11 +115,21 @@ class Tracker:
         
         await self.update()
 
+    async def confNotify(self, win: 'GWindow'):
+        #? should we do something more complex here?
+        await self.update()
+
     async def mapNotify(self, win: 'GWindow'):
+        if win.ignore:
+            return
+
         await win.setFocus(True)
         #? can the window be focused if its not mapped? (it shouldnt but idk)
 
     async def mapWindow(self, win: 'GWindow'):
+        if win.ignore:
+            return
+
         # this is a bit of a hack to get windows to be on the correct screen
         x, y = self.ctx.mouse.location()
 
@@ -134,6 +137,7 @@ class Tracker:
         win.y = y
 
         await win.map() # This will set its focus, so we shouldn't need a focus change
+        await self.update()
 
     async def destroyNotify(self, win: 'GWindow'):
         removeAll(self.focusQueue, win)

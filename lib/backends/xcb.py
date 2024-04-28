@@ -6,14 +6,330 @@ NULL = ffi.NULL
 
 # types
 
-class XcbRandrCrtcChangeIteratorT(Base):
+# skipping Xcbkeysymbols, because its not fully defined
+
+class XcbAtomEnumT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbAtomT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbButtonIndexT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbButtonPressEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.child: int = obj.child
+        self.detail: int = obj.detail
+        self.event: int = obj.event
+        self.eventX: int = obj.event_x
+        self.eventY: int = obj.event_y
+        self.pad0: int = obj.pad0
+        self.responseType: int = obj.response_type
+        self.root: int = obj.root
+        self.rootX: int = obj.root_x
+        self.rootY: int = obj.root_y
+        self.sameScreen: int = obj.same_screen
+        self.sequence: int = obj.sequence
+        self.state: int = obj.state
+        self.time: int = obj.time
+
+class XcbButtonT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbClientMessageDataT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.data16: _CDataBase = obj.data16
+        self.data32: _CDataBase = obj.data32
+        self.data8: _CDataBase = obj.data8
+
+class XcbClientMessageEventT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
         self.data: _CDataBase = obj.data
-        self.index: int = obj.index
-        self.rem: int = obj.rem
+        self.format: int = obj.format
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.type: int = obj.type
+        self.window: int = obj.window
+
+class XcbColormapT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbConfigWindowT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbConfigureNotifyEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.aboveSibling: int = obj.above_sibling
+        self.borderWidth: int = obj.border_width
+        self.event: int = obj.event
+        self.height: int = obj.height
+        self.overrideRedirect: int = obj.override_redirect
+        self.pad0: int = obj.pad0
+        self.pad1: int = obj.pad1
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.width: int = obj.width
+        self.window: int = obj.window
+        self.x: int = obj.x
+        self.y: int = obj.y
+
+class XcbConfigureRequestEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.borderWidth: int = obj.border_width
+        self.height: int = obj.height
+        self.parent: int = obj.parent
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.sibling: int = obj.sibling
+        self.stackMode: int = obj.stack_mode
+        self.valueMask: int = obj.value_mask
+        self.width: int = obj.width
+        self.window: int = obj.window
+        self.x: int = obj.x
+        self.y: int = obj.y
+
+# skipping XcbConnectionT, because its not fully defined
+
+class XcbCreateNotifyEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.borderWidth: int = obj.border_width
+        self.height: int = obj.height
+        self.overrideRedirect: int = obj.override_redirect
+        self.pad0: int = obj.pad0
+        self.pad1: int = obj.pad1
+        self.parent: int = obj.parent
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.width: int = obj.width
+        self.window: int = obj.window
+        self.x: int = obj.x
+        self.y: int = obj.y
+
+class XcbCursorT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbCwT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbDestroyNotifyEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.event: int = obj.event
+        self.pad0: int = obj.pad0
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.window: int = obj.window
+
+class XcbDrawableT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbEnterNotifyEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.child: int = obj.child
+        self.detail: int = obj.detail
+        self.event: int = obj.event
+        self.eventX: int = obj.event_x
+        self.eventY: int = obj.event_y
+        self.mode: int = obj.mode
+        self.responseType: int = obj.response_type
+        self.root: int = obj.root
+        self.rootX: int = obj.root_x
+        self.rootY: int = obj.root_y
+        self.sameScreenFocus: int = obj.same_screen_focus
+        self.sequence: int = obj.sequence
+        self.state: int = obj.state
+        self.time: int = obj.time
+
+class XcbEventMaskT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbExposeEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.count: int = obj.count
+        self.height: int = obj.height
+        self.pad0: int = obj.pad0
+        self.pad1: _CDataBase = obj.pad1
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.width: int = obj.width
+        self.window: int = obj.window
+        self.x: int = obj.x
+        self.y: int = obj.y
+
+# skipping XcbExtensionT, because its not fully defined
+
+class XcbFocusInEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.detail: int = obj.detail
+        self.event: int = obj.event
+        self.mode: int = obj.mode
+        self.pad0: _CDataBase = obj.pad0
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+
+class XcbFontT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbGcT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbGcontextT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbGenericErrorT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.errorCode: int = obj.error_code
+        self.fullSequence: int = obj.full_sequence
+        self.majorCode: int = obj.major_code
+        self.minorCode: int = obj.minor_code
+        self.pad: _CDataBase = obj.pad
+        self.pad0: int = obj.pad0
+        self.resourceId: int = obj.resource_id
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+
+class XcbGenericEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.fullSequence: int = obj.full_sequence
+        self.pad: _CDataBase = obj.pad
+        self.pad0: int = obj.pad0
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+
+class XcbGetAtomNameCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
+class XcbGetAtomNameReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.length: int = obj.length
+        self.nameLen: int = obj.name_len
+        self.pad0: int = obj.pad0
+        self.pad1: _CDataBase = obj.pad1
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+
+class XcbGetAtomNameRequestT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.atom: int = obj.atom
+        self.length: int = obj.length
+        self.majorOpcode: int = obj.major_opcode
+        self.pad0: int = obj.pad0
+
+class XcbGetGeometryCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
+class XcbGetGeometryReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.borderWidth: int = obj.border_width
+        self.depth: int = obj.depth
+        self.height: int = obj.height
+        self.length: int = obj.length
+        self.pad0: _CDataBase = obj.pad0
+        self.responseType: int = obj.response_type
+        self.root: int = obj.root
+        self.sequence: int = obj.sequence
+        self.width: int = obj.width
+        self.x: int = obj.x
+        self.y: int = obj.y
+
+class XcbGetKeyboardMappingCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
 
 class XcbGetKeyboardMappingReplyT(Base):
     def __init__(self, obj):
@@ -26,59 +342,57 @@ class XcbGetKeyboardMappingReplyT(Base):
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
 
-class XcbGcontextT(Base):
+class XcbGetModifierMappingCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
+        self.sequence: int = obj.sequence
 
-class XcbImageT(Base):
+class XcbGetModifierMappingReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
-        self.base: _CDataBase = obj.base
-        self.bitOrder: int = obj.bit_order
-        self.bpp: int = obj.bpp
-        self.byteOrder: int = obj.byte_order
-        self.data: _CDataBase = obj.data
-        self.depth: int = obj.depth
-        self.format: int = obj.format
-        self.height: int = obj.height
-        self.planeMask: int = obj.plane_mask
-        self.scanlinePad: int = obj.scanline_pad
-        self.size: int = obj.size
-        self.stride: int = obj.stride
-        self.unit: int = obj.unit
-        self.width: int = obj.width
-
-class XcbAtomT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbFontT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbGetAtomNameRequestT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.atom: int = obj.atom
+        self.keycodesPerModifier: int = obj.keycodes_per_modifier
         self.length: int = obj.length
-        self.majorOpcode: int = obj.major_opcode
-        self.pad0: int = obj.pad0
+        self.pad0: _CDataBase = obj.pad0
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
 
-class XcbDrawableT(Base):
+class XcbGetPropertyCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
+        self.sequence: int = obj.sequence
+
+class XcbGetPropertyReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.bytesAfter: int = obj.bytes_after
+        self.format: int = obj.format
+        self.length: int = obj.length
+        self.pad0: _CDataBase = obj.pad0
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.type: int = obj.type
+        self.valueLen: int = obj.value_len
+
+class XcbGetPropertyTypeT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbGetWindowAttributesCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
 
 class XcbGetWindowAttributesReplyT(Base):
     def __init__(self, obj):
@@ -105,6 +419,108 @@ class XcbGetWindowAttributesReplyT(Base):
         self.winGravity: int = obj.win_gravity
         self.yourEventMask: int = obj.your_event_mask
 
+class XcbGxT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbImageFormatT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbImageOrderT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbImageT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.base: _CDataBase = obj.base
+        self.bitOrder: int = obj.bit_order
+        self.bpp: int = obj.bpp
+        self.byteOrder: int = obj.byte_order
+        self.data: _CDataBase = obj.data
+        self.depth: int = obj.depth
+        self.format: int = obj.format
+        self.height: int = obj.height
+        self.planeMask: int = obj.plane_mask
+        self.scanlinePad: int = obj.scanline_pad
+        self.size: int = obj.size
+        self.stride: int = obj.stride
+        self.unit: int = obj.unit
+        self.width: int = obj.width
+
+class XcbInputFocusT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbInternAtomCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
+class XcbInternAtomReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.atom: int = obj.atom
+        self.length: int = obj.length
+        self.pad0: int = obj.pad0
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+
+class XcbKeyPressEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.child: int = obj.child
+        self.detail: int = obj.detail
+        self.event: int = obj.event
+        self.eventX: int = obj.event_x
+        self.eventY: int = obj.event_y
+        self.pad0: int = obj.pad0
+        self.responseType: int = obj.response_type
+        self.root: int = obj.root
+        self.rootX: int = obj.root_x
+        self.rootY: int = obj.root_y
+        self.sameScreen: int = obj.same_screen
+        self.sequence: int = obj.sequence
+        self.state: int = obj.state
+        self.time: int = obj.time
+
+# skipping XcbKeySymbolsT, because its not fully defined
+
+class XcbKeycodeT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbKeysymT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbLineStyleT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
 class XcbMapNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -117,6 +533,61 @@ class XcbMapNotifyEventT(Base):
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.window: int = obj.window
+
+class XcbMapRequestEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.pad0: int = obj.pad0
+        self.parent: int = obj.parent
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.window: int = obj.window
+
+class XcbMapStateT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbModMaskT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbMotionNotifyEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.child: int = obj.child
+        self.detail: int = obj.detail
+        self.event: int = obj.event
+        self.eventX: int = obj.event_x
+        self.eventY: int = obj.event_y
+        self.pad0: int = obj.pad0
+        self.responseType: int = obj.response_type
+        self.root: int = obj.root
+        self.rootX: int = obj.root_x
+        self.rootY: int = obj.root_y
+        self.sameScreen: int = obj.same_screen
+        self.sequence: int = obj.sequence
+        self.state: int = obj.state
+        self.time: int = obj.time
+
+class XcbPixmapT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbPropModeT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
 
 class XcbQueryExtensionReplyT(Base):
     def __init__(self, obj):
@@ -132,36 +603,155 @@ class XcbQueryExtensionReplyT(Base):
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
 
-class XcbWindowClassT(Base):
+class XcbQueryPointerCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
-
-class XcbGenericEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.fullSequence: int = obj.full_sequence
-        self.pad: _CDataBase = obj.pad
-        self.pad0: int = obj.pad0
-        self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
 
-class XcbGetPropertyReplyT(Base):
+class XcbQueryPointerReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
-        self.bytesAfter: int = obj.bytes_after
-        self.format: int = obj.format
+        self.child: int = obj.child
         self.length: int = obj.length
+        self.mask: int = obj.mask
         self.pad0: _CDataBase = obj.pad0
         self.responseType: int = obj.response_type
+        self.root: int = obj.root
+        self.rootX: int = obj.root_x
+        self.rootY: int = obj.root_y
+        self.sameScreen: int = obj.same_screen
         self.sequence: int = obj.sequence
-        self.type: int = obj.type
-        self.valueLen: int = obj.value_len
+        self.winX: int = obj.win_x
+        self.winY: int = obj.win_y
+
+class XcbQueryTreeCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
+class XcbQueryTreeReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.childrenLen: int = obj.children_len
+        self.length: int = obj.length
+        self.pad0: int = obj.pad0
+        self.pad1: _CDataBase = obj.pad1
+        self.parent: int = obj.parent
+        self.responseType: int = obj.response_type
+        self.root: int = obj.root
+        self.sequence: int = obj.sequence
+
+class XcbRandrCrtcChangeIteratorT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.data: _CDataBase = obj.data
+        self.index: int = obj.index
+        self.rem: int = obj.rem
+
+# skipping XcbRandrCrtcChangeT, because its not fully defined
+
+class XcbRandrCrtcT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbRandrGetCrtcInfoCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
+class XcbRandrGetCrtcInfoReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.height: int = obj.height
+        self.length: int = obj.length
+        self.mode: int = obj.mode
+        self.numOutputs: int = obj.num_outputs
+        self.numPossibleOutputs: int = obj.num_possible_outputs
+        self.responseType: int = obj.response_type
+        self.rotation: int = obj.rotation
+        self.rotations: int = obj.rotations
+        self.sequence: int = obj.sequence
+        self.status: int = obj.status
+        self.timestamp: int = obj.timestamp
+        self.width: int = obj.width
+        self.x: int = obj.x
+        self.y: int = obj.y
+
+class XcbRandrGetScreenResourcesCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
+class XcbRandrGetScreenResourcesReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.configTimestamp: int = obj.config_timestamp
+        self.length: int = obj.length
+        self.namesLen: int = obj.names_len
+        self.numCrtcs: int = obj.num_crtcs
+        self.numModes: int = obj.num_modes
+        self.numOutputs: int = obj.num_outputs
+        self.pad0: int = obj.pad0
+        self.pad1: _CDataBase = obj.pad1
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.timestamp: int = obj.timestamp
+
+class XcbRandrModeT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+# skipping XcbRandrNotifyDataT, because its not fully defined
+
+# skipping XcbRandrNotifyEventT, because its not fully defined
+
+class XcbRandrNotifyMaskT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+class XcbRandrNotifyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+# skipping XcbRandrOutputChangeT, because its not fully defined
+
+# skipping XcbRandrOutputPropertyT, because its not fully defined
+
+class XcbRandrOutputT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
+# skipping XcbRandrProviderChangeT, because its not fully defined
+
+# skipping XcbRandrProviderPropertyT, because its not fully defined
 
 class XcbRandrProviderT(Base):
     def __init__(self, obj):
@@ -169,32 +759,41 @@ class XcbRandrProviderT(Base):
         if obj == ffi.NULL:
             return
 
-class XcbGetWindowAttributesCookieT(Base):
+# skipping XcbRandrResourceChangeT, because its not fully defined
+
+class XcbRectangleT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
-        self.sequence: int = obj.sequence
+        self.height: int = obj.height
+        self.width: int = obj.width
+        self.x: int = obj.x
+        self.y: int = obj.y
 
-class XcbGxT(Base):
+class XcbScreenT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
+        self.allowedDepthsLen: int = obj.allowed_depths_len
+        self.backingStores: int = obj.backing_stores
+        self.blackPixel: int = obj.black_pixel
+        self.currentInputMasks: int = obj.current_input_masks
+        self.defaultColormap: int = obj.default_colormap
+        self.heightInMillimeters: int = obj.height_in_millimeters
+        self.heightInPixels: int = obj.height_in_pixels
+        self.maxInstalledMaps: int = obj.max_installed_maps
+        self.minInstalledMaps: int = obj.min_installed_maps
+        self.root: int = obj.root
+        self.rootDepth: int = obj.root_depth
+        self.rootVisual: int = obj.root_visual
+        self.saveUnders: int = obj.save_unders
+        self.whitePixel: int = obj.white_pixel
+        self.widthInMillimeters: int = obj.width_in_millimeters
+        self.widthInPixels: int = obj.width_in_pixels
 
-class XcbButtonIndexT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbKeycodeT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbRandrOutputT(Base):
+class XcbSendEventDestT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
@@ -226,549 +825,17 @@ class XcbSetupT(Base):
         self.status: int = obj.status
         self.vendorLen: int = obj.vendor_len
 
-# skipping XcbRandrCrtcChangeT, because its not fully defined
-
-class XcbRectangleT(Base):
+class XcbStackModeT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
-        self.height: int = obj.height
-        self.width: int = obj.width
-        self.x: int = obj.x
-        self.y: int = obj.y
-
-class XcbPixmapT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbGenericErrorT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.errorCode: int = obj.error_code
-        self.fullSequence: int = obj.full_sequence
-        self.majorCode: int = obj.major_code
-        self.minorCode: int = obj.minor_code
-        self.pad: _CDataBase = obj.pad
-        self.pad0: int = obj.pad0
-        self.resourceId: int = obj.resource_id
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-
-# skipping XcbRandrProviderChangeT, because its not fully defined
-
-class XcbInternAtomReplyT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.atom: int = obj.atom
-        self.length: int = obj.length
-        self.pad0: int = obj.pad0
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-
-class XcbRandrModeT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbGetModifierMappingCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
-
-class XcbConfigWindowT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbRandrGetCrtcInfoCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
-
-class XcbKeysymT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbQueryTreeCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
-
-class XcbRandrGetScreenResourcesCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
-
-class XcbButtonT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbMotionNotifyEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.child: int = obj.child
-        self.detail: int = obj.detail
-        self.event: int = obj.event
-        self.eventX: int = obj.event_x
-        self.eventY: int = obj.event_y
-        self.pad0: int = obj.pad0
-        self.responseType: int = obj.response_type
-        self.root: int = obj.root
-        self.rootX: int = obj.root_x
-        self.rootY: int = obj.root_y
-        self.sameScreen: int = obj.same_screen
-        self.sequence: int = obj.sequence
-        self.state: int = obj.state
-        self.time: int = obj.time
-
-class XcbQueryTreeReplyT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.childrenLen: int = obj.children_len
-        self.length: int = obj.length
-        self.pad0: int = obj.pad0
-        self.pad1: _CDataBase = obj.pad1
-        self.parent: int = obj.parent
-        self.responseType: int = obj.response_type
-        self.root: int = obj.root
-        self.sequence: int = obj.sequence
-
-class XcbGetGeometryCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
-
-class XcbRandrCrtcT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-# skipping Xcbkeysymbols, because its not fully defined
-
-class XcbClientMessageDataT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.data16: _CDataBase = obj.data16
-        self.data32: _CDataBase = obj.data32
-        self.data8: _CDataBase = obj.data8
-
-class XcbSendEventDestT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbGetModifierMappingReplyT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.keycodesPerModifier: int = obj.keycodes_per_modifier
-        self.length: int = obj.length
-        self.pad0: _CDataBase = obj.pad0
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-
-class XcbKeyPressEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.child: int = obj.child
-        self.detail: int = obj.detail
-        self.event: int = obj.event
-        self.eventX: int = obj.event_x
-        self.eventY: int = obj.event_y
-        self.pad0: int = obj.pad0
-        self.responseType: int = obj.response_type
-        self.root: int = obj.root
-        self.rootX: int = obj.root_x
-        self.rootY: int = obj.root_y
-        self.sameScreen: int = obj.same_screen
-        self.sequence: int = obj.sequence
-        self.state: int = obj.state
-        self.time: int = obj.time
-
-class XcbEnterNotifyEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.child: int = obj.child
-        self.detail: int = obj.detail
-        self.event: int = obj.event
-        self.eventX: int = obj.event_x
-        self.eventY: int = obj.event_y
-        self.mode: int = obj.mode
-        self.responseType: int = obj.response_type
-        self.root: int = obj.root
-        self.rootX: int = obj.root_x
-        self.rootY: int = obj.root_y
-        self.sameScreenFocus: int = obj.same_screen_focus
-        self.sequence: int = obj.sequence
-        self.state: int = obj.state
-        self.time: int = obj.time
-
-class XcbGcT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbInternAtomCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
-
-# skipping XcbExtensionT, because its not fully defined
-
-# skipping XcbRandrProviderPropertyT, because its not fully defined
-
-class XcbScreenT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.allowedDepthsLen: int = obj.allowed_depths_len
-        self.backingStores: int = obj.backing_stores
-        self.blackPixel: int = obj.black_pixel
-        self.currentInputMasks: int = obj.current_input_masks
-        self.defaultColormap: int = obj.default_colormap
-        self.heightInMillimeters: int = obj.height_in_millimeters
-        self.heightInPixels: int = obj.height_in_pixels
-        self.maxInstalledMaps: int = obj.max_installed_maps
-        self.minInstalledMaps: int = obj.min_installed_maps
-        self.root: int = obj.root
-        self.rootDepth: int = obj.root_depth
-        self.rootVisual: int = obj.root_visual
-        self.saveUnders: int = obj.save_unders
-        self.whitePixel: int = obj.white_pixel
-        self.widthInMillimeters: int = obj.width_in_millimeters
-        self.widthInPixels: int = obj.width_in_pixels
-
-# skipping XcbRandrNotifyEventT, because its not fully defined
-
-# skipping XcbConnectionT, because its not fully defined
-
-class XcbGetAtomNameCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
-
-class XcbPropModeT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbConfigureRequestEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.borderWidth: int = obj.border_width
-        self.height: int = obj.height
-        self.parent: int = obj.parent
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-        self.sibling: int = obj.sibling
-        self.stackMode: int = obj.stack_mode
-        self.valueMask: int = obj.value_mask
-        self.width: int = obj.width
-        self.window: int = obj.window
-        self.x: int = obj.x
-        self.y: int = obj.y
-
-class XcbExposeEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.count: int = obj.count
-        self.height: int = obj.height
-        self.pad0: int = obj.pad0
-        self.pad1: _CDataBase = obj.pad1
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-        self.width: int = obj.width
-        self.window: int = obj.window
-        self.x: int = obj.x
-        self.y: int = obj.y
-
-class XcbGetAtomNameReplyT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.length: int = obj.length
-        self.nameLen: int = obj.name_len
-        self.pad0: int = obj.pad0
-        self.pad1: _CDataBase = obj.pad1
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-
-class XcbColormapT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbMapRequestEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.pad0: int = obj.pad0
-        self.parent: int = obj.parent
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-        self.window: int = obj.window
-
-class XcbEventMaskT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbCursorT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbQueryPointerReplyT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.child: int = obj.child
-        self.length: int = obj.length
-        self.mask: int = obj.mask
-        self.pad0: _CDataBase = obj.pad0
-        self.responseType: int = obj.response_type
-        self.root: int = obj.root
-        self.rootX: int = obj.root_x
-        self.rootY: int = obj.root_y
-        self.sameScreen: int = obj.same_screen
-        self.sequence: int = obj.sequence
-        self.winX: int = obj.win_x
-        self.winY: int = obj.win_y
 
 class XcbTimestampT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
-
-class XcbButtonPressEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.child: int = obj.child
-        self.detail: int = obj.detail
-        self.event: int = obj.event
-        self.eventX: int = obj.event_x
-        self.eventY: int = obj.event_y
-        self.pad0: int = obj.pad0
-        self.responseType: int = obj.response_type
-        self.root: int = obj.root
-        self.rootX: int = obj.root_x
-        self.rootY: int = obj.root_y
-        self.sameScreen: int = obj.same_screen
-        self.sequence: int = obj.sequence
-        self.state: int = obj.state
-        self.time: int = obj.time
-
-class XcbModMaskT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbGetGeometryReplyT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.borderWidth: int = obj.border_width
-        self.depth: int = obj.depth
-        self.height: int = obj.height
-        self.length: int = obj.length
-        self.pad0: _CDataBase = obj.pad0
-        self.responseType: int = obj.response_type
-        self.root: int = obj.root
-        self.sequence: int = obj.sequence
-        self.width: int = obj.width
-        self.x: int = obj.x
-        self.y: int = obj.y
-
-# skipping XcbRandrOutputPropertyT, because its not fully defined
-
-class XcbVisualidT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbGetPropertyTypeT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-# skipping XcbRandrNotifyDataT, because its not fully defined
-
-# skipping XcbRandrResourceChangeT, because its not fully defined
-
-class XcbRandrNotifyMaskT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbFocusInEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.detail: int = obj.detail
-        self.event: int = obj.event
-        self.mode: int = obj.mode
-        self.pad0: _CDataBase = obj.pad0
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-
-class XcbImageFormatT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbRandrGetCrtcInfoReplyT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.height: int = obj.height
-        self.length: int = obj.length
-        self.mode: int = obj.mode
-        self.numOutputs: int = obj.num_outputs
-        self.numPossibleOutputs: int = obj.num_possible_outputs
-        self.responseType: int = obj.response_type
-        self.rotation: int = obj.rotation
-        self.rotations: int = obj.rotations
-        self.sequence: int = obj.sequence
-        self.status: int = obj.status
-        self.timestamp: int = obj.timestamp
-        self.width: int = obj.width
-        self.x: int = obj.x
-        self.y: int = obj.y
-
-class XcbClientMessageEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.data: _CDataBase = obj.data
-        self.format: int = obj.format
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-        self.type: int = obj.type
-        self.window: int = obj.window
-
-class XcbQueryPointerCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
-
-class XcbWindowT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbVoidCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
-
-class XcbAtomEnumT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbCwT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbMapStateT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbRandrGetScreenResourcesReplyT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.configTimestamp: int = obj.config_timestamp
-        self.length: int = obj.length
-        self.namesLen: int = obj.names_len
-        self.numCrtcs: int = obj.num_crtcs
-        self.numModes: int = obj.num_modes
-        self.numOutputs: int = obj.num_outputs
-        self.pad0: int = obj.pad0
-        self.pad1: _CDataBase = obj.pad1
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-        self.timestamp: int = obj.timestamp
-
-# skipping XcbKeySymbolsT, because its not fully defined
-
-# skipping XcbRandrOutputChangeT, because its not fully defined
 
 class XcbUnmapNotifyEventT(Base):
     def __init__(self, obj):
@@ -783,79 +850,24 @@ class XcbUnmapNotifyEventT(Base):
         self.sequence: int = obj.sequence
         self.window: int = obj.window
 
-class XcbDestroyNotifyEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.event: int = obj.event
-        self.pad0: int = obj.pad0
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-        self.window: int = obj.window
-
-class XcbCreateNotifyEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.borderWidth: int = obj.border_width
-        self.height: int = obj.height
-        self.overrideRedirect: int = obj.override_redirect
-        self.pad0: int = obj.pad0
-        self.pad1: int = obj.pad1
-        self.parent: int = obj.parent
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-        self.width: int = obj.width
-        self.window: int = obj.window
-        self.x: int = obj.x
-        self.y: int = obj.y
-
-class XcbImageOrderT(Base):
+class XcbVisualidT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
 
-class XcbGetKeyboardMappingCookieT(Base):
+class XcbVoidCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
         self.sequence: int = obj.sequence
 
-class XcbRandrNotifyT(Base):
+class XcbWindowClassT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
             return
-
-class XcbConfigureNotifyEventT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.aboveSibling: int = obj.above_sibling
-        self.borderWidth: int = obj.border_width
-        self.event: int = obj.event
-        self.height: int = obj.height
-        self.overrideRedirect: int = obj.override_redirect
-        self.pad0: int = obj.pad0
-        self.pad1: int = obj.pad1
-        self.responseType: int = obj.response_type
-        self.sequence: int = obj.sequence
-        self.width: int = obj.width
-        self.window: int = obj.window
-        self.x: int = obj.x
-        self.y: int = obj.y
-
-class XcbGetPropertyCookieT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-        self.sequence: int = obj.sequence
 
 class XcbWindowEnumT(Base):
     def __init__(self, obj):
@@ -863,13 +875,7 @@ class XcbWindowEnumT(Base):
         if obj == ffi.NULL:
             return
 
-class XcbLineStyleT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-class XcbInputFocusT(Base):
+class XcbWindowT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:
@@ -1121,6 +1127,11 @@ XCBSelectionNotify: int = lib.XCB_SELECTION_NOTIFY
 XCBSelectionRequest: int = lib.XCB_SELECTION_REQUEST
 XCBSendEventDestItemFocus: int = lib.XCB_SEND_EVENT_DEST_ITEM_FOCUS
 XCBSendEventDestPointerWindow: int = lib.XCB_SEND_EVENT_DEST_POINTER_WINDOW
+XCBStackModeAbove: int = lib.XCB_STACK_MODE_ABOVE
+XCBStackModeBelow: int = lib.XCB_STACK_MODE_BELOW
+XCBStackModeBottomIf: int = lib.XCB_STACK_MODE_BOTTOM_IF
+XCBStackModeOpposite: int = lib.XCB_STACK_MODE_OPPOSITE
+XCBStackModeTopIf: int = lib.XCB_STACK_MODE_TOP_IF
 XCBUnmapNotify: int = lib.XCB_UNMAP_NOTIFY
 XCBVisibilityNotify: int = lib.XCB_VISIBILITY_NOTIFY
 XCBWindowClassCopyFromParent: int = lib.XCB_WINDOW_CLASS_COPY_FROM_PARENT

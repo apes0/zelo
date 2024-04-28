@@ -1,9 +1,10 @@
-from tests.tester import tests, load
+from tests.tester import tests, load, Shared
 import trio
 
-load()
-
 repeat = 3
+Shared.mul = 3
+
+load()
 
 failed = []
 succeeded = []

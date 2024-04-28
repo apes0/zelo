@@ -54,7 +54,6 @@ buildX = partial(
         'xcb-image',
         'xcb-keysyms',
         'xcb-randr',
-        'xcb-xinput',
         'xcb-xtest',
     ],
     xcb,
@@ -71,7 +70,7 @@ def assertModule(imp, build):
     try:
         # TODO: can we do this better?
         _lib = import_module(imp)
-    except:
+    except ModuleNotFoundError:
         build()
 
 

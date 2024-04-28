@@ -152,6 +152,7 @@ class Window(GWindow):
         newWidth: int | None = None,
         newHeight: int | None = None,
         newBorderWidth: int | None = None,
+#        newStackMode: int | None = None # TODO: should we have this?
     ):
         compare = {
             (newX, 'x'): xcb.XCBConfigWindowX,
@@ -159,6 +160,8 @@ class Window(GWindow):
             (newWidth, 'width'): xcb.XCBConfigWindowWidth,
             (newHeight, 'height'): xcb.XCBConfigWindowHeight,
             (newBorderWidth, 'borderWidth'): xcb.XCBConfigWindowBorderWidth,
+#            (newSibling, 'sibling'): xcb.XCBConfigWindowSibling, # TODO: what and how
+#            (newStackMode, 'stackMode'): xcb.XCBConfigWindowStackMode,
         }
 
         vals = []
@@ -188,10 +191,17 @@ class Window(GWindow):
         )
 
         fn()
+        xcb.xcbFlush(self.ctx.connection)
 
         log('windows', DEBUG, f'configured {self} with x={newX or self.x}, y={newY or self.y}, w={newWidth or self.width}, h={newHeight or self.height}, border width={newBorderWidth or self.borderWidth}')
 
     #        await runAndWait(self.ctx, [self.configureNotify], fn)
+
+    async def toTop(self):
+        xcb.xcbConfigureWindow(self.ctx.connection, self.id, xcb.XCBConfigWindowStackMode, uintarr([xcb.XCBStackModeAbove]))
+
+    async def toBottom(self):
+        xcb.xcbConfigureWindow(self.ctx.connection, self.id, xcb.XCBConfigWindowStackMode, uintarr([xcb.XCBStackModeBelow]))
 
     async def close(self):
         fn = partial(xcb.xcbDestroyWindow, self.ctx.connection, self.id)

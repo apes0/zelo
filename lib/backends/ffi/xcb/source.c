@@ -5,4 +5,7 @@
 #include <xcb/xcb_image.h>
 #include <xcb/randr.h>
 #include <xcb/xtest.h>
-//#include <xcb/xinput.h>
+
+// void main(){
+//     printf("%d", XCB_STACK_MODE_ABOVE);
+// }

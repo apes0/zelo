@@ -863,6 +863,13 @@ typedef struct xcb_get_modifier_mapping_reply_t {
     unsigned int length;
     unsigned char  pad0[24];
 } xcb_get_modifier_mapping_reply_t;
+typedef enum xcb_stack_mode_t {
+    XCB_STACK_MODE_ABOVE = 0,
+    XCB_STACK_MODE_BELOW = 1,
+    XCB_STACK_MODE_TOP_IF = 2,
+    XCB_STACK_MODE_BOTTOM_IF = 3,
+    XCB_STACK_MODE_OPPOSITE = 4
+} xcb_stack_mode_t;
 
 // functions
 
