@@ -1,0 +1,3 @@
+[submodule "libxcb-errors"]
+	path = libxcb-errors
+	url = https://gitlab.freedesktop.org/xorg/lib/libxcb-errors
