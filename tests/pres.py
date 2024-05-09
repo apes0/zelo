@@ -7,6 +7,7 @@ from lib.backends.ffi import load
 from utils.fns import stop
 from lib.cfg import cfg
 import random
+from .utils import popen, pclose
 
 # these are all the prerequesites, they should only block until they can be used
 
@@ -30,8 +31,10 @@ class Pre:
         await done.wait()
 
     def __call__(self, *args: Any) -> Any:
-        self.args = args
-        return self
+        new = Pre(self.lable, self.start)
+        new.end = self.end
+        new.args = args
+        return new
 
 
 def pre(lable):
@@ -48,31 +51,7 @@ def preEnd(pre: Pre):
     return deco
 
 
-async def popen(nurs: trio.Nursery, proc: str) -> trio.Process:
-    async def fn(task_status) -> None:
-
-        async with await trio.open_file(os.devnull) as dn:
-            await trio.run_process(
-                proc.split(' '),
-                task_status=task_status,
-                check=False,
-                stdout=dn,
-                stderr=dn,
-            )
-
-    return await nurs.start(fn)
-
-
-async def pclose(proc: trio.Process):
-    proc.terminate()
-    with trio.move_on_after(2):
-        await proc.wait()
-    if proc.poll() == None:
-        proc.kill()
-        await proc.wait()
-
-
-@pre('starting X')
+@pre('X11')
 async def startX(pre: Pre, nurs: trio.Nursery, done: trio.Event):
     new: str = ':' + str(int(os.environ["DISPLAY"][1:]) + 1)
 
@@ -97,7 +76,7 @@ async def endX(pre: Pre, nurs: trio.Nursery, done: trio.Event):
     done.set()
 
 
-@pre('opening Windows')
+@pre('Windows')
 async def openWins(pre: Pre, nurs: trio.Nursery, done: trio.Event):
     procs: list[trio.Process] = [
         await popen(nurs, random.choice(['xeyes', 'xclock', 'xterm']))
@@ -121,7 +100,7 @@ async def killWins(pre: Pre, nurs: trio.Nursery, done: trio.Event):
     done.set()
 
 
-@pre('startWm')
+@pre('Wm')
 async def startWm(pre: Pre, nurs: trio.Nursery, done: trio.Event):
     cfg.__dict__ = pre.args[0].__dict__.copy()  # new cfg
 

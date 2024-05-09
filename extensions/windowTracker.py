@@ -17,9 +17,10 @@ if TYPE_CHECKING:
 
 def track(updateFn: str, custom: list = []):
     def deco(ext: type[Extension]):
-        class New:
+        class New(Extension):
             def __init__(self, ctx: 'Ctx', args: dict) -> None:
-                Tracker(ext, ctx, updateFn, args, custom)
+                super().__init__(ctx, {})
+                Tracker(ext, ctx, updateFn, args, custom, self)
 
         return New
 
@@ -52,7 +53,6 @@ def removeAll(l: list['GWindow'], win: 'GWindow'):
 
 UpdateType = Callable[[list['GWindow']], Coroutine]
 
-
 class Tracker:
     def __init__(
         self,
@@ -60,7 +60,8 @@ class Tracker:
         ctx: 'Ctx',
         updateFn: str,
         args: dict,
-        customEvents: list['Event'] = [],
+        customEvents: list['Event'],
+        ext: Extension, # a hack to make the tracker destroyable lol
     ):
         self.ctx: 'Ctx' = ctx
         self.exts: dict[GDisplay, Extension] = {}
@@ -69,20 +70,20 @@ class Tracker:
             win for win in ctx.windows.values() if win.mapped and not win.ignore
         ]
 
+        ext.addListener(mapRequest, self.mapWindow)
+        ext.addListener(destroyNotify, self.destroyNotify)
+        ext.addListener(focusChange, self.focusChange)
+        ext.addListener(unmapNotify, self.unmapWindow)
+        ext.addListener(mapNotify, self.mapNotify)
+        ext.addListener(configureNotify, self.confNotify)
+
+        for event in customEvents:
+            ext.addListener(event, lambda *a: self.update())
+
         for display in ctx.screen.displays:
             ext = tiler(ctx, {**args, 'display': display})
             self.exts[display] = ext
             self.updates[display] = getattr(ext, updateFn)
-
-        mapRequest.addListener(self.mapWindow)
-        destroyNotify.addListener(self.destroyNotify)
-        focusChange.addListener(self.focusChange)
-        unmapNotify.addListener(self.unmapWindow)
-        mapNotify.addListener(self.mapNotify)
-        configureNotify.addListener(self.confNotify)
-
-        for event in customEvents:
-            event.addListener(lambda *a: self.update())
 
     async def findFocus(self):
         # just having a focused win is not enough here!!

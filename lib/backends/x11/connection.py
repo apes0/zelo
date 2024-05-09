@@ -6,6 +6,7 @@ from ..generic import GConnection
 from .window import Window
 from .types import intarr
 from .screen import Display, Screen
+from .keys import Mod, Key
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
@@ -120,3 +121,27 @@ def initWindows(ctx: 'Ctx'):
 @init
 def initMouse(ctx: 'Ctx'):
         ctx.mouse = Mouse(ctx)
+
+@init
+def initModMap(ctx: 'Ctx'):
+    rep = xcb.xcbGetModifierMappingReply(
+        ctx.connection, xcb.xcbGetModifierMappingUnchecked(ctx.connection), xcb.NULL
+    )
+
+    mappings = xcb.xcbGetModifierMappingKeycodes(rep)
+
+    for mod in range(rep.length):
+        for i in range(rep.keycodesPerModifier):
+            key = mappings[mod * rep.keycodesPerModifier + i]
+
+            if not key:
+                break
+
+            Mod.mappings[1 << mod] = [
+                *Mod.mappings.get(mod, []),
+                key,
+            ]
+
+@init
+def initSyms(ctx: 'Ctx'):
+    Key.syms = xcb.xcbKeySymbolsAlloc(ctx.connection)

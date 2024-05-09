@@ -10,7 +10,6 @@
 - decide wheather to use the generic types or using the backend's types for typing
 - docs and docstrings
 - use the sequence thing in x11 backend
-- make button.press/release, just like key.press/release
 - actually implement GCtx lol
 - always use checked function for xcb to catch errors
 - make all scripts be bash
@@ -26,3 +25,21 @@
 - scrolling!! (i wanna try it out)
 - maybe use layouts for tiling, might also make it possible to resize arbitrary windows on the fly
 - fix typing for extension resolves
+- schedule the reply getting functions to run after everything else is done, so that the async is more acceptable
+- split this file into more categories lol
+- threaded drawing?
+- gpu acceleration?
+- export c api to extensions
+- auto setup extensions?
+- optimization for certain backends on extensions?
+- apps!!
+- gui stuff in general is pretty lacking, so i should add some more
+- composition
+- config extensions like widgets? (is this a good idea?)
+- maybe render with cogl & coglpango for text?
+- gestures? xinput supports only 2 so i will prolly have to impl my own :/
+- reference all sources iv used in the code
+- finally implement the fucking atoms
+- theming events
+- more stuff that themes support lol (roundness and shit)
+- update x11's image.set (see extensions/share.py)

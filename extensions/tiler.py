@@ -32,7 +32,6 @@ if TYPE_CHECKING:
 # FIXME: breaks with too many windows (its an unreasonable number imho, but we should handle it properly)
 # FIXME: breaks with spacing of 0
 
-
 @track('update')
 class Tiler(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
@@ -58,7 +57,7 @@ class Tiler(Extension):
             },
         )
 
-        self.x = self.display.x + self.leftSpacing
+        self.x = self.display.x + self.leftSpacing # TODO: maybe calculate this at the window tracker level
         self.y = self.display.y + self.topSpacing
         self.width = self.display.width - self.leftSpacing - self.rightSpacing
         self.height = self.display.height - self.topSpacing - self.bottomSpacing

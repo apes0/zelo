@@ -32,6 +32,8 @@ modMap = {
 
 
 class Mod(GMod):
+    mappings = {}
+
     def __init__(self, *names: str, value: int = 0) -> None:
         self.mod = value
         if not value:
@@ -41,8 +43,7 @@ class Mod(GMod):
 
 class Key(GKey):
     cache: dict[str, int] = {}
-    modCache: dict[int, list[int]] = {}
-    syms: CData | None = None
+    syms: CData
 
     def __init__(self, lable: str | None = None, code: int | None = None) -> None:
         assert lable or code, 'You must have the lable or keycode for a key.'
@@ -58,9 +59,6 @@ class Key(GKey):
                     break
 
     def load(self, ctx: 'Ctx'):
-        if not self.__class__.syms:
-            self.__class__.syms = xcb.xcbKeySymbolsAlloc(ctx.connection)
-
         syms = self.__class__.syms
         assert syms, 'Couldn\'t allocate key symbols (for some reason)'
 
@@ -78,24 +76,6 @@ class Key(GKey):
         self.key = code[0]
         self.__class__.cache[self.lable] = self.key
         # xcb.xcbKeySymbolsFree(syms)  # ? idk how efficient this is lol
-
-    def loadMods(self, ctx: 'Ctx'):
-        rep = xcb.xcbGetModifierMappingReply(
-            ctx.connection, xcb.xcbGetModifierMappingUnchecked(ctx.connection), xcb.NULL
-        )
-        mappings = xcb.xcbGetModifierMappingKeycodes(rep)
-
-        for mod in range(rep.length):
-            for i in range(rep.keycodesPerModifier):
-                key = mappings[mod * rep.keycodesPerModifier + i]
-
-                if not key:
-                    break
-
-                self.__class__.modCache[1 << mod] = [
-                    *self.__class__.modCache.get(mod, []),
-                    key,
-                ]
 
     def grab(self, ctx: 'Ctx', *modifiers: Mod): # TODO: (un)grab on window
         log('grab', DEBUG, f'grabbing {self} with modifiers {modifiers}')
@@ -137,11 +117,8 @@ class Key(GKey):
         if not self.key:
             self.load(ctx)
 
-        if not self.__class__.modCache:
-            self.loadMods(ctx)
-
         for mod in modifiers:
-            Key(code=self.__class__.modCache[mod.mod][0]).press(
+            Key(code=Mod.mappings[mod.mod][0]).press(
                 ctx, window, flush=False
             )
 
@@ -166,11 +143,8 @@ class Key(GKey):
         if not self.key:
             self.load(ctx)
 
-        if not self.__class__.modCache:
-            self.loadMods(ctx)
-
         for mod in modifiers:
-            Key(code=self.__class__.modCache[mod.mod][0]).release(
+            Key(code=Mod.mappings[mod.mod][0]).release(
                 ctx, window, flush=False
             )
 

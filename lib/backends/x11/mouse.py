@@ -5,6 +5,8 @@ from ..generic import GButton, GMouse
 from logging import DEBUG
 from ...debcfg import log
 
+from .keys import Mod, Key
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -216,6 +218,50 @@ class Button(GButton):
             self.button,
             window.id,
             mod,
+        )
+
+        xcb.xcbFlush(ctx.connection)
+
+    def press(self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: Mod):
+        log('press', DEBUG, f'pressing {self} with modifiers {modifiers}')
+
+        for mod in modifiers:
+            Key(code=mod.mappings[mod.mod][0]).press(
+                ctx, window, flush=False
+            )
+
+        xcb.xcbTestFakeInput(
+            ctx.connection,
+            xcb.XCBButtonPress,
+            self.button,
+            xcb.XCBCurrentTime,
+            ctx._root,
+            x,
+            y,
+            0,
+        )
+
+        xcb.xcbFlush(ctx.connection)
+
+    def release(
+        self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: Mod
+    ):
+        log('press', DEBUG, f'releasing {self} with modifiers {modifiers}')
+
+        for mod in modifiers:
+            Key(code=Mod.mappings[mod.mod][0]).release(
+                ctx, window, flush=False
+            )
+
+        xcb.xcbTestFakeInput(
+            ctx.connection,
+            xcb.XCBButtonRelease,
+            self.button,
+            xcb.XCBCurrentTime,
+            ctx._root,
+            x,
+            y,
+            0,
         )
 
         xcb.xcbFlush(ctx.connection)

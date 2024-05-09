@@ -1,4 +1,4 @@
-from logging import ERROR, WARN
+from logging import ERROR, WARN, DEBUG
 from ...debcfg import log
 from .keys import Key, Mod
 from .mouse import Button
@@ -22,6 +22,8 @@ from .types import (
     mapNotifyTC,
     randrNotifyTC,
     ExposeTC,
+    xcbErrorContext,
+    charpp,
 )
 from lib.cfg import cfg
 from .connection import Connection
@@ -34,6 +36,7 @@ if TYPE_CHECKING:
     from lib.ctx import Ctx
     from lib.backends.generic import GConnection, GWindow
 
+# TODO: log on 'windows' log as well
 # this is mainly based on this code: https://github.com/mcpcpc/xwm/blob/main/xwm.c
 
 handlers = {}
@@ -50,17 +53,18 @@ def handler(n):
 async def createNotify(event, ctx: 'Ctx'):
     event = xcb.XcbCreateNotifyEventT(createNotifyTC(event))
     window = ctx.getWindow(event.window)
+    log('backend', DEBUG, f'{window} was created')
     ignore = bool(event.overrideRedirect)
 
     window.ignore = ignore
-    #    await window.configure(
-    #        newX=max(0, event.x),
-    #        newY=max(0, event.y),
-    #        newHeight=event.height,
-    #        newWidth=event.width,
-    #        newBorderWidth=event.borderWidth,
-    #        #        wait=False,
-    #    )
+    if not ignore: # if we follow configureNotify, we should follow this?
+        await window.configure(
+            newX=max(0, event.x),
+            newY=max(0, event.y),
+            newHeight=event.height,
+            newWidth=event.width,
+            newBorderWidth=event.borderWidth,
+    )
 
     await window.createNotify.trigger(ctx)
     await events.createNotify.trigger(ctx, window)
@@ -72,10 +76,11 @@ async def mapRequest(event, ctx: 'Ctx'):
     event = xcb.XcbMapRequestEventT(mapRequestTC(event))
     _id: int = event.window
     window: GWindow = ctx.getWindow(_id)
+    log('backend', DEBUG, f'{window} requested to be mapped')
     window.parent = ctx.getWindow(event.parent)
     # TODO: this is the only instance of ctx.values in the code, so we should remove it
     # its just a leftover from the initial code and i think i can remove it
-    ctx.values[0] = xcb.XCBEventMaskEnterWindow | xcb.XCBEventMaskFocusChange
+    ctx.values[0] = xcb.XCBEventMaskEnterWindow | xcb.XCBEventMaskLeaveWindow
     xcb.xcbChangeWindowAttributesChecked(
         ctx.connection, _id, xcb.XCBCwEventMask, ctx.values
     )
@@ -89,6 +94,9 @@ async def confRequest(event, ctx: 'Ctx'):
     # TODO: there is a parent field, so should i follow it?
     event = xcb.XcbConfigureRequestEventT(confRequestTC(event))
     window = ctx.getWindow(event.window)
+
+    log('backend', DEBUG, f'{window} sent a configure request')
+    
     valueMask = event.valueMask
     change = []
     for mask, (value, lable) in {
@@ -122,6 +130,9 @@ async def confRequest(event, ctx: 'Ctx'):
 async def confNotify(event, ctx: 'Ctx'):
     event = xcb.XcbConfigureNotifyEventT(confNotifyTC(event))
     window: GWindow = ctx.getWindow(event.window)
+
+    log('backend', DEBUG, f'{window} sent a configure notify')
+
     ignore = event.overrideRedirect
     window.ignore = bool(ignore)
 
@@ -134,7 +145,7 @@ async def confNotify(event, ctx: 'Ctx'):
     }
     for val, lable in change.items():
         window.__dict__[lable] = val
-
+    
     await window.configureNotify.trigger(ctx)
     await events.configureNotify.trigger(ctx, window)
 
@@ -159,6 +170,9 @@ async def destroyNotify(event, ctx: 'Ctx'):
     # https://wiki.python.org/moin/TimeComplexity
     window: int = event.window
     win: GWindow = ctx.getWindow(window)
+
+    log('backend', DEBUG, f'{win} got destroyed')
+
     win.destroyed = True
 
     if ctx.focused and window == ctx.focused.id:
@@ -183,6 +197,9 @@ async def mapNotify(event, ctx: 'Ctx'):
     event = xcb.XcbMapNotifyEventT(mapNotifyTC(event))
     _id = event.window
     win: GWindow = ctx.getWindow(_id)
+
+    log('backend', DEBUG, f'{win} was mapped')
+
     ignore = event.overrideRedirect
     win.ignore = bool(ignore)
 
@@ -195,6 +212,8 @@ async def unmapNotify(event, ctx: 'Ctx'):
     event = xcb.XcbUnmapNotifyEventT(unmapNotifyTC(event))
     _id = event.window
     win: GWindow = ctx.getWindow(_id)
+
+    log('backend', DEBUG, f'{win} got unmapped')
 
     # NOTE: we shouldn't actually delete here as we can unmap without destroying the window
 
@@ -214,9 +233,7 @@ async def unmapNotify(event, ctx: 'Ctx'):
     await events.unmapNotify.trigger(ctx, win)
 
 
-(xcb.XCBMotionNotify)
-
-
+@handler(xcb.XCBMotionNotify)
 async def motionNotify(event, ctx: 'Ctx'):
     # TODO: when does this get called???
     event = motionNotifyTC(event)
@@ -238,10 +255,33 @@ async def motionNotify(event, ctx: 'Ctx'):
 @handler(0)
 async def error(event, ctx: 'Ctx'):
     event = xcb.XcbGenericErrorT(genericErrorTC(event))
+    
+    _errCtx = xcbErrorContext()
+    xcb.xcbErrorsContextNew(ctx.connection, _errCtx)
+    errCtx = _errCtx[0]
+    extension = charpp()
+
+    major = xcb.xcbErrorsGetNameForMajorCode(errCtx, event.majorCode)
+    minor = xcb.xcbErrorsGetNameForMinorCode(errCtx, event.majorCode, event.minorCode)
+    error = xcb.xcbErrorsGetNameForError(errCtx, event.errorCode, extension)
+    xcb.xcbErrorsContextFree(errCtx)
+    
+    def toStr(obj):
+        if obj == xcb.NULL:
+            return 'NULL'
+
+        out = ''
+        i = 0
+
+        while (ch := obj[i][0]):
+            out += chr(ch)
+            i += 1
+        
+        return out
+    
     log('errors', ERROR,
-        f'{event.errorCode} ({event.majorCode}.{event.minorCode}) for resource {event.resourceId}'
+        f'{toStr(error)}: {toStr(extension[0])}, {toStr(major)}: {toStr(minor)} for resource {event.resourceId}'
     )
-    # TODO: xcb-util-errors
 
 
 @handler(xcb.XCBKeyPress)
@@ -250,6 +290,8 @@ async def keyPress(event, ctx: 'Ctx'):
     key = Key(code=event.detail)
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.child)
+
+    log('backend', DEBUG, f'{key} with {mod} pressed on {window}')
 
     await window.keyPress.trigger(ctx, key, mod)
     await events.keyPress.trigger(ctx, key, mod, window)
@@ -262,6 +304,8 @@ async def keyRelease(event, ctx: 'Ctx'):
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.event)
 
+    log('backend', DEBUG, f'{key} with {mod} released on {window}')
+
     await window.keyRelease.trigger(ctx, key, mod)
     await events.keyRelease.trigger(ctx, key, mod, window)
 
@@ -272,6 +316,8 @@ async def buttonPress(event, ctx: 'Ctx'):
     button = Button(button=event.detail)
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.event)
+
+    log('backend', DEBUG, f'{button} with {mod} pressed on {window}')
 
     await window.buttonPress.trigger(ctx, button, mod)
     await events.buttonPress.trigger(ctx, button, mod, window)
@@ -284,6 +330,8 @@ async def buttonRelease(event, ctx: 'Ctx'):
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.event)
 
+    log('backend', DEBUG, f'{button} with {mod} released on {window}')
+
     await window.buttonRelease.trigger(ctx, button, mod)
     await events.buttonRelease.trigger(ctx, button, mod, window)
 
@@ -293,6 +341,8 @@ async def enterNotify(event, ctx: 'Ctx'):
     event = xcb.XcbEnterNotifyEventT(enterNotifyTC(event))
     window: GWindow = ctx.getWindow(event.event)
 
+    log('backend', DEBUG, f'mouse entered {window}')
+
     await window.enterNotify.trigger(ctx)
     await events.enterNotify.trigger(ctx, window)
 
@@ -301,6 +351,8 @@ async def enterNotify(event, ctx: 'Ctx'):
 async def leaveNotify(event, ctx: 'Ctx'):
     event = xcb.XcbEnterNotifyEventT(enterNotifyTC(event))
     window: GWindow = ctx.getWindow(event.event)
+
+    log('backend', DEBUG, f'mouse left {window}')
 
     await window.leaveNotify.trigger(ctx)
     await events.leaveNotify.trigger(ctx, window)
@@ -323,6 +375,8 @@ async def expose(event, ctx: 'Ctx'):
 
     #    print(event.x, event.y, event.width, event.height, event.window, event.count)
     window = ctx.getWindow(event.window)
+
+    log('backend', DEBUG, f'{window} needs to be redrawn')
 
     await window.redraw.trigger(ctx)
     await events.redraw.trigger(ctx, window)

@@ -24,18 +24,15 @@ jobs:
         python-version: "3.10"
     - name: Setup
       run: |
-        echo updating repos...
         sudo apt-get update -y 2>&1 > /dev/null
-        echo installing dependencies...
         sudo apt-get install -y zsh gawk build-essential libdbus-glib-1-dev libgirepository1.0-dev 2>&1 > /dev/null
-        echo updating pip...
         python -m pip install --upgrade pip 2>&1 > /dev/null
-        pip install -r requirements.txt dbus-python 2>&1 > /dev/null
-        echo running setup.sh...
+        pip install -r requirements.txt dbus-python cryptography 2>&1 > /dev/null
+        sudo apt-get install -y xvfb xserver-xephyr x11-apps xterm 2>&1 > /dev/null
+    - name: Run setup.sh
+      run: |
         chmod +x scripts/setup.sh 2>&1 > /dev/null
         zsh scripts/setup.sh 2>&1 > /dev/null
-        echo installing testing tools...
-        sudo apt-get install -y xvfb xserver-xephyr x11-apps xterm 2>&1 > /dev/null
     - name: Run tests
       run: |
         xvfb-run python test.py

@@ -28,18 +28,20 @@ class MouseFocus(Extension):
             for button in self.buttons:
                 button.grab(ctx, win, self.mod)
 
-        buttonPress.addListener(self.buttonPress)
-        mapNotify.addListener(self.mapNotify)
-        focusChange.addListener(self.focusChange)
+        self.addListener(buttonPress, self.buttonPress)
+        self.addListener(mapNotify, self.mapNotify)
+        self.addListener(focusChange, self.focusChange)
 
     async def mapNotify(self, win: 'GWindow'):
         if win.ignore or win.focused:
             return
 
         for button in self.buttons:
+            print('i came', win.id)
             button.grab(self.ctx, win, self.mod)
 
     async def buttonPress(self, _button: 'GButton', mod: 'GMod', window: 'GWindow'):
+        print(window, 'he came!')
         await window.setFocus(True)
 
     async def focusChange(self, old: 'GWindow | None', new: 'GWindow| None'):

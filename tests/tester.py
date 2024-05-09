@@ -9,7 +9,7 @@ async def catch(fn: Callable, err: str, *args) -> bool:
     try:
         await fn(*args)
         return False
-    except BaseException as e:
+    except AssertionError as e: # let the rest bubble down
         print(f'{err}: {e}')
         return True
 
@@ -26,8 +26,10 @@ class Test:
         tests.append(self)
 
     async def test(self, nurs: 'trio.Nursery') -> bool:
+        print(f'starting test {self.lable}')
         for i, pre in enumerate(self.pres):
-            if await catch(pre.run, f'{self.lable}: {pre.lable} failed', nurs):
+            print(f'\tstarting pre {pre.lable}')
+            if await catch(pre.run, f'\t{self.lable}: pre {pre.lable} failed', nurs):
                 await self.cleanUp(nurs, end=i)
                 return False
 
@@ -41,7 +43,9 @@ class Test:
 
     async def cleanUp(self, nurs: 'trio.Nursery', end: int|None = None) -> None:
         for pre in reversed(self.pres[:end]):
-            await catch(pre.stop, f'{self.lable}: {pre.lable} failed to stop', nurs)
+            print(f'\tstopping {pre.lable}')
+            await catch(pre.stop, f'\t{self.lable}: pre {pre.lable} failed to stop', nurs)
+        print()
 
 class Shared:
     mul = 1
@@ -65,7 +69,7 @@ class Shared:
 
             done.set()
 
-        async def end(pre: Pre, nurs: trio.Nursery, done: trio.Event):
+        async def end(_pre: Pre, nurs: trio.Nursery, done: trio.Event):
             self.shares -= 1
 
             if self.shares != 0:
@@ -77,7 +81,7 @@ class Shared:
 
             done.set()
 
-        new = Pre(','.join([pre.lable for pre in pres]), start)
+        new = Pre(', '.join([pre.lable for pre in pres]), start)
         new.end = end
         self.new = new
     
@@ -92,13 +96,13 @@ def test(lable, preq):
     return deco
 
 
-def load() -> None:
+def load(suit='', test='') -> None:
     dirname: str = os.path.dirname(__file__)
     for dir in os.listdir(dirname):
         cur: str = os.path.join(dirname, dir)
-        if dir.startswith('__') or os.path.isfile(cur):
+        if dir.startswith('__') or dir.startswith('.') or os.path.isfile(cur) or not dir.endswith(suit):
             continue
         for file in os.listdir(cur):
-            if os.path.isdir(file) or file.startswith('__'):
+            if os.path.isdir(file) or file.startswith('__') or file.startswith('.') or not file[:-3].endswith(test):
                 continue
             importlib.import_module(f'.{dir}.{file[:-3]}', package='tests')

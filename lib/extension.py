@@ -1,4 +1,6 @@
 from logging import ERROR
+
+from .backends.events import Event
 from .debcfg import log
 import traceback
 from typing import TYPE_CHECKING, Any, Callable
@@ -14,7 +16,7 @@ if TYPE_CHECKING:
 class Extension:
     def __init__(self, ctx: 'Ctx', cfg: dict, resolve={}) -> None:
         self.ctx = ctx
-        self.listeners = {}
+        self.listeners = []
         self.resolve = resolve
         self.conf(cfg)
 
@@ -25,8 +27,15 @@ class Extension:
             if obj := self.__dict__[lable]:
                 self.__dict__[lable] = get(obj, self, lable, _type)
 
-    def addListener(self, event: int, fn: Callable):
-        self.listeners[event] = fn
+    def addListener(self, event: Event, fn: Callable):
+        event.addListener(fn)
+        self.listeners.append((event, fn))
+    
+    def unload(self): # ? should this be async?
+        event: Event
+        for (event, fn) in self.listeners:
+            event.removeListener(fn)
+        #? anything else here?
 
 
 def setupExtensions(ctx: 'Ctx', extensions: dict):
@@ -39,6 +48,10 @@ def setupExtensions(ctx: 'Ctx', extensions: dict):
         except:
             log('extensions', ERROR, traceback.format_exc())
 
+
+def unloadExtensions(ctx: 'Ctx'):
+    for extension in ctx.extensions.values():
+        extension.unload()
 
 def single(ext: type[Extension]) -> Extension:
     class New(Extension):

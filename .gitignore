@@ -171,3 +171,6 @@ program.prof
 
 # log from cfg
 log
+
+# c compiler output
+a.out

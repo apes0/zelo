@@ -42,8 +42,8 @@ class Shortcuts(Extension):
         for l in range(2, len(baseIgnore) + 1):
             self.ignore += [Mod(*mod) for mod in combinations(baseIgnore, l)]
 
-        keyPress.addListener(self.keyPress)
-        keyRelease.addListener(self.keyRelease)
+        self.addListener(keyPress, self.keyPress)
+        self.addListener(keyRelease, self.keyRelease)
 
         self.register()
 

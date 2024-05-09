@@ -17,6 +17,8 @@ def spawn(proc: str):
 
 
 def stop(ctx: 'Ctx'):
+    from lib.extension import unloadExtensions
+    unloadExtensions(ctx)
     ctx.closed = True
 
 

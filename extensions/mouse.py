@@ -16,7 +16,7 @@ class Mouse(Extension):
 
         super().__init__(ctx, cfg)
 
-        createNotify.addListener(self.set)
+        self.addListener(createNotify, self.set)
 
         ctx.mouse.setCursor(
             ctx.root,

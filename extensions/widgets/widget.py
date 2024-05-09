@@ -22,7 +22,7 @@ class Widget(Extension):
         )
         # the window to draw in
         self.ctx.nurs.start_soon(self.win.map)
-        self.win.redraw.addListener(self.draw)
+        self.addListener(self.win.redraw, self.draw)
 
     async def draw(self):
         raise NotImplementedError

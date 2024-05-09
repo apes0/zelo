@@ -44,7 +44,6 @@ def build(name, libraries, out):
 
     ffibuilder.compile(verbose=True, target='*')
 
-
 buildX = partial(
     build,
     'xcb',
@@ -55,6 +54,7 @@ buildX = partial(
         'xcb-keysyms',
         'xcb-randr',
         'xcb-xtest',
+        'xcb-errors',
     ],
     xcb,
 )
@@ -84,7 +84,7 @@ imp: str
 _build: Callable
 
 assertModule(imp, _build)  # assert that we have the xcb/wayland module
-assertModule(cairo, buildCairo)  # assert that we have the cairo module
+assertModule(cairo, buildCairo)  # assert that we have the cairo module for text rendering
 
 
 def load(

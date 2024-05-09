@@ -27,7 +27,7 @@ class Bar(Widget):
         self.rect = Rectangle(ctx, self.win, 0, 0, self.width, self.height, self.back)
 
         ctx.nurs.start_soon(self.draw)
-        self.win.redraw.addListener(self.draw)
+        self.addListener(self.win.redraw, self.draw)
 
     async def draw(self):
         await self.setSize(self.width, self.height)

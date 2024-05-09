@@ -1,10 +1,11 @@
 from tests.tester import tests, load, Shared
 import trio
+import sys
 
 repeat = 3
 Shared.mul = 3
 
-load()
+load(*sys.argv[1].split('.')) if len(sys.argv) > 1 else load()
 
 failed = []
 succeeded = []
@@ -29,3 +30,6 @@ Summary:
     ({round(suc/tot*100, 1)}%, {suc}/{tot})
     failed:    {fai}
     ({round(fai/tot*100, 1)}%, {fai}/{tot})''' + (( ':\n        ' + '\n        '.join([f.lable for f in failed])) if failed else ''))
+
+if fai:
+    exit(1)

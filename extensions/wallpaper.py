@@ -44,7 +44,7 @@ class Wallpaper(Extension):
 
             ctx.nurs.start_soon(self.drawVideo)
 
-        redraw.addListener(self.drawImg)
+        self.addListener(redraw, self.drawImg)
 
     async def drawImg(self, win: 'GWindow'):
         if win.id != self.ctx._root:

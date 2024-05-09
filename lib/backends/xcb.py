@@ -8,6 +8,8 @@ NULL = ffi.NULL
 
 # skipping Xcbkeysymbols, because its not fully defined
 
+# skipping ExtensionInfoT, because its not fully defined
+
 class XcbAtomEnumT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -191,6 +193,8 @@ class XcbEnterNotifyEventT(Base):
         self.state: int = obj.state
         self.time: int = obj.time
 
+# skipping XcbErrorsContextT, because its not fully defined
+
 class XcbEventMaskT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -323,6 +327,25 @@ class XcbGetGeometryReplyT(Base):
         self.width: int = obj.width
         self.x: int = obj.x
         self.y: int = obj.y
+
+class XcbGetImageCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
+class XcbGetImageReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.depth: int = obj.depth
+        self.length: int = obj.length
+        self.pad0: _CDataBase = obj.pad0
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.visual: int = obj.visual
 
 class XcbGetKeyboardMappingCookieT(Base):
     def __init__(self, obj):
@@ -1153,6 +1176,11 @@ xcbCreateWindow = lambda *a: XcbVoidCookieT(lib.xcb_create_window(*parseArgs(a))
 xcbDeleteProperty = lambda *a: XcbVoidCookieT(lib.xcb_delete_property(*parseArgs(a)))
 xcbDestroyWindow = lambda *a: XcbVoidCookieT(lib.xcb_destroy_window(*parseArgs(a)))
 xcbDisconnect = lambda *a: (lib.xcb_disconnect(*parseArgs(a)))
+xcbErrorsContextFree = lambda *a: (lib.xcb_errors_context_free(*parseArgs(a)))
+xcbErrorsContextNew = lambda *a: (lib.xcb_errors_context_new(*parseArgs(a)))
+xcbErrorsGetNameForError = lambda *a: (lib.xcb_errors_get_name_for_error(*parseArgs(a)))
+xcbErrorsGetNameForMajorCode = lambda *a: (lib.xcb_errors_get_name_for_major_code(*parseArgs(a)))
+xcbErrorsGetNameForMinorCode = lambda *a: (lib.xcb_errors_get_name_for_minor_code(*parseArgs(a)))
 xcbFlush = lambda *a: (lib.xcb_flush(*parseArgs(a)))
 xcbFreeCursor = lambda *a: XcbVoidCookieT(lib.xcb_free_cursor(*parseArgs(a)))
 xcbGenerateId = lambda *a: (lib.xcb_generate_id(*parseArgs(a)))
@@ -1163,6 +1191,10 @@ xcbGetExtensionData = lambda *a: (lib.xcb_get_extension_data(*parseArgs(a)))
 xcbGetFileDescriptor = lambda *a: (lib.xcb_get_file_descriptor(*parseArgs(a)))
 xcbGetGeometry = lambda *a: XcbGetGeometryCookieT(lib.xcb_get_geometry(*parseArgs(a)))
 xcbGetGeometryReply = lambda *a: XcbGetGeometryReplyT(lib.xcb_get_geometry_reply(*parseArgs(a)))
+xcbGetImage = lambda *a: XcbGetImageCookieT(lib.xcb_get_image(*parseArgs(a)))
+xcbGetImageData = lambda *a: (lib.xcb_get_image_data(*parseArgs(a)))
+xcbGetImageDataLength = lambda *a: (lib.xcb_get_image_data_length(*parseArgs(a)))
+xcbGetImageReply = lambda *a: XcbGetImageReplyT(lib.xcb_get_image_reply(*parseArgs(a)))
 xcbGetKeyboardMapping = lambda *a: XcbGetKeyboardMappingCookieT(lib.xcb_get_keyboard_mapping(*parseArgs(a)))
 xcbGetKeyboardMappingReply = lambda *a: XcbGetKeyboardMappingReplyT(lib.xcb_get_keyboard_mapping_reply(*parseArgs(a)))
 xcbGetMaximumRequestLength = lambda *a: (lib.xcb_get_maximum_request_length(*parseArgs(a)))

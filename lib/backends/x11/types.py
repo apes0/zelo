@@ -3,6 +3,12 @@ from xcb_cffi import ffi
 from ..base import Base
 
 
+def maxUVal(t: str):
+    return (1<<(ffi.sizeof(t)*8)) - 1
+
+def maxVal(t: str):
+    return (1<<(ffi.sizeof(t)*8 - 1)) - 1
+
 class FFIType:
     def __init__(self, _type) -> None:
         self.type = _type
@@ -15,10 +21,12 @@ intp = FFIType('int*')
 intarr = FFIType('int[]')
 uintarr = FFIType('unsigned int[]')
 charp = FFIType('char*')
+charpp = FFIType('char**')
 uchararr = FFIType('unsigned char[]')
 chararr = FFIType('char[]')
 rectangle = FFIType('xcb_rectangle_t*')
 keyEvent = FFIType('xcb_key_press_event_t*')  # key release is the same
+xcbErrorContext = FFIType('xcb_errors_context_t**')
 
 
 class Caster:

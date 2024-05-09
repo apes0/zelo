@@ -20,7 +20,7 @@ async def caller(fn, *args, task_status: trio._core._run._TaskStatus):
         await fn(*args)
     except:
         # TODO: do something here
-        log('events', ERROR, traceback.format_exc())
+        log('evErrors', ERROR, traceback.format_exc())
 
 
 class Event:

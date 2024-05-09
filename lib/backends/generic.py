@@ -102,6 +102,9 @@ class GWindow:
     async def toBottom(self):
         raise NotImplementedError
 
+    async def screenshot(self, x:int=0, y:int=0, width:int|None=None, height:int|None=None) -> np.ndarray:
+        raise NotImplementedError
+
     async def map(self):
         raise NotImplementedError
 
@@ -180,6 +183,13 @@ class GButton:
     def ungrab(self, ctx: 'Ctx', window: GWindow, *mods: GMod):
         raise NotImplementedError
 
+    def press(self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: GMod):
+        raise NotImplementedError
+
+    def release(
+        self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: GMod
+    ): #? do we need x and y here?
+        raise NotImplementedError
 
 # mouse
 class GMouse:
@@ -210,6 +220,11 @@ class GImage:
         x: int,
         y: int,
     ) -> None:
+        self.width = width
+        self.height = height
+        self.x = x
+        self.y = y
+        self.windowId = window.id
         raise NotImplementedError
 
     def __repr__(self) -> str:

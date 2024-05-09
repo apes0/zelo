@@ -1,6 +1,6 @@
 #!/bin/bash
 
-_DISPLAY=`echo $DISPLAY | awk '{print ":" strtonum(substr($1, 2)) + 1}'`
+_DISPLAY=:$(for i in {0..10}; do [ -e "/tmp/.X11-unix/X$i" ] || break; done; echo $i)
 w=960
 h=540
 # here ``+extension RANDR`` does nothing (altho randr support works i think) :/

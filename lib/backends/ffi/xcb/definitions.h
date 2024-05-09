@@ -870,6 +870,19 @@ typedef enum xcb_stack_mode_t {
     XCB_STACK_MODE_BOTTOM_IF = 3,
     XCB_STACK_MODE_OPPOSITE = 4
 } xcb_stack_mode_t;
+typedef struct xcb_get_image_cookie_t {
+    unsigned int sequence;
+} xcb_get_image_cookie_t;
+typedef struct xcb_get_image_reply_t {
+    unsigned char response_type;
+    unsigned char depth;
+    unsigned short sequence;
+    unsigned int length;
+    xcb_visualid_t visual;
+    unsigned char pad0[20];
+} xcb_get_image_reply_t;
+typedef struct extension_info_t extension_info_t;
+typedef struct xcb_errors_context_t xcb_errors_context_t;
 
 // functions
 
@@ -946,6 +959,15 @@ const struct xcb_query_extension_reply_t* xcb_get_extension_data(xcb_connection_
 xcb_get_modifier_mapping_cookie_t xcb_get_modifier_mapping_unchecked(xcb_connection_t *c);
 xcb_get_modifier_mapping_reply_t *xcb_get_modifier_mapping_reply(xcb_connection_t *c, xcb_get_modifier_mapping_cookie_t cookie, xcb_generic_error_t **e);
 xcb_keycode_t *xcb_get_modifier_mapping_keycodes(const xcb_get_modifier_mapping_reply_t *R);
+xcb_get_image_cookie_t xcb_get_image(xcb_connection_t *c, unsigned char format, xcb_drawable_t drawable, short x, short y, unsigned short width, unsigned short height, unsigned int plane_mask);
+xcb_get_image_reply_t *xcb_get_image_reply(xcb_connection_t *c, xcb_get_image_cookie_t cookie, xcb_generic_error_t **e);
+unsigned char *xcb_get_image_data(const xcb_get_image_reply_t *R);
+int xcb_get_image_data_length(const xcb_get_image_reply_t *R);
+int xcb_errors_context_new(xcb_connection_t *conn, xcb_errors_context_t **c);
+char *xcb_errors_get_name_for_major_code(xcb_errors_context_t *ctx, unsigned char major_code);
+char *xcb_errors_get_name_for_minor_code(xcb_errors_context_t *ctx, unsigned char major_code, unsigned short minor_code);
+char *xcb_errors_get_name_for_error(xcb_errors_context_t *ctx, unsigned char error_code, const char **extension);
+void xcb_errors_context_free(xcb_errors_context_t *ctx);
 
 // weird values
 

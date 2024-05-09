@@ -15,7 +15,7 @@ class Animation(Extension):
         self.fn = lambda x: x**2 * (3 - 2 * x)
         super().__init__(ctx, cfg)
 
-        mapNotify.addListener(self.anim)
+        self.addListener(mapNotify, self.anim)
 
     async def anim(self, win: 'GWindow'):
         i = self.frames

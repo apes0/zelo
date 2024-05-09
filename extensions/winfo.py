@@ -29,9 +29,9 @@ class Winfo(Extension):
 
         super().__init__(ctx, cfg)
 
-        enterNotify.addListener(self.enter)
-        leaveNotify.addListener(self.enter)
-        self.win.redraw.addListener(self.redraw)
+        self.addListener(enterNotify, self.enter)
+        self.addListener(leaveNotify, self.enter)
+        self.addListener(self.win.redraw, self.redraw)
 
     async def enter(self, win: 'GWindow'):
         self.text.set(f'''id: {win.id}

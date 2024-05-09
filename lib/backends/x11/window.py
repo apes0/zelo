@@ -1,8 +1,11 @@
 from functools import partial
+import numpy as np
+
 from ..generic import GWindow, GKey, GButton, GMod
 from .. import xcb
+from xcb_cffi import ffi
 import trio
-from .types import uintarr, intarr
+from .types import uintarr, maxUVal
 from typing import TYPE_CHECKING, Callable, Coroutine
 from ...cfg import cfg
 from ..events import (
@@ -98,7 +101,7 @@ class Window(GWindow):
             color = cfg.focusedColor
             xcb.xcbSetInputFocus(
                 self.ctx.connection,
-                xcb.XCBInputFocusPointerRoot,  # seemingly fine?
+                xcb.XCBInputFocusNone,  # seemingly fine?
                 self.id,
                 xcb.XCBCurrentTime,
             )
@@ -209,6 +212,26 @@ class Window(GWindow):
         await runAndWait(self.ctx, [self.destroyNotify, self.leaveNotify], fn)
         
         log('windows', DEBUG, f'closed {self}')
+
+    async def screenshot(self, x:int=0, y:int=0, width:int|None=None, height:int|None=None) -> np.ndarray:
+        width = width or self.width
+        height = height or self.height
+
+        resp = xcb.xcbGetImageReply(
+            self.ctx.connection,
+            xcb.xcbGetImage(self.ctx.connection, xcb.XCBImageFormatZPixmap, self.id, x, y, width, height, maxUVal('int')),
+            xcb.NULL
+        )
+
+        dat = xcb.xcbGetImageData(resp)
+
+        depth: int = xcb.xcbGetImageDataLength(resp)//(width*height)
+
+        out = ffi.buffer(dat, width*height*depth)
+        out: np.ndarray = np.frombuffer(out, np.uint8)
+        out = out.reshape((height, width, depth))
+        return out
+
 
     async def kill(self):
         # the nuclear option

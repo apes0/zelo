@@ -14,6 +14,7 @@ from extensions.widgets.nowPlaying import NowPlaying
 from extensions.widgets.text import Text
 from extensions.workspaces import Workspaces
 from extensions.winfo import Winfo
+from extensions.share import ShareServer, ShareClient
 
 from lib._cfg import Cfg
 from lib.api.keys import Key, Mod
@@ -117,7 +118,9 @@ cfg.extensions = {
     },
     Mouse: {},
     Winfo: {},
-    #    Animation: {},
+#    ShareServer:{},
+#    ShareClient:{'addr': '0.0.0.0'},
+#    Animation: {},
 }
 
 # startup
