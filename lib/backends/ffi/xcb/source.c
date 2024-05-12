@@ -5,8 +5,35 @@
 #include <xcb/xcb_image.h>
 #include <xcb/randr.h>
 #include <xcb/xtest.h>
+#include <xcb/shm.h>
+
+#include <sys/shm.h>
+#include <sys/ipc.h>
+
 #include "libxcb-errors/src/xcb_errors.h"
 
-// void main(){
-//     printf("%d", XCB_STACK_MODE_ABOVE);
-// }
+// see this: https://stackoverflow.com/questions/27745131/how-to-use-shm-pixmap-with-xcb
+
+typedef struct xcb_shm {
+    uint32_t id;
+    void *addr;
+} xcb_shm;
+
+
+xcb_shm create_shm(xcb_connection_t *c, size_t size) {
+    xcb_shm out;
+
+    int shmid = shmget(IPC_PRIVATE, size, IPC_CREAT | 0600);
+    out.addr = shmat(shmid, 0, 0);
+
+    out.id = xcb_generate_id(c);
+    xcb_shm_attach(c, out.id, shmid, 0);
+    shmctl(shmid, IPC_RMID, 0);
+
+    return out;
+}
+
+void remove_shm(xcb_connection_t *c, xcb_shm shm) {
+    xcb_shm_detach(c, shm.id);
+    shmdt(shm.addr);
+}

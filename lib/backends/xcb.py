@@ -612,6 +612,13 @@ class XcbPropModeT(Base):
         if obj == ffi.NULL:
             return
 
+class XcbQueryExtensionCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
 class XcbQueryExtensionReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -848,6 +855,39 @@ class XcbSetupT(Base):
         self.status: int = obj.status
         self.vendorLen: int = obj.vendor_len
 
+class XcbShm(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.addr: _CDataBase = obj.addr
+        self.id: int = obj.id
+
+class XcbShmGetImageCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
+class XcbShmGetImageReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.depth: int = obj.depth
+        self.length: int = obj.length
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.size: int = obj.size
+        self.visual: int = obj.visual
+
+class XcbShmSegT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+
 class XcbStackModeT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -904,7 +944,7 @@ class XcbWindowT(Base):
         if obj == ffi.NULL:
             return
 
-# funcs
+# funcs and vars
 
 XCBAtomAny: int = lib.XCB_ATOM_ANY
 XCBAtomArc: int = lib.XCB_ATOM_ARC
@@ -1161,6 +1201,8 @@ XCBWindowClassCopyFromParent: int = lib.XCB_WINDOW_CLASS_COPY_FROM_PARENT
 XCBWindowClassInputOnly: int = lib.XCB_WINDOW_CLASS_INPUT_ONLY
 XCBWindowClassInputOutput: int = lib.XCB_WINDOW_CLASS_INPUT_OUTPUT
 XCBWindowNone: int = lib.XCB_WINDOW_NONE
+createShm = lambda *a: XcbShm(lib.create_shm(*parseArgs(a)))
+removeShm = lambda *a: (lib.remove_shm(*parseArgs(a)))
 xcbAuxGetScreen = lambda *a: XcbScreenT(lib.xcb_aux_get_screen(*parseArgs(a)))
 xcbChangeProperty = lambda *a: XcbVoidCookieT(lib.xcb_change_property(*parseArgs(a)))
 xcbChangeWindowAttributesChecked = lambda *a: XcbVoidCookieT(lib.xcb_change_window_attributes_checked(*parseArgs(a)))
@@ -1183,6 +1225,7 @@ xcbErrorsGetNameForMajorCode = lambda *a: (lib.xcb_errors_get_name_for_major_cod
 xcbErrorsGetNameForMinorCode = lambda *a: (lib.xcb_errors_get_name_for_minor_code(*parseArgs(a)))
 xcbFlush = lambda *a: (lib.xcb_flush(*parseArgs(a)))
 xcbFreeCursor = lambda *a: XcbVoidCookieT(lib.xcb_free_cursor(*parseArgs(a)))
+xcbFreePixmap = lambda *a: XcbVoidCookieT(lib.xcb_free_pixmap(*parseArgs(a)))
 xcbGenerateId = lambda *a: (lib.xcb_generate_id(*parseArgs(a)))
 xcbGetAtomName = lambda *a: XcbGetAtomNameCookieT(lib.xcb_get_atom_name(*parseArgs(a)))
 xcbGetAtomNameName = lambda *a: (lib.xcb_get_atom_name_name(*parseArgs(a)))
@@ -1223,6 +1266,8 @@ xcbMapWindow = lambda *a: XcbVoidCookieT(lib.xcb_map_window(*parseArgs(a)))
 xcbOpenFont = lambda *a: XcbVoidCookieT(lib.xcb_open_font(*parseArgs(a)))
 xcbPollForEvent = lambda *a: XcbGenericEventT(lib.xcb_poll_for_event(*parseArgs(a)))
 xcbPolyFillRectangle = lambda *a: XcbVoidCookieT(lib.xcb_poly_fill_rectangle(*parseArgs(a)))
+xcbQueryExtensionReply = lambda *a: XcbQueryExtensionReplyT(lib.xcb_query_extension_reply(*parseArgs(a)))
+xcbQueryExtensionUnchecked = lambda *a: XcbQueryExtensionCookieT(lib.xcb_query_extension_unchecked(*parseArgs(a)))
 xcbQueryPointer = lambda *a: XcbQueryPointerCookieT(lib.xcb_query_pointer(*parseArgs(a)))
 xcbQueryPointerReply = lambda *a: XcbQueryPointerReplyT(lib.xcb_query_pointer_reply(*parseArgs(a)))
 xcbQueryTree = lambda *a: XcbQueryTreeCookieT(lib.xcb_query_tree(*parseArgs(a)))
@@ -1237,6 +1282,10 @@ xcbRandrGetScreenResourcesReply = lambda *a: XcbRandrGetScreenResourcesReplyT(li
 xcbRandrSelectInput = lambda *a: XcbVoidCookieT(lib.xcb_randr_select_input(*parseArgs(a)))
 xcbSendEvent = lambda *a: XcbVoidCookieT(lib.xcb_send_event(*parseArgs(a)))
 xcbSetInputFocus = lambda *a: XcbVoidCookieT(lib.xcb_set_input_focus(*parseArgs(a)))
+xcbShmCreatePixmap = lambda *a: XcbVoidCookieT(lib.xcb_shm_create_pixmap(*parseArgs(a)))
+xcbShmGetImageReply = lambda *a: XcbShmGetImageReplyT(lib.xcb_shm_get_image_reply(*parseArgs(a)))
+xcbShmGetImageUnchecked = lambda *a: XcbShmGetImageCookieT(lib.xcb_shm_get_image_unchecked(*parseArgs(a)))
+xcbShmPutImage = lambda *a: XcbVoidCookieT(lib.xcb_shm_put_image(*parseArgs(a)))
 xcbTestFakeInput = lambda *a: XcbVoidCookieT(lib.xcb_test_fake_input(*parseArgs(a)))
 xcbUngrabButton = lambda *a: XcbVoidCookieT(lib.xcb_ungrab_button(*parseArgs(a)))
 xcbUngrabKey = lambda *a: XcbVoidCookieT(lib.xcb_ungrab_key(*parseArgs(a)))

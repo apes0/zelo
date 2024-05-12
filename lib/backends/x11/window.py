@@ -216,19 +216,39 @@ class Window(GWindow):
     async def screenshot(self, x:int=0, y:int=0, width:int|None=None, height:int|None=None) -> np.ndarray:
         width = width or self.width
         height = height or self.height
+        useShm = self.ctx.gctx.avail('MIT-SHM') # type: ignore
 
-        resp = xcb.xcbGetImageReply(
-            self.ctx.connection,
-            xcb.xcbGetImage(self.ctx.connection, xcb.XCBImageFormatZPixmap, self.id, x, y, width, height, maxUVal('int')),
-            xcb.NULL
-        )
+        if useShm:
+            shm = xcb.createShm(self.ctx.connection, height*width*4) # TODO: get the *actual* depth here
 
-        dat = xcb.xcbGetImageData(resp)
+            resp = xcb.xcbShmGetImageReply(
+                self.ctx.connection,
+                xcb.xcbShmGetImageUnchecked(self.ctx.connection, self.id, x, y, width, height, maxUVal('int'), xcb.XCBImageFormatZPixmap, shm.id, 0),
+                xcb.NULL
+            )
 
-        depth: int = xcb.xcbGetImageDataLength(resp)//(width*height)
+            depth = resp.size//(width*height) # TODO: i know you can do this better lol
 
-        out = ffi.buffer(dat, width*height*depth)
+            out = ffi.buffer(shm.addr, resp.size)
+        else:
+            resp = xcb.xcbGetImageReply(
+                self.ctx.connection,
+                xcb.xcbGetImage(self.ctx.connection, xcb.XCBImageFormatZPixmap, self.id, x, y, width, height, maxUVal('int')),
+                xcb.NULL
+            )
+
+            dat = xcb.xcbGetImageData(resp)
+
+            depth: int = xcb.xcbGetImageDataLength(resp)//(width*height) # TODO: same as above here
+
+            out = ffi.buffer(dat, width*height*depth)
+
         out: np.ndarray = np.frombuffer(out, np.uint8)
+        if useShm:
+            out = out.copy() # if this isnt here, we get a segfault loool
+            # i think this happens because numpy tries to reference the, now freed, memory
+            # (probably because memcpy-ing before doing anything is slower lol)
+            xcb.removeShm(self.ctx.connection, shm)
         out = out.reshape((height, width, depth))
         return out
 

@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ...ctx import Ctx
     from .window import Window
+    from .gctx import GCtx
 
 # Create gcontext and such here
 # do text rendering, image drawing, etc.
@@ -42,15 +43,30 @@ class Image(GImage):
         self.pixmap = xcb.xcbGenerateId(ctx.connection)
 
         self.image: xcb.XcbImageT
+        self.useShm = ctx.gctx.avail('MIT-SHM') # type: ignore
 
-        xcb.xcbCreatePixmap(
-            ctx.connection,
-            ctx.screen.screen.rootDepth,
-            self.pixmap,
-            self.windowId,
-            self.width,
-            self.height,
-        )
+        if self.useShm:
+            self.shm = self.shm = xcb.createShm(self.ctx.connection, self.width * self.height * 4)
+
+            xcb.xcbShmCreatePixmap(
+                self.ctx.connection, 
+                self.pixmap, 
+                self.windowId, 
+                self.width, 
+                self.height, 
+                ctx.screen.screen.rootDepth, 
+                self.shm.id,
+                0
+            )
+        else:
+            xcb.xcbCreatePixmap(
+                ctx.connection,
+                ctx.screen.screen.rootDepth,
+                self.pixmap,
+                self.windowId,
+                self.width,
+                self.height,
+            )
 
         xcb.xcbCreateGc(ctx.connection, self.gc, self.pixmap, 0, xcb.NULL)
 
@@ -66,33 +82,40 @@ class Image(GImage):
             img = np.dstack(
                 (img, np.ones((self.height, self.width, 1), dtype=np.uint8) * 255)
             )
-        self.parts = (self.width * self.height * 4) // xcb.xcbGetMaximumRequestLength(
-            self.ctx.connection
-        ) + 2
-        # this works with +2 for some reason
-        pos = 0
-        prev = 0
-        size = self.height / self.parts
 
-        for _ in range(self.parts):
-            # TODO: use the.scanlinePad stuff
-            pos += size
-            self.image = xcb.xcbImageCreateNative(
-                self.ctx.connection,
-                self.width,
-                round(pos) - round(prev),
-                xcb.XCBImageFormatZPixmap,
-                self.ctx.screen.screen.rootDepth,
-                xcb.NULL,
-                self.width * (round(pos) - round(prev)) * 4,
-                uchararr(img[round(prev) : round(pos), :, :].tobytes()),
-            )
+        if self.useShm: # type: ignore
+            data = img.tobytes()
+            ffi.memmove(self.shm.addr, data, len(data))
 
-            xcb.xcbImagePut(
-                self.ctx.connection, self.pixmap, self.gc, self.image, 0, round(prev), 0
-            )
+        else:
+            parts = (self.width * self.height * 4) // xcb.xcbGetMaximumRequestLength(
+                self.ctx.connection
+            ) + 2
+            # this works with +2 for some reason
+            pos = 0
+            prev = 0
+            size = self.height / parts
 
-            prev = pos
+            for _ in range(parts):
+                # TODO: use the.scanlinePad stuff
+                pos += size
+                self.image = xcb.xcbImageCreateNative(
+                    self.ctx.connection,
+                    self.width,
+                    round(pos) - round(prev),
+                    xcb.XCBImageFormatZPixmap,
+                    self.ctx.screen.screen.rootDepth,
+                    xcb.NULL,
+                    self.width * (round(pos) - round(prev)) * 4,
+                    uchararr(img[round(prev) : round(pos), :, :].tobytes()),
+                )
+
+                xcb.xcbImagePut(
+                    self.ctx.connection, self.pixmap, self.gc, self.image, 0, round(prev), 0
+                )
+
+                prev = pos
+
         xcb.xcbFlush(self.ctx.connection)
 
     def draw(self):
@@ -112,7 +135,12 @@ class Image(GImage):
         xcb.xcbFlush(self.ctx.connection)
 
     def destroy(self):
-        xcb.xcbImageDestroy(self.image)
+        if self.useShm:
+            xcb.removeShm(self.ctx.connection, self.shm)
+        else:
+            xcb.xcbImageDestroy(self.image)
+
+        xcb.xcbFreePixmap(self.ctx.connection, self.pixmap)
         xcb.xcbFlush(self.ctx.connection)
 
     def move(self, x: int, y: int):

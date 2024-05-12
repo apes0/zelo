@@ -56,7 +56,7 @@ class {toCamelCase(_type, cls=True)}(Base):
             text += f'\n# skipping {toCamelCase(_type, cls=True)}, because its not fully defined\n'
 
     text += '''
-# funcs
+# funcs and vars
 
 '''
     defs = open(f'lib/backends/ffi/{_name}/definitions.h').read()

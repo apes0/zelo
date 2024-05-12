@@ -3,7 +3,7 @@ import trio
 import sys
 
 repeat = 3
-Shared.mul = 3
+Shared.mul = repeat
 
 load(*sys.argv[1].split('.')) if len(sys.argv) > 1 else load()
 

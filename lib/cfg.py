@@ -42,7 +42,7 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     ((Key('s'),), Mod('control')): lambda ctx: stop(ctx),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
     ((Key('x'),), Mod('control')): lambda ctx: (
-        ctx.nurs.start_soon(ctx.focused.close) if ctx.focused else None
+        ctx.nurs.start_soon(ctx.focused.screenshot) if ctx.focused else None
     ),
     # ((Key('m'),), Mod('control')): lambda ctx: (
     #     toCursor(ctx, ctx.focused) if ctx.focused else None
@@ -76,7 +76,7 @@ cfg.extensions = {
     },
     MouseFocus: {},
     Wallpaper: {'wall': wall},
-    #    Wallpaper: {'wall': 'video.gif', 'video': True},
+#    Wallpaper: {'wall': 'video.gif', 'video': True},
     Shortcuts: {'shortcuts': keys},
     Workspaces: {
         'prev': ((Key('left'), Key('super_l')), Mod('control')),
@@ -117,7 +117,7 @@ cfg.extensions = {
         ]
     },
     Mouse: {},
-    Winfo: {},
+#    Winfo: {},
 #    ShareServer:{},
 #    ShareClient:{'addr': '0.0.0.0'},
 #    Animation: {},

@@ -22,6 +22,6 @@ class FtBitmap(Base):
 
 # skipping FtBitmap, because its not fully defined
 
-# funcs
+# funcs and vars
 
 render = lambda *a: FtBitmap(lib.render(*parseArgs(a)))

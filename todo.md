@@ -13,9 +13,8 @@
 - actually implement GCtx lol
 - always use checked function for xcb to catch errors
 - make all scripts be bash
-- use Xvideo (x plugin, not porn) and implement a Video class for the x backend
+- use Xvideo (x plugin, not porn) and implement a Video class for the x backend (?)
 - errors
-- use xshm for images?
 - properly redraw
 - make animations work; maybe with a composer?
 - more backends (e.g. one for windows/macos?)
@@ -43,3 +42,5 @@
 - theming events
 - more stuff that themes support lol (roundness and shit)
 - update x11's image.set (see extensions/share.py)
+- typing for the cffi functions
+- fix gctx typing

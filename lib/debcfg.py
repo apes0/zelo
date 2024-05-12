@@ -9,13 +9,14 @@ streamHandler.setFormatter(formatter)
 # debbuger config
 # contains lables for each thing that we can debug
 
+# ? why do i keep these in a dict lol?
 cfg = {
     'all': False,  # if we should log everything
     'events': False,  # event triggerings
     'evErrors': False, # event errors
     'grab': False,  # and ungrab
     'press': False,  # and release
-    'errors': False,  # backend errors
+    'errors': True,  # backend errors
     'backend': False,  # backend debug info
     'windows': False,  # anything to do with windows
     'extensions': False,  # extension logs
@@ -23,7 +24,18 @@ cfg = {
 }
 
 
-# TODO: multiple filters
-def log(name: str, level: int, message: str):
-    if cfg['all'] or cfg.get(name, cfg['others']):
-        logger.log(level, f'{name}: {message}')
+def log(name: str | list[str], level: int, message: str, single=True):
+    if isinstance(name, str):
+        if not (cfg['all'] or cfg.get(name, cfg['others'])):
+            return
+
+    else:
+        for n in name:
+            if cfg.get(n, cfg['others']):
+                break
+            elif not single:
+                return
+
+            name = ', '.join(name)
+
+    logger.log(level, f'{name}: {message}')

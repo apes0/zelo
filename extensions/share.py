@@ -20,8 +20,8 @@ if TYPE_CHECKING:
 
 # share wins to other systems
 # NOTE: requires ``cryptography`` module
-# NOTE: this will run well only when shm is added, so it will not be documented untill then
 
+# TODO: fix window closing (and other window operations in general)
 # TODO: shortcut for sharing/unsharing
 # TODO: io for wins
 # TODO: resize win when sending
@@ -30,7 +30,8 @@ if TYPE_CHECKING:
 # TODO: clean up this mess
 # TODO: exclude/fetch window shortcuts on the client
 # TODO: client shortcut to sent io to the root window on the server
-# FIXME: memory leaks somewhere???
+# TODO: document this
+# FIXME: memory leaks when we dont use shm, must be something with screenshotting
 
 # This is how it works (from the server side):
 # First, we generate a public and private rsa key

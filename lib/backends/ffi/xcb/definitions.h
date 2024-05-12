@@ -852,7 +852,6 @@ typedef struct xcb_query_extension_reply_t {
     unsigned char first_event;
     unsigned char first_error;
 } xcb_query_extension_reply_t;
-typedef struct xcb_extension_t xcb_extension_t;
 typedef struct xcb_get_modifier_mapping_cookie_t {
     unsigned int sequence;
 } xcb_get_modifier_mapping_cookie_t;
@@ -883,6 +882,30 @@ typedef struct xcb_get_image_reply_t {
 } xcb_get_image_reply_t;
 typedef struct extension_info_t extension_info_t;
 typedef struct xcb_errors_context_t xcb_errors_context_t;
+typedef unsigned int xcb_shm_seg_t;
+typedef struct xcb_shm_get_image_cookie_t {
+    unsigned int sequence;
+} xcb_shm_get_image_cookie_t;
+typedef struct xcb_shm_get_image_reply_t {
+    unsigned char response_type;
+    unsigned char depth;
+    unsigned short sequence;
+    unsigned int length;
+    xcb_visualid_t visual;
+    unsigned int size;
+} xcb_shm_get_image_reply_t;
+typedef struct xcb_extension_t xcb_extension_t;
+typedef struct xcb_query_extension_cookie_t {
+    unsigned int sequence;
+} xcb_query_extension_cookie_t;
+
+// custom from source:
+
+typedef struct xcb_shm
+{
+    unsigned int id;
+    void *addr;
+} xcb_shm;
 
 // functions
 
@@ -968,6 +991,19 @@ char *xcb_errors_get_name_for_major_code(xcb_errors_context_t *ctx, unsigned cha
 char *xcb_errors_get_name_for_minor_code(xcb_errors_context_t *ctx, unsigned char major_code, unsigned short minor_code);
 char *xcb_errors_get_name_for_error(xcb_errors_context_t *ctx, unsigned char error_code, const char **extension);
 void xcb_errors_context_free(xcb_errors_context_t *ctx);
+xcb_void_cookie_t xcb_free_pixmap(xcb_connection_t *conn, xcb_pixmap_t pixmap);
+xcb_void_cookie_t xcb_shm_put_image(xcb_connection_t *c, xcb_drawable_t drawable, xcb_gcontext_t gc, unsigned short total_width, unsigned short total_height, unsigned short src_x, unsigned short src_y, unsigned short src_width, unsigned short src_height, short dst_x, short dst_y, unsigned char depth, unsigned char format, unsigned char send_event, xcb_shm_seg_t shmseg, unsigned int offset);
+xcb_void_cookie_t xcb_shm_create_pixmap(xcb_connection_t *c, xcb_pixmap_t pid, xcb_drawable_t drawable, unsigned short width, unsigned short height, unsigned char depth, xcb_shm_seg_t shmseg, unsigned int offset);
+xcb_shm_get_image_cookie_t xcb_shm_get_image_unchecked(xcb_connection_t *c, xcb_drawable_t drawable, short x, short y, unsigned short width, unsigned short height, unsigned int plane_mask, unsigned char format, xcb_shm_seg_t shmseg, unsigned int offset);
+xcb_shm_get_image_reply_t *xcb_shm_get_image_reply(xcb_connection_t *conn, xcb_shm_get_image_cookie_t cookie, xcb_generic_error_t **e);
+xcb_query_extension_cookie_t xcb_query_extension_unchecked(xcb_connection_t *conn, unsigned short name_len, const char *name);
+xcb_query_extension_reply_t *xcb_query_extension_reply(xcb_connection_t *conn, xcb_query_extension_cookie_t cookie, xcb_generic_error_t **e);
+
+
+// custom from source:
+
+xcb_shm create_shm(xcb_connection_t *c, unsigned long size);
+void remove_shm(xcb_connection_t *c, xcb_shm shm);
 
 // weird values
 
