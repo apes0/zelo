@@ -212,4 +212,3 @@ def shm(ctx: 'Ctx'):
     )
 
     ctx.gctx.sharedPixmaps = bool(rep.sharedPixmaps)
-    ctx.gctx.sharedPixmaps = False
