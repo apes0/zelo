@@ -98,13 +98,8 @@ class Window(GWindow):
         act: Coroutine | None = None
 
         if focus:
+            wid = self.id
             color = cfg.focusedColor
-            xcb.xcbSetInputFocus(
-                self.ctx.connection,
-                xcb.XCBInputFocusNone,  # seemingly fine?
-                self.id,
-                xcb.XCBCurrentTime,
-            )
 
             if not self.ctx.focused:
                 # if there is not other window that is focused, we dont have anything to do
@@ -126,6 +121,7 @@ class Window(GWindow):
                 act = fn()
 
         else:
+            wid = self.ctx._root # ? should this be xcb.XCBNone?
             color = cfg.unfocusedColor
             # if the id of the focused is our id, and only then, we need to unfocus the window,
             # otherwise, if the ids arent the same, then we are already unfocused
@@ -139,14 +135,22 @@ class Window(GWindow):
             self.ctx.connection, self.id, xcb.XCBCwBorderPixel, uintarr([color])
         )
 
-        xcb.xcbFlush(self.ctx.connection)
-
         if act:
             await act
 
-        log('windows', DEBUG, f'set {self}\'s focus to {focus}')
+        xcb.xcbSetInputFocus(
+            self.ctx.connection,
+            xcb.XCBInputFocusNone,
+            wid,
+            xcb.XCBCurrentTime,
+        )
+
+        xcb.xcbFlush(self.ctx.connection)
+
+        log(['windows', 'focus'], DEBUG, f'set {self}\'s focus to {focus}')
 
         # no waiting to do here :)
+        # ? should we wait for focusin/out??
 
     async def configure(
         self,

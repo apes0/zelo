@@ -16,6 +16,9 @@ cfg = {
     'evErrors': True, # event errors
     'grab': False,  # and ungrab
     'press': False,  # and release
+    'keys': False,  # key related logs
+    'buttons': False,  # button related logs
+    'focus': False,  # focus changes
     'errors': True,  # backend errors
     'backend': False,  # backend debug info
     'windows': False,  # anything to do with windows

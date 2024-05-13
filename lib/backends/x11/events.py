@@ -291,7 +291,7 @@ async def keyPress(event, ctx: 'Ctx'):
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.child)
 
-    log('backend', DEBUG, f'{key} with {mod} pressed on {window}')
+    log(['backend', 'keys'], DEBUG, f'{key} with {mod} pressed on {window}')
 
     await window.keyPress.trigger(ctx, key, mod)
     await events.keyPress.trigger(ctx, key, mod, window)
@@ -304,7 +304,7 @@ async def keyRelease(event, ctx: 'Ctx'):
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.event)
 
-    log('backend', DEBUG, f'{key} with {mod} released on {window}')
+    log(['backend', 'keys'], DEBUG, f'{key} with {mod} released on {window}')
 
     await window.keyRelease.trigger(ctx, key, mod)
     await events.keyRelease.trigger(ctx, key, mod, window)
@@ -317,7 +317,7 @@ async def buttonPress(event, ctx: 'Ctx'):
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.event)
 
-    log('backend', DEBUG, f'{button} with {mod} pressed on {window}')
+    log(['backend', 'buttons'], DEBUG, f'{button} with {mod} pressed on {window}')
 
     await window.buttonPress.trigger(ctx, button, mod)
     await events.buttonPress.trigger(ctx, button, mod, window)
@@ -330,7 +330,7 @@ async def buttonRelease(event, ctx: 'Ctx'):
     mod = Mod(value=event.state)
     window: GWindow = ctx.getWindow(event.event)
 
-    log('backend', DEBUG, f'{button} with {mod} released on {window}')
+    log(['backend', 'buttons'], DEBUG, f'{button} with {mod} released on {window}')
 
     await window.buttonRelease.trigger(ctx, button, mod)
     await events.buttonRelease.trigger(ctx, button, mod, window)

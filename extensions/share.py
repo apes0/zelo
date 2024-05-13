@@ -158,7 +158,6 @@ class ShareServer(Extension):
             await send(stream, encryptRsa(clientPub, myKey)) # send encrypted fernet key
             
             key = xorb(clientKey, myKey)
-            print(urlsafe_b64encode(key), len(urlsafe_b64encode(key)))
             fernet = Fernet(urlsafe_b64encode(key))
 
             await self.conn(fernet, stream)
