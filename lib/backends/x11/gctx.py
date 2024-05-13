@@ -13,6 +13,7 @@ class Ctx(GCtx):
     def __init__(self, ctx: 'Ctxt') -> None:
         self.ctx = ctx
         self.extResps = {}
+        self.sharedPixmaps: bool = False
 
     def avail(self, ext: str):
         return self.extResps[ext].present

@@ -882,6 +882,29 @@ class XcbShmGetImageReplyT(Base):
         self.size: int = obj.size
         self.visual: int = obj.visual
 
+class XcbShmQueryVersionCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.sequence: int = obj.sequence
+
+class XcbShmQueryVersionReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:
+            return
+        self.gid: int = obj.gid
+        self.length: int = obj.length
+        self.majorVersion: int = obj.major_version
+        self.minorVersion: int = obj.minor_version
+        self.pad0: _CDataBase = obj.pad0
+        self.pixmapFormat: int = obj.pixmap_format
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.sharedPixmaps: int = obj.shared_pixmaps
+        self.uid: int = obj.uid
+
 class XcbShmSegT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -1286,6 +1309,8 @@ xcbShmCreatePixmap = lambda *a: XcbVoidCookieT(lib.xcb_shm_create_pixmap(*parseA
 xcbShmGetImageReply = lambda *a: XcbShmGetImageReplyT(lib.xcb_shm_get_image_reply(*parseArgs(a)))
 xcbShmGetImageUnchecked = lambda *a: XcbShmGetImageCookieT(lib.xcb_shm_get_image_unchecked(*parseArgs(a)))
 xcbShmPutImage = lambda *a: XcbVoidCookieT(lib.xcb_shm_put_image(*parseArgs(a)))
+xcbShmQueryVersion = lambda *a: XcbShmQueryVersionCookieT(lib.xcb_shm_query_version(*parseArgs(a)))
+xcbShmQueryVersionReply = lambda *a: XcbShmQueryVersionReplyT(lib.xcb_shm_query_version_reply(*parseArgs(a)))
 xcbTestFakeInput = lambda *a: XcbVoidCookieT(lib.xcb_test_fake_input(*parseArgs(a)))
 xcbUngrabButton = lambda *a: XcbVoidCookieT(lib.xcb_ungrab_button(*parseArgs(a)))
 xcbUngrabKey = lambda *a: XcbVoidCookieT(lib.xcb_ungrab_key(*parseArgs(a)))

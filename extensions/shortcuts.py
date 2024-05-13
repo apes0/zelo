@@ -59,7 +59,7 @@ class Shortcuts(Extension):
                 mod: GMod = key[1]  # add the modifier used for the actual shortcut
                 for _key in key[0]:
                     _key: GKey
-                    _key.grab(self.ctx, _mod, mod)
+                    _key.grab(self.ctx, self.ctx.root, _mod, mod)
 
         shortcuts = {}  # adapt self.shortcuts to the old system, bc lazy
 

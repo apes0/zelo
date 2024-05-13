@@ -7,12 +7,12 @@ from ..cairo import render
 from xcb_cffi import ffi
 from ..generic import GImage, GWindow, GRectangle, GText
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
     from .window import Window
-    from .gctx import GCtx
+    from .gctx import Ctx as GCtx
 
 # Create gcontext and such here
 # do text rendering, image drawing, etc.
@@ -32,6 +32,7 @@ class Image(GImage):
         self.x: int = x
         self.y: int = y
 
+        ctx.gctx = cast('GCtx', ctx.gctx)
         self.ctx = ctx
 
         self.windowId = window.id
@@ -43,21 +44,23 @@ class Image(GImage):
         self.pixmap = xcb.xcbGenerateId(ctx.connection)
 
         self.image: xcb.XcbImageT
-        self.useShm = ctx.gctx.avail('MIT-SHM') # type: ignore
+        self.useShm = ctx.gctx.avail('MIT-SHM')
 
         if self.useShm:
-            self.shm = self.shm = xcb.createShm(self.ctx.connection, self.width * self.height * 4)
-
-            xcb.xcbShmCreatePixmap(
-                self.ctx.connection, 
-                self.pixmap, 
-                self.windowId, 
-                self.width, 
-                self.height, 
-                ctx.screen.screen.rootDepth, 
-                self.shm.id,
-                0
-            )
+            self.shm = xcb.createShm(self.ctx.connection, self.width * self.height * 4)
+            if ctx.gctx.sharedPixmaps:
+                xcb.xcbShmCreatePixmap(
+                    self.ctx.connection, 
+                    self.pixmap, 
+                    self.windowId, 
+                    self.width, 
+                    self.height, 
+                    ctx.screen.screen.rootDepth, 
+                    self.shm.id,
+                    0
+                )
+            else:
+                self.pixmap = self.windowId
         else:
             xcb.xcbCreatePixmap(
                 ctx.connection,
@@ -83,9 +86,28 @@ class Image(GImage):
                 (img, np.ones((self.height, self.width, 1), dtype=np.uint8) * 255)
             )
 
-        if self.useShm: # type: ignore
+        if self.useShm:
             data = img.tobytes()
             ffi.memmove(self.shm.addr, data, len(data))
+            if not self.ctx.gctx.sharedPixmaps: # type: ignore
+                xcb.xcbShmPutImage(
+                    self.ctx.connection, 
+                    self.windowId, 
+                    self.gc, 
+                    self.width, 
+                    self.height, 
+                    0, 
+                    0, 
+                    self.width, 
+                    self.height, 
+                    self.x, 
+                    self.y, 
+                    self.ctx.screen.screen.rootDepth, 
+                    xcb.XCBImageFormatZPixmap, 
+                    0, 
+                    self.shm.id, 
+                    0
+                )
 
         else:
             parts = (self.width * self.height * 4) // xcb.xcbGetMaximumRequestLength(
@@ -119,6 +141,26 @@ class Image(GImage):
         xcb.xcbFlush(self.ctx.connection)
 
     def draw(self):
+        if self.useShm and not self.ctx.gctx.sharedPixmaps: # type: ignore
+            xcb.xcbShmPutImage(
+                self.ctx.connection, 
+                self.windowId, 
+                self.gc, 
+                self.width, 
+                self.height, 
+                0, 
+                0, 
+                self.width, 
+                self.height, 
+                self.x, 
+                self.y, 
+                self.ctx.screen.screen.rootDepth, 
+                xcb.XCBImageFormatZPixmap, 
+                0, 
+                self.shm.id, 
+                0
+            )
+            return
         xcb.xcbCopyArea(
             self.ctx.connection,
             self.pixmap,

@@ -898,6 +898,21 @@ typedef struct xcb_extension_t xcb_extension_t;
 typedef struct xcb_query_extension_cookie_t {
     unsigned int sequence;
 } xcb_query_extension_cookie_t;
+typedef struct xcb_shm_query_version_cookie_t {
+    unsigned int sequence;
+} xcb_shm_query_version_cookie_t;
+typedef struct xcb_shm_query_version_reply_t {
+    unsigned char  response_type;
+    unsigned char  shared_pixmaps;
+    unsigned short sequence;
+    unsigned int length;
+    unsigned short major_version;
+    unsigned short minor_version;
+    unsigned short uid;
+    unsigned short gid;
+    unsigned char  pixmap_format;
+    unsigned char  pad0[15];
+} xcb_shm_query_version_reply_t;
 
 // custom from source:
 
@@ -998,7 +1013,8 @@ xcb_shm_get_image_cookie_t xcb_shm_get_image_unchecked(xcb_connection_t *c, xcb_
 xcb_shm_get_image_reply_t *xcb_shm_get_image_reply(xcb_connection_t *conn, xcb_shm_get_image_cookie_t cookie, xcb_generic_error_t **e);
 xcb_query_extension_cookie_t xcb_query_extension_unchecked(xcb_connection_t *conn, unsigned short name_len, const char *name);
 xcb_query_extension_reply_t *xcb_query_extension_reply(xcb_connection_t *conn, xcb_query_extension_cookie_t cookie, xcb_generic_error_t **e);
-
+xcb_shm_query_version_cookie_t xcb_shm_query_version(xcb_connection_t *c);
+xcb_shm_query_version_reply_t *xcb_shm_query_version_reply(xcb_connection_t *c, xcb_shm_query_version_cookie_t cookie, xcb_generic_error_t **e);
 
 // custom from source:
 

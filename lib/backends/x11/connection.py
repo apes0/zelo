@@ -1,7 +1,7 @@
 # from .ewmh import AtomStore
 from .mouse import Mouse
 from .. import xcb
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from ..generic import GConnection
 from .window import Window
 from .types import intarr
@@ -11,6 +11,7 @@ from .types import chararr
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
+    from .gctx import Ctx as GCtx
 
 
 initers = []
@@ -182,6 +183,7 @@ def initSyms(ctx: 'Ctx'):
 
 @init
 def extensions(ctx: 'Ctx'):
+    ctx.gctx = cast('GCtx', ctx.gctx)
     reqs = {}
     names = ['RANDR', 'MIT-SHM', 'XTEST']
 
@@ -195,4 +197,19 @@ def extensions(ctx: 'Ctx'):
             xcb.NULL
         )
 
-        ctx.gctx.extResps[name] = rep # type: ignore
+        ctx.gctx.extResps[name] = rep
+
+@init
+def shm(ctx: 'Ctx'):
+    ctx.gctx = cast('GCtx', ctx.gctx)
+    if not ctx.gctx.avail('MIT-SHM'):
+        return
+  
+    rep = xcb.xcbShmQueryVersionReply(
+        ctx.connection,
+        xcb.xcbShmQueryVersion(ctx.connection),
+        xcb.NULL
+    )
+
+    ctx.gctx.sharedPixmaps = bool(rep.sharedPixmaps)
+    ctx.gctx.sharedPixmaps = False

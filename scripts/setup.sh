@@ -18,6 +18,8 @@ sudo make install
 sudo ldconfig # see: https://stackoverflow.com/questions/65366236/error-while-loading-shared-libraries-libxcb-errors-so-0-cannot-open-shared-obj
 # and: https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s
 
+cd ..
+
 python3 -m lib.backends.ffi # compile everything
 
 cd $mypath

@@ -73,11 +73,12 @@ class Key(GKey):
 
         assert code, f'Couldn\'t find keycode for {self.lable}...'
 
-        self.key = code[0]
-        self.__class__.cache[self.lable] = self.key
+        key: int = code[0]
+        self.key = key
+        self.__class__.cache[self.lable] = key
         # xcb.xcbKeySymbolsFree(syms)  # ? idk how efficient this is lol
 
-    def grab(self, ctx: 'Ctx', *modifiers: Mod): # TODO: (un)grab on window
+    def grab(self, ctx: 'Ctx', window: GWindow, *modifiers: Mod): # TODO: (un)grab on window
         log('grab', DEBUG, f'grabbing {self} with modifiers {modifiers}')
         if not self.key:
             self.load(ctx)
@@ -90,7 +91,7 @@ class Key(GKey):
         xcb.xcbGrabKey(
             ctx.connection,
             1,
-            ctx._root,
+            window.id,
             mod,
             self.key,
             xcb.XCBGrabModeAsync,
@@ -99,7 +100,7 @@ class Key(GKey):
 
         xcb.xcbFlush(ctx.connection)
 
-    def ungrab(self, ctx: 'Ctx', *modifiers: Mod):
+    def ungrab(self, ctx: 'Ctx', window: GWindow, *modifiers: Mod):
         log('grab', DEBUG, f'ungrabbing {self} with modifiers {modifiers}')
         if not self.key:
             self.load(ctx)
@@ -109,7 +110,7 @@ class Key(GKey):
         for _mod in modifiers:
             mod |= _mod.mod
 
-        xcb.xcbUngrabKey(ctx.connection, self.key, ctx._root, mod)
+        xcb.xcbUngrabKey(ctx.connection, self.key, window.id, mod)
         xcb.xcbFlush(ctx.connection)
 
     def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod, flush: bool = True):

@@ -21,4 +21,6 @@ git stash pop
 # here we do this so that the update script doesnt override itself lol
 grep -lr '<<<<''<<<' . | xargs git checkout --theirs
 
+git submodule update --init --recursive
+
 python3 -m lib.backends.ffi # compile everything that was changed

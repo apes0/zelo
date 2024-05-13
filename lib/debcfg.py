@@ -13,14 +13,14 @@ streamHandler.setFormatter(formatter)
 cfg = {
     'all': False,  # if we should log everything
     'events': False,  # event triggerings
-    'evErrors': False, # event errors
+    'evErrors': True, # event errors
     'grab': False,  # and ungrab
     'press': False,  # and release
     'errors': True,  # backend errors
     'backend': False,  # backend debug info
     'windows': False,  # anything to do with windows
     'extensions': False,  # extension logs
-    'others': False,  # anything else that's logging
+    'others': True,  # anything else that's logging
 }
 
 

@@ -154,10 +154,10 @@ class GKey:
     def load(self, ctx: 'Ctx'):
         raise NotImplementedError
 
-    def grab(self, ctx: 'Ctx', *modifiers: GMod):
+    def grab(self, ctx: 'Ctx', window: GWindow, *modifiers: GMod):
         raise NotImplementedError
 
-    def ungrab(self, ctx: 'Ctx'):
+    def ungrab(self, ctx: 'Ctx', window: GWindow, *modifiers: GMod):
         raise NotImplementedError
 
     def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: GMod):

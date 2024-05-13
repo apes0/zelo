@@ -390,7 +390,7 @@ ignore = [9, 10, 14, 89]  # list of events to ignore
 
 # TODO: verify this info (this will forever be here)
 
-
+# TODO: support event 34 (XCB_MAPPING_NOTIFY)
 async def setup(ctx: 'Ctx'):
     # this is, in practice, the init function for the ctx
     ctx.dname = xcb.NULL
