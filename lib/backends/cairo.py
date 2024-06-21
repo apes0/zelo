@@ -6,6 +6,7 @@ NULL = ffi.NULL
 
 # types
 
+
 class FtBitmap(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -19,6 +20,7 @@ class FtBitmap(Base):
         self.pixelMode: int = obj.pixel_mode
         self.rows: int = obj.rows
         self.width: int = obj.width
+
 
 # skipping FtBitmap, because its not fully defined
 

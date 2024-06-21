@@ -1,108 +1,93 @@
 from typing import Callable
 from .pres import Pre
+from .ctx import Ctx
 import os
 import importlib
+import traceback
 from typing import TYPE_CHECKING
 import trio
 
-async def catch(fn: Callable, err: str, *args) -> bool:
+
+async def catch(fn: Callable, err: str, *args) -> tuple[bool, BaseException | None]:
     try:
         await fn(*args)
-        return False
-    except AssertionError as e: # let the rest bubble down
-        print(f'{err}: {e}')
-        return True
+        return False, None
+    except BaseException as e:
+        print(f'{err}: {traceback.format_exc()}')
+        return True, e
 
 
 tests: list['Test'] = []
 
 # FIXME: we shouldn't run pres if any of them are shared and in the same order between tests
 
+
 class Test:
-    def __init__(self, lable: str, pres: list[Pre], test: Callable):
-        self.lable = lable
+    def __init__(self, lable: str, pres: list[Pre], test: Callable, sname: str):
+        self.lable = f'{sname}/{lable}'
+        self._lable = lable
         self.pres = pres
         self._test = test
+        self.sname = sname
         tests.append(self)
 
-    async def test(self, nurs: 'trio.Nursery') -> bool:
+    async def test(self, nurs: 'trio.Nursery') -> tuple[bool, BaseException | None]:
         print(f'starting test {self.lable}')
-        for i, pre in enumerate(self.pres):
+        ctx = Ctx(nurs)
+        ctx.pres = [pre() for pre in self.pres]
+        for i, pre in enumerate(ctx.pres):
             print(f'\tstarting pre {pre.lable}')
-            if await catch(pre.run, f'\t{self.lable}: pre {pre.lable} failed', nurs):
-                await self.cleanUp(nurs, end=i)
-                return False
+            res, err = await catch(
+                pre.run, f'\t{self.lable}: pre {pre.lable} failed', ctx
+            )
+            if res:
+                await self.cleanUp(ctx, end=i)
+                return False, err
 
-        if await catch(self._test, f'{self.lable} failed', self):
-            await self.cleanUp(nurs)
-            return False
+        res, err = await catch(self._test, f'{self.lable} failed', ctx)
+        if res:
+            await self.cleanUp(ctx)
+            return False, err
 
         print(f'{self.lable} succeeded!')
-        await self.cleanUp(nurs)
-        return True
+        await self.cleanUp(ctx)
+        return True, None
 
-    async def cleanUp(self, nurs: 'trio.Nursery', end: int|None = None) -> None:
-        for pre in reversed(self.pres[:end]):
+    async def cleanUp(self, ctx: Ctx, end: int | None = None) -> None:
+        for pre in reversed(ctx.pres[:end]):
             print(f'\tstopping {pre.lable}')
-            await catch(pre.stop, f'\t{self.lable}: pre {pre.lable} failed to stop', nurs)
+            await catch(
+                pre.stop, f'\t{self.lable}: pre {pre.lable} failed to stop', ctx
+            )
         print()
 
-class Shared:
-    mul = 1
-    def __init__(self, pres: list[Pre]) -> None:
-        self.pres = pres
-        self.shares = 0
-        self.started = False
 
-        async def start(_pre: Pre, nurs: trio.Nursery, done: trio.Event):
-            if self.started:
-                done.set()
-                return
-
-            self.started = True
-
-            _pre.data = []
-            
-            for pre in self.pres:
-                await pre.run(nurs)
-                _pre.data.append(pre.data)
-
-            done.set()
-
-        async def end(_pre: Pre, nurs: trio.Nursery, done: trio.Event):
-            self.shares -= 1
-
-            if self.shares != 0:
-                done.set()
-                return
-
-            for pre in self.pres:
-                await pre.stop(nurs)
-
-            done.set()
-
-        new = Pre(', '.join([pre.lable for pre in pres]), start)
-        new.end = end
-        self.new = new
-    
-    def __call__(self, test: Test):
-        self.shares += self.__class__.mul
-        test.pres = [self.new, *test.pres]
-
-def test(lable, preq):
+def test(lable, preq, tcase):
     def deco(fn):
-        return Test(lable, preq, fn)
+        return Test(lable, preq, fn, tcase)
 
     return deco
 
 
-def load(suit='', test='') -> None:
+def load(suit='', test='', igndirs=[], ignfiles=[]) -> None:
     dirname: str = os.path.dirname(__file__)
     for dir in os.listdir(dirname):
         cur: str = os.path.join(dirname, dir)
-        if dir.startswith('__') or dir.startswith('.') or os.path.isfile(cur) or not dir.endswith(suit):
+        if (
+            dir.startswith('__')
+            or dir.startswith('.')
+            or os.path.isfile(cur)
+            or not dir.endswith(suit)
+            or dir in igndirs
+        ):
             continue
         for file in os.listdir(cur):
-            if os.path.isdir(file) or file.startswith('__') or file.startswith('.') or not file[:-3].endswith(test):
+            if (
+                os.path.isdir(file)
+                or file.startswith('__')
+                or file.startswith('.')
+                or not file[:-3].endswith(test)
+                or file in ignfiles
+            ):
                 continue
             importlib.import_module(f'.{dir}.{file[:-3]}', package='tests')

@@ -27,12 +27,19 @@ jobs:
         sudo apt-get update -y 2>&1 > /dev/null
         sudo apt-get install -y zsh gawk build-essential libdbus-glib-1-dev libgirepository1.0-dev 2>&1 > /dev/null
         python -m pip install --upgrade pip 2>&1 > /dev/null
-        pip install -r requirements.txt dbus-python cryptography 2>&1 > /dev/null
-        sudo apt-get install -y xvfb xserver-xephyr x11-apps xterm 2>&1 > /dev/null
+        pip install -r devrequirements.txt 2>&1 > /dev/null
+        sudo apt-get install -y xvfb xserver-xephyr x11-apps xterm x11-xserver-utils 2>&1 > /dev/null
+        mkdir junit
     - name: Run setup.sh
       run: |
         chmod +x scripts/setup.sh 2>&1 > /dev/null
         zsh scripts/setup.sh 2>&1 > /dev/null
     - name: Run tests
       run: |
-        xvfb-run python test.py
+        sh -c "xvfb-run python test.py --junit"
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: junit/test-results.xml
+      if: ${{ always() }}

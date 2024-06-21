@@ -6,12 +6,9 @@ from .. import xcb
 from xcb_cffi import ffi
 import trio
 from .types import uintarr, maxUVal
-from typing import TYPE_CHECKING, Callable, Coroutine
-from ...cfg import cfg
-from ..events import (
-    Event,
-    focusChange,
-)
+from typing import TYPE_CHECKING, Callable
+from ...lock import alock, calock
+from ..events import Event, focusChange, reparent, ignored
 
 from logging import DEBUG
 from ...debcfg import log
@@ -28,7 +25,7 @@ async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
         ev.set()
 
     for event in events:
-        event.addListener(wait)
+        event.addListener(ctx, wait)
 
     fn()
     xcb.xcbFlush(ctx.connection)
@@ -36,7 +33,7 @@ async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
     await ev.wait()
 
     for event in events:
-        event.removeListener(wait)
+        event.removeListener(ctx, wait)
 
 
 class Window(GWindow):
@@ -52,7 +49,7 @@ class Window(GWindow):
         self.focused: bool = False
         self.mapped: bool = False
         self.destroyed: bool = False
-        self.ignore = True  # set by override redirect (also we assume the worst, so we set it to true)
+        self._ignore = True  # set by override redirect (also we assume the worst, so we set it to true)
         self.mine: bool = False
 
         # events:
@@ -71,6 +68,19 @@ class Window(GWindow):
         self.enterNotify = Event('enterNotify')
         self.leaveNotify = Event('leaveNotify')
         self.redraw = Event('redraw')  # exposure notify for x
+        self.reparented = Event('reparented', GWindow)  # my parent
+        self.ignored = Event('ignored')  # when we are marked as ignored
+
+    @property  # ? this is the only property, so should i add functions to ignore the win instead?
+    def ignore(self):
+        return self._ignore
+
+    @ignore.setter
+    def ignore(self, val):
+        self._ignore = val
+        # ? can i perhaps do an async setter?
+        self.ctx.nurs.start_soon(ignored.trigger, self.ctx, self)
+        self.ctx.nurs.start_soon(self.ignored.trigger, self.ctx)
 
     async def map(self):
         fn = partial(xcb.xcbMapWindow, self.ctx.connection, self.id)
@@ -90,53 +100,32 @@ class Window(GWindow):
 
         self.mapped = False
 
+    @alock
     async def setFocus(self, focus: bool):
         self.focused = focus
-        color: int
-        # act is the function to be called *after* everything is done
-        # its used so that we dont have any conflicts
-        act: Coroutine | None = None
+        wid = None
 
         if focus:
             wid = self.id
-            color = cfg.focusedColor
+            old = self.ctx.focused
 
-            if not self.ctx.focused:
-                # if there is not other window that is focused, we dont have anything to do
-                act = focusChange.trigger(self.ctx, None, self)
-                self.ctx.focused = self
+            if self.ctx.focused and self.ctx.focused.id != self.id:
+                # if there is a window that is focused, mark it as unfocused
+                old.focused = False
 
-            elif self.ctx.focused.id != self.id:
-                # if there is a window that is focused, unfocus it first, then focus our window
-                old: GWindow = self.ctx.focused
+            self.ctx.focused = self
 
-                async def fn():
-                    focusChange.block = True
-                    await old.setFocus(False)
-                    focusChange.block = False
-
-                    await focusChange.trigger(self.ctx, old, self)
-                    self.ctx.focused = self
-
-                act = fn()
-
+            await focusChange.trigger(self.ctx, old, self)
         else:
-            wid = self.ctx._root # ? should this be xcb.XCBNone?
-            color = cfg.unfocusedColor
             # if the id of the focused is our id, and only then, we need to unfocus the window,
             # otherwise, if the ids arent the same, then we are already unfocused
             if self.ctx.focused and self.ctx.focused.id == self.id:
-                act = focusChange.trigger(self.ctx, self, None)
+                await focusChange.trigger(self.ctx, self, None)
                 self.ctx.focused = None
-                # print(f'unfocus on {self.id} with {color}')
+                wid = self.ctx._root
 
-        # ? maybe expose this to a separate function?
-        xcb.xcbChangeWindowAttributesChecked(
-            self.ctx.connection, self.id, xcb.XCBCwBorderPixel, uintarr([color])
-        )
-
-        if act:
-            await act
+        if not wid:
+            return
 
         xcb.xcbSetInputFocus(
             self.ctx.connection,
@@ -152,6 +141,7 @@ class Window(GWindow):
         # no waiting to do here :)
         # ? should we wait for focusin/out??
 
+    @calock
     async def configure(
         self,
         newX: int | None = None,
@@ -159,7 +149,7 @@ class Window(GWindow):
         newWidth: int | None = None,
         newHeight: int | None = None,
         newBorderWidth: int | None = None,
-#        newStackMode: int | None = None # TODO: should we have this?
+        #        newStackMode: int | None = None # TODO: should we have this?
     ):
         compare = {
             (newX, 'x'): xcb.XCBConfigWindowX,
@@ -167,8 +157,8 @@ class Window(GWindow):
             (newWidth, 'width'): xcb.XCBConfigWindowWidth,
             (newHeight, 'height'): xcb.XCBConfigWindowHeight,
             (newBorderWidth, 'borderWidth'): xcb.XCBConfigWindowBorderWidth,
-#            (newSibling, 'sibling'): xcb.XCBConfigWindowSibling, # TODO: what and how
-#            (newStackMode, 'stackMode'): xcb.XCBConfigWindowStackMode,
+            #            (newSibling, 'sibling'): xcb.XCBConfigWindowSibling, # TODO: what and how
+            #            (newStackMode, 'stackMode'): xcb.XCBConfigWindowStackMode,
         }
 
         vals = []
@@ -200,67 +190,127 @@ class Window(GWindow):
         fn()
         xcb.xcbFlush(self.ctx.connection)
 
-        log('windows', DEBUG, f'configured {self} with x={newX or self.x}, y={newY or self.y}, w={newWidth or self.width}, h={newHeight or self.height}, border width={newBorderWidth or self.borderWidth}')
+        log(
+            'windows',
+            DEBUG,
+            f'configured {self} with x={newX or self.x}, y={newY or self.y}, w={newWidth or self.width}, h={newHeight or self.height}, border width={newBorderWidth or self.borderWidth}',
+        )
 
+    # TODO: what are we missing here
     #        await runAndWait(self.ctx, [self.configureNotify], fn)
 
+    async def setBorderColor(self, color: int):
+        xcb.xcbChangeWindowAttributesChecked(
+            self.ctx.connection, self.id, xcb.XCBCwBorderPixel, uintarr([color])
+        )
+
+        xcb.xcbFlush(self.ctx.connection)
+
     async def toTop(self):
-        xcb.xcbConfigureWindow(self.ctx.connection, self.id, xcb.XCBConfigWindowStackMode, uintarr([xcb.XCBStackModeAbove]))
+        xcb.xcbConfigureWindow(
+            self.ctx.connection,
+            self.id,
+            xcb.XCBConfigWindowStackMode,
+            uintarr([xcb.XCBStackModeAbove]),
+        )
 
     async def toBottom(self):
-        xcb.xcbConfigureWindow(self.ctx.connection, self.id, xcb.XCBConfigWindowStackMode, uintarr([xcb.XCBStackModeBelow]))
+        xcb.xcbConfigureWindow(
+            self.ctx.connection,
+            self.id,
+            xcb.XCBConfigWindowStackMode,
+            uintarr([xcb.XCBStackModeBelow]),
+        )
 
     async def close(self):
         fn = partial(xcb.xcbDestroyWindow, self.ctx.connection, self.id)
 
         await runAndWait(self.ctx, [self.destroyNotify, self.leaveNotify], fn)
-        
+
         log('windows', DEBUG, f'closed {self}')
 
-    async def screenshot(self, x:int=0, y:int=0, width:int|None=None, height:int|None=None) -> np.ndarray:
+    async def screenshot(
+        self,
+        x: int = 0,
+        y: int = 0,
+        width: int | None = None,
+        height: int | None = None,
+    ) -> np.ndarray:
         width = width or self.width
         height = height or self.height
-        useShm = self.ctx.gctx.avail('MIT-SHM') # type: ignore
+        useShm = self.ctx.gctx.avail('MIT-SHM')  # type: ignore
 
         if useShm:
-            shm = xcb.createShm(self.ctx.connection, height*width*4) # TODO: get the *actual* depth here
+            shm = xcb.createShm(
+                self.ctx.connection, height * width * 4
+            )  # TODO: get the *actual* depth here
 
             resp = xcb.xcbShmGetImageReply(
                 self.ctx.connection,
-                xcb.xcbShmGetImageUnchecked(self.ctx.connection, self.id, x, y, width, height, maxUVal('int'), xcb.XCBImageFormatZPixmap, shm.id, 0),
-                xcb.NULL
+                xcb.xcbShmGetImageUnchecked(
+                    self.ctx.connection,
+                    self.id,
+                    x,
+                    y,
+                    width,
+                    height,
+                    maxUVal('int'),
+                    xcb.XCBImageFormatZPixmap,
+                    shm.id,
+                    0,
+                ),
+                xcb.NULL,
             )
 
-            depth = resp.size//(width*height) # TODO: i know you can do this better lol
+            depth = resp.size // (
+                width * height
+            )  # TODO: i know you can do this better lol
 
             out = ffi.buffer(shm.addr, resp.size)
         else:
             resp = xcb.xcbGetImageReply(
                 self.ctx.connection,
-                xcb.xcbGetImage(self.ctx.connection, xcb.XCBImageFormatZPixmap, self.id, x, y, width, height, maxUVal('int')),
-                xcb.NULL
+                xcb.xcbGetImage(
+                    self.ctx.connection,
+                    xcb.XCBImageFormatZPixmap,
+                    self.id,
+                    x,
+                    y,
+                    width,
+                    height,
+                    maxUVal('int'),
+                ),
+                xcb.NULL,
             )
 
             dat = xcb.xcbGetImageData(resp)
 
-            depth: int = xcb.xcbGetImageDataLength(resp)//(width*height) # TODO: same as above here
+            depth: int = xcb.xcbGetImageDataLength(resp) // (
+                width * height
+            )  # TODO: same as above here
 
-            out = ffi.buffer(dat, width*height*depth)
+            out = ffi.buffer(dat, width * height * depth)
 
         out: np.ndarray = np.frombuffer(out, np.uint8)
         if useShm:
-            out = out.copy() # if this isnt here, we get a segfault loool
+            out = out.copy()  # if this isnt here, we get a segfault loool
             # i think this happens because numpy tries to reference the, now freed, memory
             # (probably because memcpy-ing before doing anything is slower lol)
             xcb.removeShm(self.ctx.connection, shm)
         out = out.reshape((height, width, depth))
         return out
 
+    async def reparent(self, parent: 'Window', x: int, y: int):
+        fn = partial(
+            xcb.xcbReparentWindow, self.ctx.connection, self.id, parent.id, x, y
+        )
+
+        await runAndWait(self.ctx, [reparent], fn)
 
     async def kill(self):
         # the nuclear option
         # ? should we wait for something here lol?
         xcb.xcbKillClient(self.ctx.connection, self.id)
         xcb.xcbFlush(self.ctx.connection)
-        
+
         log('windows', DEBUG, f'killed {self}')

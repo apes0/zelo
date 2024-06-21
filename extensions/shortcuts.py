@@ -102,3 +102,13 @@ class Shortcuts(Extension):
 
     def conf(self, cfg: dict):
         self.shortcuts = {**self.shortcuts, **cfg['shortcuts']}
+
+    def unloader(self):
+        for keys, mod in self.shortcuts:
+            key: 'GKey'
+            for key in keys:
+                key.ungrab(self.ctx, self.ctx.root, Mod('any'))
+
+            self.shortcuts = {}
+            self._shortcuts = {}
+            self.keys = []

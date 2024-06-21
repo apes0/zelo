@@ -4,10 +4,12 @@ from ..base import Base
 
 
 def maxUVal(t: str):
-    return (1<<(ffi.sizeof(t)*8)) - 1
+    return (1 << (ffi.sizeof(t) * 8)) - 1
+
 
 def maxVal(t: str):
-    return (1<<(ffi.sizeof(t)*8 - 1)) - 1
+    return (1 << (ffi.sizeof(t) * 8 - 1)) - 1
+
 
 class FFIType:
     def __init__(self, _type) -> None:
@@ -56,6 +58,7 @@ motionNotifyTC = Caster('xcb_motion_notify_event_t*')
 mapNotifyTC = Caster('xcb_map_notify_event_t *')
 unmapNotifyTC = Caster('xcb_unmap_notify_event_t *')
 ExposeTC = Caster('xcb_expose_event_t *')
+ReparentNotifyTC = Caster('xcb_reparent_notify_event_t *')
 # requests
 atomNameRequestTC = Caster('xcb_get_atom_name_request_t *')
 genericErrorTC = Caster('xcb_generic_error_t*')

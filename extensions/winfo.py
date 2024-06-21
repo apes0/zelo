@@ -14,11 +14,11 @@ if TYPE_CHECKING:
 
 class Winfo(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
-        self.upd = 1/60
+        self.upd = 1 / 60
         self.win = ctx.createWindow(1, 1, 1, 1, 5, ignore=True)
         self.following = False
         self.font = 'Ubuntu 20'
-        self.fore = 0xffffff
+        self.fore = 0xFFFFFF
         self.back = 0
         self.xoff = 10
         self.yoff = 10
@@ -34,14 +34,16 @@ class Winfo(Extension):
         self.addListener(self.win.redraw, self.redraw)
 
     async def enter(self, win: 'GWindow'):
-        self.text.set(f'''id: {win.id}
+        self.text.set(
+            f'''id: {win.id}
 focused: {win.focused}
 ignore: {win.ignore}
 destroyed: {win.destroyed}
 mapped: {win.mapped}
 mine: {win.mine}
 parent: {win.parent}
-x: {win.x} y: {win.y} w: {win.width} h: {win.height}''')
+x: {win.x} y: {win.y} w: {win.width} h: {win.height}'''
+        )
         self.text.draw()
         await self.win.configure(newWidth=self.text.width, newHeight=self.text.height)
         await self.win.map()

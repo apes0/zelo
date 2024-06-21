@@ -8,6 +8,8 @@ from .types import intarr
 from .screen import Display, Screen
 from .keys import Mod, Key
 from .types import chararr
+from ...debcfg import log
+from logging import DEBUG
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
@@ -16,8 +18,10 @@ if TYPE_CHECKING:
 
 initers = []
 
+
 def init(fn):
     initers.append(fn)
+
 
 class Connection(GConnection):
     def __init__(self, ctx: 'Ctx') -> None:
@@ -50,18 +54,15 @@ def initScreens(ctx: 'Ctx'):
         for n in range(screenRes.numCrtcs)
     ]
 
-    crtcs = [
-        xcb.xcbRandrGetCrtcInfoReply(conn, req, xcb.NULL) for req in requests
-    ]
+    crtcs = [xcb.xcbRandrGetCrtcInfoReply(conn, req, xcb.NULL) for req in requests]
 
     for crtc in crtcs:
         if crtc == xcb.NULL or (crtc.width + crtc.height) == 0:
             continue
         ctx.screen.displays.append(Display(crtc.x, crtc.y, crtc.width, crtc.height))
-    
-    xcb.xcbRandrSelectInput(
-        conn, ctx._root, xcb.XCBRandrNotifyMaskScreenChange
-    )
+
+    xcb.xcbRandrSelectInput(conn, ctx._root, xcb.XCBRandrNotifyMaskScreenChange)
+
 
 @init
 def initWindows(ctx: 'Ctx'):
@@ -83,9 +84,7 @@ def initWindows(ctx: 'Ctx'):
     xcb.xcbUngrabKey(conn, xcb.XCBGrabAny, ctx._root, xcb.XCBModMaskAny)
 
     # TODO: get x, y, border width, width, height here
-    req = xcb.xcbQueryTreeReply(
-        conn, xcb.xcbQueryTree(conn, ctx._root), xcb.NULL
-    )
+    req = xcb.xcbQueryTreeReply(conn, xcb.xcbQueryTree(conn, ctx._root), xcb.NULL)
     win = xcb.xcbQueryTreeChildren(req)
     requests = {
         win[n]: (
@@ -120,9 +119,11 @@ def initWindows(ctx: 'Ctx'):
 
     xcb.xcbFlush(conn)
 
+
 @init
 def initMouse(ctx: 'Ctx'):
-        ctx.mouse = Mouse(ctx)
+    ctx.mouse = Mouse(ctx)
+
 
 @init
 def initModMap(ctx: 'Ctx'):
@@ -144,9 +145,11 @@ def initModMap(ctx: 'Ctx'):
                 key,
             ]
 
+
 @init
 def initSyms(ctx: 'Ctx'):
     Key.syms = xcb.xcbKeySymbolsAlloc(ctx.connection)
+
 
 # list of all extensions i had on my x server (via ``xdpyinfo -display :1 -queryExtensions``):
 # BIG-REQUESTS  (opcode: 133)
@@ -181,6 +184,7 @@ def initSyms(ctx: 'Ctx'):
 # XTEST  (opcode: 132)
 # XVideo  (opcode: 151, base event: 93, base error: 155)
 
+
 @init
 def extensions(ctx: 'Ctx'):
     ctx.gctx = cast('GCtx', ctx.gctx)
@@ -188,27 +192,27 @@ def extensions(ctx: 'Ctx'):
     names = ['RANDR', 'MIT-SHM', 'XTEST']
 
     for name in names:
-        reqs[name] = xcb.xcbQueryExtensionUnchecked(ctx.connection, len(name), chararr(name.encode()))
-
-    for name, req in reqs.items():
-        rep = xcb.xcbQueryExtensionReply(
-            ctx.connection,
-            req,
-            xcb.NULL
+        reqs[name] = xcb.xcbQueryExtensionUnchecked(
+            ctx.connection, len(name), chararr(name.encode())
         )
 
+    for name, req in reqs.items():
+        rep = xcb.xcbQueryExtensionReply(ctx.connection, req, xcb.NULL)
+
         ctx.gctx.extResps[name] = rep
+        log('backend', DEBUG, f'{name} is {"not "*(not rep.present)}present')
+
 
 @init
 def shm(ctx: 'Ctx'):
     ctx.gctx = cast('GCtx', ctx.gctx)
     if not ctx.gctx.avail('MIT-SHM'):
         return
-  
+
     rep = xcb.xcbShmQueryVersionReply(
-        ctx.connection,
-        xcb.xcbShmQueryVersion(ctx.connection),
-        xcb.NULL
+        ctx.connection, xcb.xcbShmQueryVersion(ctx.connection), xcb.NULL
     )
 
     ctx.gctx.sharedPixmaps = bool(rep.sharedPixmaps)
+
+    log('backend', DEBUG, f'shared pixmaps are {"not "*(not rep.sharedPixmaps)}present')

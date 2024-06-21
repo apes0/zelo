@@ -7,6 +7,7 @@ from .. import xcb
 from .types import (
     intp,
     uintarr,
+    charpp,
     createNotifyTC,
     mapRequestTC,
     confRequestTC,
@@ -23,19 +24,19 @@ from .types import (
     randrNotifyTC,
     ExposeTC,
     xcbErrorContext,
-    charpp,
+    ReparentNotifyTC,
 )
-from lib.cfg import cfg
 from .connection import Connection
 from typing import TYPE_CHECKING
 from .. import events
 from .gctx import Ctx as GCtx
-from ...watcher import watch
+import trio
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
     from lib.backends.generic import GConnection, GWindow
 
+# TODO: event handlers for extension events?
 # TODO: log on 'windows' log as well
 # this is mainly based on this code: https://github.com/mcpcpc/xwm/blob/main/xwm.c
 
@@ -57,14 +58,14 @@ async def createNotify(event, ctx: 'Ctx'):
     ignore = bool(event.overrideRedirect)
 
     window.ignore = ignore
-    if not ignore: # if we follow configureNotify, we should follow this?
+    if not ignore:  # if we follow configureNotify, we should follow this?
         await window.configure(
             newX=max(0, event.x),
             newY=max(0, event.y),
             newHeight=event.height,
             newWidth=event.width,
             newBorderWidth=event.borderWidth,
-    )
+        )
 
     await window.createNotify.trigger(ctx)
     await events.createNotify.trigger(ctx, window)
@@ -96,7 +97,7 @@ async def confRequest(event, ctx: 'Ctx'):
     window = ctx.getWindow(event.window)
 
     log('backend', DEBUG, f'{window} sent a configure request')
-    
+
     valueMask = event.valueMask
     change = []
     for mask, (value, lable) in {
@@ -145,7 +146,7 @@ async def confNotify(event, ctx: 'Ctx'):
     }
     for val, lable in change.items():
         window.__dict__[lable] = val
-    
+
     await window.configureNotify.trigger(ctx)
     await events.configureNotify.trigger(ctx, window)
 
@@ -255,7 +256,7 @@ async def motionNotify(event, ctx: 'Ctx'):
 @handler(0)
 async def error(event, ctx: 'Ctx'):
     event = xcb.XcbGenericErrorT(genericErrorTC(event))
-    
+
     _errCtx = xcbErrorContext()
     xcb.xcbErrorsContextNew(ctx.connection, _errCtx)
     errCtx = _errCtx[0]
@@ -265,7 +266,7 @@ async def error(event, ctx: 'Ctx'):
     minor = xcb.xcbErrorsGetNameForMinorCode(errCtx, event.majorCode, event.minorCode)
     error = xcb.xcbErrorsGetNameForError(errCtx, event.errorCode, extension)
     xcb.xcbErrorsContextFree(errCtx)
-    
+
     def toStr(obj):
         if obj == xcb.NULL:
             return 'NULL'
@@ -273,14 +274,16 @@ async def error(event, ctx: 'Ctx'):
         out = ''
         i = 0
 
-        while (ch := obj[i][0]):
+        while ch := obj[i][0]:
             out += chr(ch)
             i += 1
-        
+
         return out
-    
-    log('errors', ERROR,
-        f'{toStr(error)}: {toStr(extension[0])}, {toStr(major)}: {toStr(minor)} for resource {event.resourceId}'
+
+    log(
+        'errors',
+        ERROR,
+        f'{toStr(error)}: {toStr(extension[0])}, {toStr(major)}: {toStr(minor)} for resource {event.resourceId}',
     )
 
 
@@ -363,7 +366,19 @@ async def randrNotify(event, ctx: 'Ctx'):
     event = randrNotifyTC(event)  # TODO: typing
 
 
+# TODO: impl this shit lol
 #    print(event.responseType, event.subCode)
+
+
+@handler(xcb.XCBReparentNotify)
+async def reparentNotify(event, ctx: 'Ctx'):
+    ev = xcb.XcbReparentNotifyEventT(ReparentNotifyTC(event))
+
+    win = ctx.getWindow(ev.window)
+    parent = ctx.getWindow(ev.parent)
+
+    await win.reparented.trigger(ctx, parent)
+    await events.reparent.trigger(ctx, win, parent)
 
 
 @handler(xcb.XCBExpose)
@@ -390,10 +405,11 @@ ignore = [9, 10, 14, 89]  # list of events to ignore
 
 # TODO: verify this info (this will forever be here)
 
+
 # TODO: support event 34 (XCB_MAPPING_NOTIFY)
-async def setup(ctx: 'Ctx'):
+async def setup(ctx: 'Ctx', task_status: trio._core._run._TaskStatus):
     # this is, in practice, the init function for the ctx
-    ctx.dname = xcb.NULL
+    ctx.dname = ctx.dname if hasattr(ctx, 'dname') else xcb.NULL
     ctx.screenp = intp(0)
     ctx.gctx = GCtx(ctx)
 
@@ -401,13 +417,14 @@ async def setup(ctx: 'Ctx'):
         ctx
     )  # TODO: put this in the ctx and rename the current ``connection``
 
-    ctx.cfg = cfg
-    setupExtensions(ctx, cfg.extensions)
+    setupExtensions(ctx, ctx.cfg.extensions)
 
     async def _update():
         await update(ctx, conn)
 
-    watch(xcb.xcbGetFileDescriptor(ctx.connection), _update)
+    ctx.watcher.watch(xcb.xcbGetFileDescriptor(ctx.connection), _update)
+
+    task_status.started()
 
 
 async def update(ctx: 'Ctx', conn: 'GConnection'):

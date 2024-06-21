@@ -1,5 +1,5 @@
 from ..utils import checkWin, randFocus
-from ..tester import Shared, test
+from ..tester import test
 from ..pres import startX, openWins, startWm
 
 from lib._cfg import Cfg
@@ -8,13 +8,10 @@ from extensions.tiler import Tiler
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..tester import Test
     from lib.ctx import Ctx
+    from ..ctx import Ctx as TCtx
 
 cfg = Cfg()
-
-cfg.focusedColor = 0xaaaaaa
-cfg.unfocusedColor = 0x444444
 
 cfg.extensions = {
     Tiler: {
@@ -24,83 +21,65 @@ cfg.extensions = {
     },
 }
 
-defShared = Shared([startX, startWm(cfg), openWins])
+suit = 'x11/tiler'
 
-@defShared
-@test('opened == focused?', [])
-async def OpeningWinsFocusesThem(test: 'Test'):
-    ctx: 'Ctx' = test.pres[0].data[1]
+
+@test('opened == focused?', [startX, startWm(cfg), openWins], suit)
+async def OpeningWinsFocusesThem(tctx: 'TCtx'):
+    ctx: 'Ctx' = tctx.pres[1].data
 
     await randFocus(ctx)
 
     assert ctx.focused != None, 'there must be a focused window'
 
 
-@defShared
-@test('focused == main?', [])
-async def focusedIsMain(test: 'Test'):
-    ctx: 'Ctx' = test.pres[0].data[1]
+@test('focused == main?', [startX, startWm(cfg), openWins], suit)
+async def focusedIsMain(tctx: 'TCtx'):
+    ctx: 'Ctx' = tctx.pres[1].data
 
     assert ctx.focused != None, 'there must be a focused window'
-    assert checkWin(ctx.focused, 10, 10, 370, 370), 'The window is not the right size'
+    assert checkWin(ctx.focused, 10, 10, 378, 378), 'The window is not the right size'
 
     win = await randFocus(ctx)
 
     assert ctx.focused.id == win.id, 'setFocus doesn\'t work'
-    assert checkWin(ctx.focused, 10, 10, 370, 370), 'The window is not the right size'
+    assert checkWin(ctx.focused, 10, 10, 378, 378), 'The window is not the right size'
 
-@defShared
-@test('are side windows correct?', [])
-async def checkSideWins(test: 'Test'):
-    ctx: 'Ctx' = test.pres[0].data[1]
+
+@test('side windows correct?', [startX, startWm(cfg), openWins], suit)
+async def checkSideWins(tctx: 'TCtx'):
+    ctx: 'Ctx' = tctx.pres[1].data
 
     await randFocus(ctx)
 
     for win in ctx.windows.values():
+        if not ctx.editable(win):
+            continue
+
         if not win.focused:
             # TODO: check more here
             assert win.x == 400, 'Side window has a wrong size'
 
-bigBorders = Cfg()
-
-bigBorders.focusedColor = cfg.focusedColor
-bigBorders.unfocusedColor = cfg.unfocusedColor
-
-border = 20
-
-bigBorders.extensions = {
-    Tiler: {
-        'mainSize': 2/3,
-        'border': border,
-        'spacing': 5
-    }
-}
-
-bigShared = Shared([startX, startWm(bigBorders), openWins])
-
-@bigShared
-@test('border size works?', [])
-async def bigBorder(test: 'Test'):
-    ctx: 'Ctx' = test.pres[0].data[1]
-
-    await randFocus(ctx)
-
-    for win in ctx.windows.values():
-        assert win.borderWidth == border, 'Border size is incorrect'
 
 bigSpacing = Cfg()
 
-bigSpacing.focusedColor = cfg.focusedColor
-bigSpacing.unfocusedColor = cfg.unfocusedColor
-
 spacing = 20
 
-bigSpacing.extensions = {
-    Tiler: {
-        'mainSize': 2/3,
-        'border': 5,
-        'spacing': spacing
-    }
-}
+bigSpacing.extensions = {Tiler: {'mainSize': 2 / 3, 'border': 5, 'spacing': spacing}}
 
 # TODO: check big spacing
+
+
+@test('spacing works?', [startX, startWm(bigSpacing), openWins], suit)
+async def _bigSpacing(tctx: 'TCtx'):
+    ctx: 'Ctx' = tctx.pres[1].data
+
+    await randFocus(ctx)
+    assert ctx.focused, 'No focused window'
+    checkWin(ctx.focused, 20, 20, 350, 350)
+
+    for win in ctx.windows.values():
+        if not ctx.editable(win) or win.id == ctx.focused.id:
+            continue
+
+        checkWin(win, 400, None, 170, None)

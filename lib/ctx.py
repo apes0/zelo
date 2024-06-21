@@ -2,6 +2,8 @@ from typing import TYPE_CHECKING, Any
 
 import trio
 
+from lib.watcher import Watcher
+
 from .api.window import Window
 
 if TYPE_CHECKING:
@@ -22,6 +24,7 @@ class Ctx:
         self.values: CData
         self.gctx: GCtx
         self.windows: dict[int, GWindow] = {}
+        self.watcher = Watcher(self)
         self.focused: GWindow | None = None
         self.mouse: GMouse
         self.extensions: dict[type, Extension] = {}  # list of loaded extensions
@@ -48,11 +51,11 @@ class Ctx:
             ev.set()
             args.extend(_args)
 
-        event.addListener(finish)
+        event.addListener(self, finish)
 
         await ev.wait()
 
-        event.removeListener(finish)
+        event.removeListener(self, finish)
 
         return args
 
@@ -71,3 +74,11 @@ class Ctx:
         win = self.gctx.createWindow(x, y, width, height, borderWidth, parent, ignore)
         self.windows[win.id] = win
         return win
+
+    def editable(self, win: 'GWindow') -> bool:
+        # tells us if we can touch a window
+        # NOTE: we can always do shit to windows, but this basically checks if we should
+        if win.ignore or not win.mapped or win.id == self._root or win.destroyed or win.id not in self.windows:
+            return False
+
+        return True

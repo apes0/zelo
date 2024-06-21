@@ -913,6 +913,18 @@ typedef struct xcb_shm_query_version_reply_t {
     unsigned char  pixmap_format;
     unsigned char  pad0[15];
 } xcb_shm_query_version_reply_t;
+typedef struct xcb_reparent_notify_event_t {
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    xcb_window_t event;
+    xcb_window_t window;
+    xcb_window_t parent;
+    short x;
+    short y;
+    unsigned char override_redirect;
+    unsigned char pad1[3];
+} xcb_reparent_notify_event_t;
 
 // custom from source:
 
@@ -1015,6 +1027,7 @@ xcb_query_extension_cookie_t xcb_query_extension_unchecked(xcb_connection_t *con
 xcb_query_extension_reply_t *xcb_query_extension_reply(xcb_connection_t *conn, xcb_query_extension_cookie_t cookie, xcb_generic_error_t **e);
 xcb_shm_query_version_cookie_t xcb_shm_query_version(xcb_connection_t *c);
 xcb_shm_query_version_reply_t *xcb_shm_query_version_reply(xcb_connection_t *c, xcb_shm_query_version_cookie_t cookie, xcb_generic_error_t **e);
+xcb_void_cookie_t xcb_reparent_window(xcb_connection_t *conn, xcb_window_t window, xcb_window_t parent, unsigned short x, unsigned short y);
 
 // custom from source:
 
@@ -1023,7 +1036,6 @@ void remove_shm(xcb_connection_t *c, xcb_shm shm);
 
 // weird values
 
-unsigned int XCB_GRAB_ANY = 0;
 unsigned int XCB_GRAB_MODE_ASYNC = 1;
 unsigned int XCB_NONE = 0;
 unsigned int XCB_GRAB_ANY = 0; // just for testing the keyboard :)

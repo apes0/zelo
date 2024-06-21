@@ -1,0 +1,7 @@
+cffi
+opencv-python
+trio
+junit-xml
+dbus-python
+cryptography
+coverage

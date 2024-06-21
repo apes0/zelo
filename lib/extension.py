@@ -13,11 +13,13 @@ if TYPE_CHECKING:
 # TODO: export what types of variables can be editted
 # FIXME: some extensions cannot be reused for some reason?
 
+
 class Extension:
     def __init__(self, ctx: 'Ctx', cfg: dict, resolve={}) -> None:
         self.ctx = ctx
         self.listeners = []
         self.resolve = resolve
+        self.unloaded = False
         self.conf(cfg)
 
     def conf(self, cfg: dict):
@@ -28,14 +30,23 @@ class Extension:
                 self.__dict__[lable] = get(obj, self, lable, _type)
 
     def addListener(self, event: Event, fn: Callable):
-        event.addListener(fn)
+        event.addListener(self.ctx, fn)
         self.listeners.append((event, fn))
-    
-    def unload(self): # ? should this be async?
+
+    def unload(self):  # ? should this be async?
+        if self.unloaded:
+            return
+
+        self.unloaded = True
         event: Event
-        for (event, fn) in self.listeners:
-            event.removeListener(fn)
-        #? anything else here?
+        for event, fn in self.listeners:
+            event.removeListener(self.ctx, fn)
+
+        self.unloader()
+        # ? anything else here?
+
+    def unloader(self):
+        pass  # the way to add custom unloading code
 
 
 def setupExtensions(ctx: 'Ctx', extensions: dict):
@@ -53,7 +64,9 @@ def unloadExtensions(ctx: 'Ctx'):
     for extension in ctx.extensions.values():
         extension.unload()
 
+
 def single(ext: type[Extension]) -> Extension:
+    # TODO: make this be single for the ctx
     class New(Extension):
         def __init__(self) -> None:
             self.ext = None

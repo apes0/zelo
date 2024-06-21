@@ -5,41 +5,60 @@ import os
 
 if TYPE_CHECKING:
     from lib.backends.generic import GWindow
+    from lib.ctx import Ctx
 
 
-def checkWin(win: 'GWindow', x: int, y: int, w: int, h: int):
-    return win.x == x and win.y == y and win.width == w and win.height == h
+def checkWin(
+    win: 'GWindow', x: int | None, y: int | None, w: int | None, h: int | None
+):
+    return (
+        (win.x == x) * bool(x)
+        and (win.y == y) * bool(y)
+        and (win.width == w) * bool(y)
+        and (win.height == h) * bool(h)
+    )
 
-async def randFocus(ctx):
-    unfocused = ctx.windows.copy()
-    assert unfocused, 'no windows to focus'
 
-    if ctx.focused and ctx.focused.id in unfocused:
-        del unfocused[ctx.focused.id]
+async def randFocus(ctx: 'Ctx'):
+    wins = [win for win in ctx.windows.values() if ctx.editable(win)]
 
-    win = random.choice(list(unfocused.values()))
+    assert wins, 'no windows to focus'
+
+    win = random.choice(wins)
 
     await win.setFocus(True)
     await trio.sleep(2)
 
     return win
 
-async def popen(nurs: trio.Nursery, proc: str) -> trio.Process:
-    async def fn(task_status) -> None:
 
-        async with await trio.open_file(os.devnull) as dn:
+async def popen(nurs: trio.Nursery, cmd: str, env: dict | None = None) -> trio.Process:
+    dn = await trio.open_file(os.devnull)
+
+    async def fn(task_status):
+        try:
             await trio.run_process(
-                proc.split(' '),
+                cmd.split(' '),
                 task_status=task_status,
                 check=False,
-                stdout=dn,
-                stderr=dn,
+                stdout=dn, # thank fuck for these
+                stderr=dn, # thank fuck for these
+                env=env,
             )
+        except BaseException:
+            return
 
-    return await nurs.start(fn)
+    proc: trio.Process = await nurs.start(fn)
+
+    await dn.aclose()
+
+    return proc
 
 
 async def pclose(proc: trio.Process):
+    if proc.poll() is not None:
+        return
+
     proc.terminate()
     with trio.move_on_after(2):
         await proc.wait()

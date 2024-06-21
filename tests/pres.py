@@ -1,11 +1,13 @@
 from typing import Callable, Any
 import os
 import trio
-from lib import watcher
 from lib.ctx import Ctx
+from lib.lock import alock
+from .ctx import Ctx as TCtx
+from lib.backends.x11.types import chararr
 from lib.backends.ffi import load
 from utils.fns import stop
-from lib.cfg import cfg
+from lib._cfg import Cfg
 import random
 from .utils import popen, pclose
 
@@ -20,20 +22,20 @@ class Pre:
         self.args: tuple = ()
         self.data: Any
 
-    async def run(self, nurs: trio.Nursery):
+    async def run(self, ctx: TCtx):
         done = trio.Event()
-        await self.start(self, nurs, done)
+        await self.start(self, ctx, done)
         await done.wait()
 
-    async def stop(self, nurs: trio.Nursery):
+    async def stop(self, ctx: TCtx):
         done = trio.Event()
-        await self.end(self, nurs, done)
+        await self.end(self, ctx, done)
         await done.wait()
 
     def __call__(self, *args: Any) -> Any:
         new = Pre(self.lable, self.start)
         new.end = self.end
-        new.args = args
+        new.args = args or self.args
         return new
 
 
@@ -50,50 +52,77 @@ def preEnd(pre: Pre):
 
     return deco
 
-
 @pre('X11')
-async def startX(pre: Pre, nurs: trio.Nursery, done: trio.Event):
-    new: str = ':' + str(int(os.environ["DISPLAY"][1:]) + 1)
+@alock
+async def startX(pre: Pre, ctx: TCtx, done: trio.Event):
+    i = int(ctx.env['DISPLAY'][1:])
+    xdir = os.listdir('/tmp/.X11-unix')
+
+    while True:
+        if f'X{i}' not in xdir:
+            new = f':{i}'
+            break
+        i += 1
 
     proc: trio.Process = await popen(
-        nurs, f'Xephyr +extension RANDR +xinerama -ac -br -screen 600x400 {new}'
+        ctx.nurs, f'Xephyr +extension RANDR +xinerama -ac -br -screen 600x400 {new}'
     )
     pre.data = proc
 
-    await trio.sleep(2)
+    for _ in range(20):
+        await trio.sleep(0.1) # i think xrefresh makes a lock????
+        p = await popen(ctx.nurs, f'xrefresh -d {new}')
+        if await p.wait():
+            await pclose(p)
+            break
 
-    assert proc.poll() == None, 'Something went wrong with Xephyr'
+        await pclose(p)
 
-    os.environ['DISPLAY'] = new
+    assert (proc.poll() == None), f'Something went wrong with Xephyr (returned {proc.poll()} on display {i})'
+
+    ctx.env['DISPLAY'] = new
     done.set()
 
 
 @preEnd(startX)
-async def endX(pre: Pre, nurs: trio.Nursery, done: trio.Event):
+async def endX(pre: Pre, ctx: TCtx, done: trio.Event):
     await pclose(pre.data)
-    await trio.sleep(1)
-    os.environ['DISPLAY'] = ':' + str(int(os.environ["DISPLAY"][1:]) - 1)
+    for _ in range(20):
+        p = await popen(ctx.nurs, f'xrefresh', ctx.env)
+        if await p.wait():
+            await pclose(p)
+            break
+
+        await pclose(p)
+        await trio.sleep(0.1)
     done.set()
 
 
 @pre('Windows')
-async def openWins(pre: Pre, nurs: trio.Nursery, done: trio.Event):
+async def openWins(pre: Pre, ctx: TCtx, done: trio.Event):
     procs: list[trio.Process] = [
-        await popen(nurs, random.choice(['xeyes', 'xclock', 'xterm']))
-        for i in range(random.randint(3, 10))
+        await popen(
+            ctx.nurs,
+            random.choice(['xclock', 'xterm', 'xedit', 'xbiff', 'xlogo']),
+            ctx.env,
+        )
+        # oclock and xeyes remove borders :P
+        # xman fails on the automated tests bc no man pages
+        for _ in range(random.randint(3, 10))
     ]
+
     pre.data = procs
 
     await trio.sleep(1)
 
-    died: list[int | None] = [procs[0].poll()]
-    assert not any(died), 'A proccess died'
+    died: list[int | None] = [proc.poll() for proc in procs]
+    assert not any(died), f'A proccess died (return codes are: {died})'
 
     done.set()
 
 
 @preEnd(openWins)
-async def killWins(pre: Pre, nurs: trio.Nursery, done: trio.Event):
+async def killWins(pre: Pre, ctx: TCtx, done: trio.Event):
     for proc in pre.data:
         await pclose(proc)
 
@@ -101,25 +130,27 @@ async def killWins(pre: Pre, nurs: trio.Nursery, done: trio.Event):
 
 
 @pre('Wm')
-async def startWm(pre: Pre, nurs: trio.Nursery, done: trio.Event):
-    cfg.__dict__ = pre.args[0].__dict__.copy()  # new cfg
-
+@alock
+async def startWm(pre: Pre, tctx: TCtx, done: trio.Event):
     async def main(task_status):
         ctx = Ctx()
         pre.data = ctx
+        cfg = Cfg()
+        cfg.__dict__ = pre.args[0].__dict__.copy()
+        ctx.cfg = cfg
 
         async with trio.open_nursery() as nurs:
             ctx.nurs = nurs
-            nurs.start_soon(watcher.setup, ctx)
-            nurs.start_soon(load('events').setup, ctx)
+            ctx.dname = chararr(tctx.env['DISPLAY'].encode())
+            await nurs.start(load('events').setup, ctx)
+            await nurs.start(ctx.watcher.start, ctx)
             task_status.started()
 
-    await nurs.start(main)
-    await trio.sleep(2)
+    await tctx.nurs.start(main)
     done.set()
 
 
 @preEnd(startWm)
-async def stopWm(pre: Pre, nurs: trio.Nursery, done: trio.Event):
+async def stopWm(pre: Pre, ctx: TCtx, done: trio.Event):
     stop(pre.data)
     done.set()

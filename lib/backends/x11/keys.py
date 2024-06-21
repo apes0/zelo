@@ -42,14 +42,16 @@ class Mod(GMod):
 
 
 class Key(GKey):
-    cache: dict[str, int] = {}
+    cache: dict[str, int] = {
+        'any': xcb.XCBGrabAny
+    }  # we dont need to get the keycode for this lol (infact it breaks it)
     syms: CData
 
     def __init__(self, lable: str | None = None, code: int | None = None) -> None:
         assert lable or code, 'You must have the lable or keycode for a key.'
         if lable:
             self.lable = lable.lower()
-            self.key: int | None = self.__class__.cache.get(lable)
+            self.key: int | None = self.__class__.cache.get(self.lable)
         else:
             self.lable = ''
             self.key = code
@@ -66,7 +68,7 @@ class Key(GKey):
         keysym: int | None = keys.get(self.lable)
 
         assert (
-            keysym
+            keysym is not None
         ), f'No {self.lable} key! (you can check keysyms.py for a list of keys)'
 
         code = xcb.xcbKeySymbolsGetKeycode(syms, keysym)
@@ -78,9 +80,11 @@ class Key(GKey):
         self.__class__.cache[self.lable] = key
         # xcb.xcbKeySymbolsFree(syms)  # ? idk how efficient this is lol
 
-    def grab(self, ctx: 'Ctx', window: GWindow, *modifiers: Mod): # TODO: (un)grab on window
+    def grab(
+        self, ctx: 'Ctx', window: GWindow, *modifiers: Mod
+    ):  # TODO: (un)grab on window
         log('grab', DEBUG, f'grabbing {self} with modifiers {modifiers}')
-        if not self.key:
+        if self.key is None:
             self.load(ctx)
 
         mod = 0
@@ -102,7 +106,7 @@ class Key(GKey):
 
     def ungrab(self, ctx: 'Ctx', window: GWindow, *modifiers: Mod):
         log('grab', DEBUG, f'ungrabbing {self} with modifiers {modifiers}')
-        if not self.key:
+        if self.key is None:
             self.load(ctx)
 
         mod = 0
@@ -115,13 +119,16 @@ class Key(GKey):
 
     def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod, flush: bool = True):
         log('press', DEBUG, f'pressing {self} with modifiers {modifiers}')
-        if not self.key:
+        if self.key is None:
             self.load(ctx)
 
         for mod in modifiers:
-            Key(code=Mod.mappings[mod.mod][0]).press(
-                ctx, window, flush=False
-            )
+            i = 1
+            while mod.mod:  # break down the summed modifier to the basic modifiers
+                if mod.mod % 2:
+                    Key(code=Mod.mappings[i][0]).press(ctx, window, flush=False)
+                mod.mod = mod.mod >> 1
+                i = i << 1
 
         xcb.xcbTestFakeInput(
             ctx.connection,
@@ -141,13 +148,16 @@ class Key(GKey):
         self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod, flush: bool = True
     ):
         log('press', DEBUG, f'releasing {self} with modifiers {modifiers}')
-        if not self.key:
+        if self.key is None:
             self.load(ctx)
 
         for mod in modifiers:
-            Key(code=Mod.mappings[mod.mod][0]).release(
-                ctx, window, flush=False
-            )
+            i = 1
+            while mod.mod:  # break down the summed modifier to the basic modifiers
+                if mod.mod % 2:
+                    Key(code=Mod.mappings[i][0]).release(ctx, window, flush=False)
+                mod.mod = mod.mod >> 1
+                i = i << 1
 
         xcb.xcbTestFakeInput(
             ctx.connection,

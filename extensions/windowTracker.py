@@ -5,7 +5,14 @@ from logging import DEBUG
 from lib.debcfg import log
 from utils.fns import getDisplay
 from lib.extension import Extension
-from lib.backends.events import mapRequest, destroyNotify, focusChange, unmapNotify, mapNotify, configureNotify
+from lib.backends.events import (
+    mapRequest,
+    destroyNotify,
+    focusChange,
+    unmapNotify,
+    mapNotify,
+    configureNotify,
+)
 
 from typing import TYPE_CHECKING, Callable, Coroutine
 
@@ -27,7 +34,6 @@ def track(updateFn: str, custom: list = []):
     return deco
 
 
-
 def perDisplay(ctx: 'Ctx', wins: list['GWindow']):
     out: dict['GDisplay', list['GWindow']] = {}
     for win in wins:
@@ -39,6 +45,7 @@ def perDisplay(ctx: 'Ctx', wins: list['GWindow']):
         out[dpy] = [*out.get(dpy, []), win]
 
     return out
+
 
 def removeAll(l: list['GWindow'], win: 'GWindow'):
     i = 0
@@ -53,6 +60,7 @@ def removeAll(l: list['GWindow'], win: 'GWindow'):
 
 UpdateType = Callable[[list['GWindow']], Coroutine]
 
+
 class Tracker:
     def __init__(
         self,
@@ -61,13 +69,13 @@ class Tracker:
         updateFn: str,
         args: dict,
         customEvents: list['Event'],
-        ext: Extension, # a hack to make the tracker destroyable lol
+        ext: Extension,  # a hack to make the tracker destroyable lol
     ):
         self.ctx: 'Ctx' = ctx
         self.exts: dict[GDisplay, Extension] = {}
         self.updates: dict[GDisplay, UpdateType] = {}
         self.focusQueue: list[GWindow] = [
-            win for win in ctx.windows.values() if win.mapped and not win.ignore
+            win for win in ctx.windows.values() if ctx.editable(win)
         ]
 
         ext.addListener(mapRequest, self.mapWindow)
@@ -87,12 +95,16 @@ class Tracker:
 
     async def findFocus(self):
         # just having a focused win is not enough here!!
-        if self.ctx.focused and self.ctx.focused.mapped and not self.ctx.focused.destroyed:
+        if (
+            self.ctx.focused
+            and self.ctx.focused.mapped
+            and not self.ctx.focused.destroyed
+        ):
             await self.update()
             return
 
         for win in self.focusQueue:
-            if not win.ignore and not win.focused and win.mapped:
+            if self.ctx.editable(win) and not win.focused:
                 await win.setFocus(True)
                 return
 
@@ -101,7 +113,7 @@ class Tracker:
 
         for dpy, wins in perDisplay(self.ctx, self.focusQueue).items():
             for win in wins:
-                if not win.mapped or win.ignore or win.id == self.ctx._root:
+                if not self.ctx.editable(win):
                     continue
 
                 ordered[dpy] = [*ordered.get(dpy, []), win]
@@ -112,12 +124,12 @@ class Tracker:
     async def unmapWindow(self, win: 'GWindow'):
         if self.ctx.focused and win.id == self.ctx.focused.id:
             await self.findFocus()
-            return # the update func is gonna be called if we find a win, and if we dont - there are no wins
-        
+            return  # the update func is gonna be called if we find a win, and if we dont - there are no wins
+
         await self.update()
 
     async def confNotify(self, win: 'GWindow'):
-        #? should we do something more complex here?
+        # ? should we do something more complex here?
         await self.update()
 
     async def mapNotify(self, win: 'GWindow'):
@@ -125,7 +137,7 @@ class Tracker:
             return
 
         await win.setFocus(True)
-        #? can the window be focused if its not mapped? (it shouldnt but idk)
+        # ? can the window be focused if its not mapped? (it shouldnt but idk)
 
     async def mapWindow(self, win: 'GWindow'):
         if win.ignore:
@@ -137,7 +149,7 @@ class Tracker:
         win.x = x
         win.y = y
 
-        await win.map() # This will set its focus, so we shouldn't need a focus change
+        await win.map()  # This will set its focus, so we shouldn't need a focus change
         await self.update()
 
     async def destroyNotify(self, win: 'GWindow'):

@@ -44,3 +44,20 @@
 - update x11's image.set (see extensions/share.py)
 - typing for the cffi functions
 - fix gctx typing
+- impl unloaders for whatever extensions need them :P
+- more tests
+- make text be able to be render for a specific pixel height
+- make gwindow auto add an event listener for win specific events that triggers the global ones
+- theming gui overrides
+- organize this shit into categories
+- fix all mypy errors
+- add mypy to the github actions
+- add black formatting to the github action
+- benchmarks
+- support transparency
+- standalone running of widgets and such
+- cli arguments
+- cli help
+- cli -d --display argument
+- remote debugging
+- custom cursor (http://uw714doc.xinuos.com/en/man/html.X3xlib/XCreateFontCursor.X3xlib.html)

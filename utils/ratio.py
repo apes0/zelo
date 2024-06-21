@@ -1,22 +1,21 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from lib.backends.generic import GDisplay
+    from lib.backends.generic import GDisplay, GWindow
     from ..lib.ctx import Ctx
 
 
 class Ratio:
-
     def __init__(self, ratio: float, width: bool = False, height: bool = False) -> None:
         self.ratio = ratio
-        self.width = width
-        self.height = height
+        self.width = width or not height
+        self.height = height or not width
 
-    def getRatio(self, display: 'GDisplay'):
+    def getRatio(self, obj: 'GDisplay | GWindow'):
         # TODO: is this a good idea?
         return (
             self.ratio
-            * (display.width * self.width + display.height * self.height)
+            * (obj.width * self.width + obj.height * self.height)
             / (self.width + self.height)
         )
 
@@ -45,3 +44,6 @@ class Ratio:
 
     def __neg__(self):
         return Ratio(-self.ratio, width=self.width, height=self.height)
+
+    def __repr__(self) -> str:
+        return f'<Ratio {self.ratio} for {["", "width", "height", "both"][self.width + self.height*2]}>'

@@ -1,4 +1,5 @@
 import traceback
+from types import NoneType, UnionType
 from typing import TYPE_CHECKING, Callable
 
 import trio
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 # backend's event, both wayland and x11 should support all of these
 
 
-async def caller(fn, *args, task_status: trio._core._run._TaskStatus):
+async def caller(fn, *args, task_status=trio.TASK_STATUS_IGNORED):
     try:
         task_status.started()
         await fn(*args)
@@ -24,18 +25,18 @@ async def caller(fn, *args, task_status: trio._core._run._TaskStatus):
 
 
 class Event:
-    def __init__(self, name: str, *types: type) -> None:
-        self.listeners: list[Callable] = []
+    def __init__(self, name: str, *types: type | UnionType) -> None:
+        self.listeners: dict['Ctx', list[Callable]] = {}
         self.name = name
         self.types = types
         self.block = False
         # NOTE: i dont like this that much, but it makes the api more reasonable to use
 
-    def addListener(self, fn: Callable):
-        self.listeners.append(fn)
+    def addListener(self, ctx: 'Ctx', fn: Callable):
+        self.listeners[ctx] = [*self.listeners.get(ctx, []), fn]
 
-    def removeListener(self, fn: Callable):
-        self.listeners.remove(fn)
+    def removeListener(self, ctx: 'Ctx', fn: Callable):
+        self.listeners[ctx].remove(fn)
         # TODO: make this faster (prolly will have to use a dictionary)
 
     async def trigger(self, ctx: 'Ctx', *args):
@@ -56,7 +57,7 @@ class Event:
                 args[n].__class__, _type
             ), f'argument #{n} must be of type {_type}, instead of {type(args[n])} for event {self.name}'
 
-        for fn in self.listeners:
+        for fn in self.listeners.get(ctx, []):
             await ctx.nurs.start(caller, fn, *args)
 
 
@@ -77,5 +78,7 @@ configureNotify = Event('configureNotify', GWindow)
 configureRequest = Event('configureRequest', GWindow)
 enterNotify = Event('enterNotify', GWindow)
 leaveNotify = Event('leaveNotify', GWindow)
-focusChange = Event('focusChange', GWindow | None, GWindow | None)  # old, new
+focusChange = Event('focusChange', GWindow | NoneType, GWindow | NoneType)  # old, new
 redraw = Event('redraw', GWindow)  # exposure notify for x
+reparent = Event('reparent', GWindow, GWindow)  # window and its parent
+ignored = Event('ignored', GWindow)  # when a window is marked as ignored

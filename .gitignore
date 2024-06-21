@@ -174,3 +174,5 @@ log
 
 # c compiler output
 a.out
+
+libxcb-errors/

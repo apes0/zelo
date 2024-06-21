@@ -50,14 +50,14 @@ class Image(GImage):
             self.shm = xcb.createShm(self.ctx.connection, self.width * self.height * 4)
             if ctx.gctx.sharedPixmaps:
                 xcb.xcbShmCreatePixmap(
-                    self.ctx.connection, 
-                    self.pixmap, 
-                    self.windowId, 
-                    self.width, 
-                    self.height, 
-                    ctx.screen.screen.rootDepth, 
+                    self.ctx.connection,
+                    self.pixmap,
+                    self.windowId,
+                    self.width,
+                    self.height,
+                    ctx.screen.screen.rootDepth,
                     self.shm.id,
-                    0
+                    0,
                 )
             else:
                 self.pixmap = self.windowId
@@ -89,24 +89,24 @@ class Image(GImage):
         if self.useShm:
             data = img.tobytes()
             ffi.memmove(self.shm.addr, data, len(data))
-            if not self.ctx.gctx.sharedPixmaps: # type: ignore
+            if not self.ctx.gctx.sharedPixmaps:  # type: ignore
                 xcb.xcbShmPutImage(
-                    self.ctx.connection, 
-                    self.windowId, 
-                    self.gc, 
-                    self.width, 
-                    self.height, 
-                    0, 
-                    0, 
-                    self.width, 
-                    self.height, 
-                    self.x, 
-                    self.y, 
-                    self.ctx.screen.screen.rootDepth, 
-                    xcb.XCBImageFormatZPixmap, 
-                    0, 
-                    self.shm.id, 
-                    0
+                    self.ctx.connection,
+                    self.windowId,
+                    self.gc,
+                    self.width,
+                    self.height,
+                    0,
+                    0,
+                    self.width,
+                    self.height,
+                    self.x,
+                    self.y,
+                    self.ctx.screen.screen.rootDepth,
+                    xcb.XCBImageFormatZPixmap,
+                    0,
+                    self.shm.id,
+                    0,
                 )
 
         else:
@@ -133,7 +133,13 @@ class Image(GImage):
                 )
 
                 xcb.xcbImagePut(
-                    self.ctx.connection, self.pixmap, self.gc, self.image, 0, round(prev), 0
+                    self.ctx.connection,
+                    self.pixmap,
+                    self.gc,
+                    self.image,
+                    0,
+                    round(prev),
+                    0,
                 )
 
                 prev = pos
@@ -141,24 +147,24 @@ class Image(GImage):
         xcb.xcbFlush(self.ctx.connection)
 
     def draw(self):
-        if self.useShm and not self.ctx.gctx.sharedPixmaps: # type: ignore
+        if self.useShm and not self.ctx.gctx.sharedPixmaps:  # type: ignore
             xcb.xcbShmPutImage(
-                self.ctx.connection, 
-                self.windowId, 
-                self.gc, 
-                self.width, 
-                self.height, 
-                0, 
-                0, 
-                self.width, 
-                self.height, 
-                self.x, 
-                self.y, 
-                self.ctx.screen.screen.rootDepth, 
-                xcb.XCBImageFormatZPixmap, 
-                0, 
-                self.shm.id, 
-                0
+                self.ctx.connection,
+                self.windowId,
+                self.gc,
+                self.width,
+                self.height,
+                0,
+                0,
+                self.width,
+                self.height,
+                self.x,
+                self.y,
+                self.ctx.screen.screen.rootDepth,
+                xcb.XCBImageFormatZPixmap,
+                0,
+                self.shm.id,
+                0,
             )
             return
         xcb.xcbCopyArea(

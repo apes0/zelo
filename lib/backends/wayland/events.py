@@ -1,4 +1,3 @@
-from lib.watcher import watch
 from .connection import Connection
 
 from .. import waylandServer as wl
@@ -20,7 +19,7 @@ async def setup(ctx: 'Ctx'):
 
     a = wl.wlEventLoopDispatch(conn.eventLoop, 0)
     print(a)
-    watch(conn.fd, _update)
+    ctx.watcher.watch(conn.fd, _update)
 
 
 async def update(ctx: 'Ctx', conn: 'GConnection'):

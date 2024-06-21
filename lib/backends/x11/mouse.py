@@ -138,19 +138,17 @@ class Mouse(GMouse):
             font,
             cursorId,
             cursorId + 1,
-            ((fore >> 16) % 256)*257,
-            ((fore >> 8) % 256) *257,
-            (fore % 256)*257,
-            ((back >> 16) % 256)*257,
-            ((back >> 8) % 256)*257,
-            (back % 256)*257,
+            ((fore >> 16) % 256) * 257,
+            ((fore >> 8) % 256) * 257,
+            (fore % 256) * 257,
+            ((back >> 16) % 256) * 257,
+            ((back >> 8) % 256) * 257,
+            (back % 256) * 257,
         )
 
         mask = xcb.XCBCwCursor
         args = uintarr([cursor])
-        xcb.xcbChangeWindowAttributesChecked(
-            self.ctx.connection, window.id, mask, args
-        )
+        xcb.xcbChangeWindowAttributesChecked(self.ctx.connection, window.id, mask, args)
 
         xcb.xcbCloseFont(self.ctx.connection, font)
         xcb.xcbFreeCursor(self.ctx.connection, cursor)
@@ -226,9 +224,7 @@ class Button(GButton):
         log('press', DEBUG, f'pressing {self} with modifiers {modifiers}')
 
         for mod in modifiers:
-            Key(code=mod.mappings[mod.mod][0]).press(
-                ctx, window, flush=False
-            )
+            Key(code=mod.mappings[mod.mod][0]).press(ctx, window, flush=False)
 
         xcb.xcbTestFakeInput(
             ctx.connection,
@@ -243,15 +239,11 @@ class Button(GButton):
 
         xcb.xcbFlush(ctx.connection)
 
-    def release(
-        self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: Mod
-    ):
+    def release(self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: Mod):
         log('press', DEBUG, f'releasing {self} with modifiers {modifiers}')
 
         for mod in modifiers:
-            Key(code=Mod.mappings[mod.mod][0]).release(
-                ctx, window, flush=False
-            )
+            Key(code=Mod.mappings[mod.mod][0]).release(ctx, window, flush=False)
 
         xcb.xcbTestFakeInput(
             ctx.connection,

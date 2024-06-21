@@ -18,8 +18,10 @@ def spawn(proc: str):
 
 def stop(ctx: 'Ctx'):
     from lib.extension import unloadExtensions
+
     unloadExtensions(ctx)
     ctx.closed = True
+    ctx.watcher.watches.clear()
 
 
 async def multiple(*fns):
@@ -53,6 +55,7 @@ def toCursor(ctx: 'Ctx', win: 'GWindow'):
         await win.configure(newX=x, newY=y)
 
     ctx.nurs.start_soon(afn)
+
 
 def getDisplay(ctx: 'Ctx', x: int, y: int):
     display: 'GDisplay | None' = None

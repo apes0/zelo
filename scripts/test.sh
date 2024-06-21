@@ -11,7 +11,7 @@ DISPLAY=$_DISPLAY
 #xrandr --setmonitor vl $(echo $w)/0x$(echo $h)/1+0+0 0
 #xrandr --setmonitor vr $(echo $w)/1x$(echo $h)/1+$(echo $w)+0 null
 ##xrandr --fb $(($w*2))/$(($h+1)); xrandr --fb $(($w*2))/$(echo $h)
-sleep .5
+inotifywait --timeout 2 /tmp/.X11-unix/
 
 #setxkbmap -display $DISPLAY -print | xkbcomp - $_DISPLAY
 

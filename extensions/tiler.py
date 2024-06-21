@@ -32,11 +32,11 @@ if TYPE_CHECKING:
 # FIXME: breaks with too many windows (its an unreasonable number imho, but we should handle it properly)
 # FIXME: breaks with spacing of 0
 
+
 @track('update')
 class Tiler(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.mainSize: float
-        self.border: int
         self.spacing: int
         self.topSpacing: int = 0
         self.bottomSpacing: int = 0
@@ -57,7 +57,9 @@ class Tiler(Extension):
             },
         )
 
-        self.x = self.display.x + self.leftSpacing # TODO: maybe calculate this at the window tracker level
+        self.x = (
+            self.display.x + self.leftSpacing
+        )  # TODO: maybe calculate this at the window tracker level
         self.y = self.display.y + self.topSpacing
         self.width = self.display.width - self.leftSpacing - self.rightSpacing
         self.height = self.display.height - self.topSpacing - self.bottomSpacing
@@ -69,13 +71,14 @@ class Tiler(Extension):
             len(windows), 1
         )  # get the size of the side windows as a fraction
         y = self.spacing  # start the y coordinate at ``self.spacing`` pixels down
+        borders = sum([w.borderWidth for w in windows])  # total border width
         _height = (
-            self.height - (1 + len(windows)) * (self.spacing) - 2*len(windows)*self.border
-        )*size  # calculate the height of each side window
+            self.height - (1 + len(windows)) * (self.spacing) - 2 * borders
+        ) * size  # calculate the height of each side window
         height = round(_height)  # round it to a whole number
         offset = _height - height  # get the error from the rounded version
         width = round(
-            self.width * (1 - self.mainSize) - self.spacing - 2 * self.border
+            self.width * (1 - self.mainSize) - self.spacing - 2 * borders * size
         )  # calculate the width of every side window
         x = round(
             self.width * self.mainSize
@@ -88,21 +91,21 @@ class Tiler(Extension):
                 window.configure(
                     newX=x + self.x,
                     newY=round(y) + self.y,
-                    newHeight=height,
-                    newWidth=width,
-                    newBorderWidth=self.border,
+                    newHeight=height - 2 * (window.borderWidth - round(borders * size)),
+                    newWidth=width - 2 * (window.borderWidth - round(borders * size)),
                 )
             )
-            y += height + self.spacing + offset + 2*self.border
+            y += height + self.spacing + offset + 2 * window.borderWidth
 
         mainSize = self.mainSize if windows else 1
         fns.append(
             main.configure(
                 newX=self.spacing + self.x,
                 newY=self.spacing + self.y,
-                newWidth=round(self.width * mainSize - 2 * self.spacing - 2 * self.border),
-                newHeight=self.height - 2 * self.spacing - 2 * self.border,
-                newBorderWidth=self.border,
+                newWidth=round(
+                    self.width * mainSize - 2 * self.spacing - 2 * main.borderWidth
+                ),
+                newHeight=self.height - 2 * self.spacing - 2 * main.borderWidth,
             )
         )
 

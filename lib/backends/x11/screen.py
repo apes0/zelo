@@ -2,6 +2,7 @@ from ..generic import GScreen, GDisplay
 
 # TODO: support xinerama as well (should not be difficult i hope)
 
+
 class Display(GDisplay):
     def __init__(self, x: int, y: int, width: int, height: int) -> None:
         self.x: int = x

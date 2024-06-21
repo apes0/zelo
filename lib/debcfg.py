@@ -13,7 +13,7 @@ streamHandler.setFormatter(formatter)
 cfg = {
     'all': False,  # if we should log everything
     'events': False,  # event triggerings
-    'evErrors': True, # event errors
+    'evErrors': True,  # event errors
     'grab': False,  # and ungrab
     'press': False,  # and release
     'keys': False,  # key related logs
@@ -32,13 +32,21 @@ def log(name: str | list[str], level: int, message: str, single=True):
         if not (cfg['all'] or cfg.get(name, cfg['others'])):
             return
 
-    else:
+    elif isinstance(name, list):
+        log = False
         for n in name:
             if cfg.get(n, cfg['others']):
+                log = True
                 break
             elif not single:
                 return
 
-            name = ', '.join(name)
+        if not log:
+            return
+
+        name = ', '.join(name)
+
+    else:
+        return
 
     logger.log(level, f'{name}: {message}')

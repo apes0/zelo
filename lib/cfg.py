@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Callable
 
 from extensions.animation import Animation
+from extensions.borders import Borders
 from extensions.fakeMonitors import FakeDisplays
 from extensions.mouse import Mouse
 from extensions.mouseFocus import MouseFocus
@@ -15,6 +16,7 @@ from extensions.widgets.text import Text
 from extensions.workspaces import Workspaces
 from extensions.winfo import Winfo
 from extensions.share import ShareServer, ShareClient
+from extensions.tabs import Tabs
 
 from lib._cfg import Cfg
 from lib.api.keys import Key, Mod
@@ -26,7 +28,7 @@ from utils.ratio import Ratio
 from utils.theme import Theme
 from utils.log import logTerm, log
 
-#debcfg['all'] = True
+# debcfg['all'] = True
 
 logTerm()
 log('log')
@@ -54,10 +56,6 @@ wall = 'wall.png'
 theme = Theme(0x9999D6, 0x393966, [])
 cfg.theme = theme
 
-# ? maybe export this to a plugin
-cfg.focusedColor = theme.fore
-cfg.unfocusedColor = theme.back
-
 # layouts
 
 main = Layout()
@@ -75,8 +73,8 @@ cfg.extensions = {
         #        'topSpacing': main.y,
     },
     MouseFocus: {},
-    Wallpaper: {'wall': wall},
-#    Wallpaper: {'wall': 'video.gif', 'video': True},
+    #    Wallpaper: {'wall': wall},
+    Wallpaper: {'wall': 'video.gif', 'video': True},
     Shortcuts: {'shortcuts': keys},
     Workspaces: {
         'prev': ((Key('left'), Key('super_l')), Mod('control')),
@@ -117,10 +115,12 @@ cfg.extensions = {
         ]
     },
     Mouse: {},
-#    Winfo: {},
-#    ShareServer:{},
-#    ShareClient:{'addr': '0.0.0.0'},
-#    Animation: {},
+    Tabs: {},
+    Borders: {'width': 5, 'focused': theme.fore, 'unfocused': theme.back},
+    #    Winfo: {},
+    #    ShareServer:{},
+    #    ShareClient:{'addr': '0.0.0.0'},
+    #    Animation: {},
 }
 
 # startup

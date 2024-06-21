@@ -90,6 +90,8 @@ class GWindow:
         self.enterNotify: 'Event'
         self.leaveNotify: 'Event'
         self.redraw: 'Event'
+        self.reparented: 'Event'
+        self.ignored: 'Event'
 
         raise NotImplementedError
 
@@ -98,11 +100,17 @@ class GWindow:
 
     async def toTop(self):
         raise NotImplementedError
-        
+
     async def toBottom(self):
         raise NotImplementedError
 
-    async def screenshot(self, x:int=0, y:int=0, width:int|None=None, height:int|None=None) -> np.ndarray:
+    async def screenshot(
+        self,
+        x: int = 0,
+        y: int = 0,
+        width: int | None = None,
+        height: int | None = None,
+    ) -> np.ndarray:
         raise NotImplementedError
 
     async def map(self):
@@ -124,10 +132,16 @@ class GWindow:
     ):
         raise NotImplementedError
 
+    async def reparent(self, parent: 'GWindow', x: int, y: int):
+        raise NotImplementedError
+
     async def close(self):
         raise NotImplementedError
 
     async def kill(self):
+        raise NotImplementedError
+
+    async def setBorderColor(self, color: int):
         raise NotImplementedError
 
 
@@ -188,8 +202,9 @@ class GButton:
 
     def release(
         self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: GMod
-    ): #? do we need x and y here?
+    ):  # ? do we need x and y here?
         raise NotImplementedError
+
 
 # mouse
 class GMouse:

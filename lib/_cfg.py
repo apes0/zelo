@@ -7,8 +7,6 @@ if TYPE_CHECKING:
 class Cfg:
     def __init__(self) -> None:
         self.extensions: dict
-        self.focusedColor: int
-        self.unfocusedColor: int
         self.theme: 'Theme'
 
 
