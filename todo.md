@@ -61,3 +61,4 @@
 - cli -d --display argument
 - remote debugging
 - custom cursor (http://uw714doc.xinuos.com/en/man/html.X3xlib/XCreateFontCursor.X3xlib.html)
+- make image.set for x11 be fast

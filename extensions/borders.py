@@ -25,7 +25,6 @@ class Borders(Extension):
         await win.setBorderColor(self.unfocused)
 
     async def focusChange(self, old: 'GWindow | None', new: 'GWindow | None'):
-        self.width += 1
         if old:
             await old.setBorderColor(self.unfocused)
         if new:

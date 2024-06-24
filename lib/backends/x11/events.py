@@ -27,7 +27,7 @@ from .types import (
     ReparentNotifyTC,
 )
 from .connection import Connection
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from .. import events
 from .gctx import Ctx as GCtx
 import trio
@@ -407,7 +407,7 @@ ignore = [9, 10, 14, 89]  # list of events to ignore
 
 
 # TODO: support event 34 (XCB_MAPPING_NOTIFY)
-async def setup(ctx: 'Ctx', task_status: trio._core._run._TaskStatus):
+async def setup(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
     # this is, in practice, the init function for the ctx
     ctx.dname = ctx.dname if hasattr(ctx, 'dname') else xcb.NULL
     ctx.screenp = intp(0)
@@ -440,4 +440,6 @@ async def update(ctx: 'Ctx', conn: 'GConnection'):
         if handler := handlers.get(eventType, None):
             ctx.nurs.start_soon(handler, event, ctx)
         elif eventType not in ignore:
+#            ctx.gctx = cast(GCtx, ctx.gctx)
+#            print(eventType - ctx.gctx.extResps['RANDR'])
             log('others', WARN, f'No handler for: {eventType}')
