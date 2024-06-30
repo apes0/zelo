@@ -16,12 +16,18 @@ def spawn(proc: str):
     subprocess.Popen(proc.split(' '), shell=False, env=os.environ.copy())
 
 
-def stop(ctx: 'Ctx'):
+async def stop(ctx: 'Ctx'):
     from lib.extension import unloadExtensions
 
     unloadExtensions(ctx)
+    ctx.watcher.stop()
+    ctx.nurs.cancel_scope.cancel()
+
+    while ctx.nurs.child_tasks:
+        await trio.sleep(1)
+
+    ctx.gctx.disconnect()
     ctx.closed = True
-    ctx.watcher.watches.clear()
 
 
 async def multiple(*fns):

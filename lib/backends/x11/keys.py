@@ -45,7 +45,6 @@ class Key(GKey):
     cache: dict[str, int] = {
         'any': xcb.XCBGrabAny
     }  # we dont need to get the keycode for this lol (infact it breaks it)
-    syms: CData
 
     def __init__(self, lable: str | None = None, code: int | None = None) -> None:
         assert lable or code, 'You must have the lable or keycode for a key.'
@@ -61,7 +60,7 @@ class Key(GKey):
                     break
 
     def load(self, ctx: 'Ctx'):
-        syms = self.__class__.syms
+        syms = xcb.xcbKeySymbolsAlloc(ctx.connection)
         assert syms, 'Couldn\'t allocate key symbols (for some reason)'
 
         # NOTE: this is adapted from qtile's implementation
@@ -78,11 +77,13 @@ class Key(GKey):
         key: int = code[0]
         self.key = key
         self.__class__.cache[self.lable] = key
-        # xcb.xcbKeySymbolsFree(syms)  # ? idk how efficient this is lol
+        xcb.xcbKeySymbolsFree(syms)
 
     def grab(
         self, ctx: 'Ctx', window: GWindow, *modifiers: Mod
     ):  # TODO: (un)grab on window
+        assert not ctx.closed, 'conn is closed'
+        
         log('grab', DEBUG, f'grabbing {self} with modifiers {modifiers}')
         if self.key is None:
             self.load(ctx)
@@ -105,6 +106,8 @@ class Key(GKey):
         xcb.xcbFlush(ctx.connection)
 
     def ungrab(self, ctx: 'Ctx', window: GWindow, *modifiers: Mod):
+        assert not ctx.closed, 'conn is closed'
+
         log('grab', DEBUG, f'ungrabbing {self} with modifiers {modifiers}')
         if self.key is None:
             self.load(ctx)
@@ -118,6 +121,8 @@ class Key(GKey):
         xcb.xcbFlush(ctx.connection)
 
     def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod, flush: bool = True):
+        assert not ctx.closed, 'conn is closed'
+
         log('press', DEBUG, f'pressing {self} with modifiers {modifiers}')
         if self.key is None:
             self.load(ctx)
@@ -147,6 +152,8 @@ class Key(GKey):
     def release(
         self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod, flush: bool = True
     ):
+        assert not ctx.closed, 'conn is closed'
+
         log('press', DEBUG, f'releasing {self} with modifiers {modifiers}')
         if self.key is None:
             self.load(ctx)

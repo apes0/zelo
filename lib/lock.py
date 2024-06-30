@@ -16,10 +16,13 @@ def alock(afn):
 
         i += 1
 
-        if i - 1:
-            await oldEv.wait()
+        try:
+            if i - 1:
+                await oldEv.wait()
 
-        await afn(*a, **kwa)
+            await afn(*a, **kwa)
+        except trio.Cancelled:
+            pass # we still need to get to the finishing code, otherwise, we break the whole lock because i isn't decreased
 
         myEv.set()
         i -= 1
@@ -41,10 +44,13 @@ def calock(afn):
 
         i[self] = i.get(self, 0) + 1
 
-        if i[self] - 1:
-            await oldEv.wait()
+        try:
+            if i[self] - 1:
+                await oldEv.wait()
 
-        await afn(self, *a, **kwa)
+            await afn(self, *a, **kwa)
+        except trio.Cancelled:
+            pass # same as alock
 
         myEv.set()
         i[self] -= 1

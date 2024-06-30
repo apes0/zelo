@@ -2,12 +2,17 @@ from tests.tester import Test, tests, load
 
 import coverage
 from junit_xml import TestSuite, TestCase
-from lib.debcfg import cfg
+from lib.debcfg import cfg, logger
+from logging import DEBUG
 import trio
 import sys
 
-for c in cfg:
-    cfg[c] = False
+#for c in cfg:
+#    cfg[c] = False
+
+#logger.setLevel(DEBUG)
+
+#cfg['events'] = True
 
 repeat = 3
 

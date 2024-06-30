@@ -19,6 +19,8 @@ class Ctx(GCtx):
         return self.extResps[ext].present
 
     def sendEvent(self, event, window: 'GWindow') -> None:
+        assert not self.ctx.closed, 'conn is closed'
+        
         xcb.xcbSendEvent(
             self.ctx.connection,
             1,
@@ -38,6 +40,8 @@ class Ctx(GCtx):
         parent: Window,
         ignore: bool,
     ):
+        assert not self.ctx.closed, 'conn is closed'
+        
         window = xcb.xcbGenerateId(self.ctx.connection)
         xcb.xcbCreateWindow(
             self.ctx.connection,
@@ -61,3 +65,9 @@ class Ctx(GCtx):
         win.mine = True
 
         return win
+
+    def disconnect(self):
+        assert not self.ctx.closed, 'conn is closed'
+
+        xcb.xcbDisconnect(self.ctx.connection)
+        self.ctx.connection = xcb.NULL

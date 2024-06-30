@@ -6,6 +6,8 @@ streamHandler = logging.StreamHandler()
 logger.addHandler(streamHandler)
 streamHandler.setFormatter(formatter)
 
+logger.setLevel(logging.ERROR)
+
 # debbuger config
 # contains lables for each thing that we can debug
 

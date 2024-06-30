@@ -19,9 +19,11 @@ async def caller(fn, *args, task_status=trio.TASK_STATUS_IGNORED):
     try:
         task_status.started()
         await fn(*args)
+    except trio.Cancelled:
+        log('evErrors', ERROR, f'{fn} called with {args} got cancelled')
     except:
         # TODO: do something here
-        log('evErrors', ERROR, traceback.format_exc())
+        log('evErrors', ERROR, f'{fn} called with {args} encountered:\n{traceback.format_exc()}')
 
 
 class Event:

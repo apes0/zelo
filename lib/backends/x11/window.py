@@ -83,6 +83,8 @@ class Window(GWindow):
         self.ctx.nurs.start_soon(self.ignored.trigger, self.ctx)
 
     async def map(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         fn = partial(xcb.xcbMapWindow, self.ctx.connection, self.id)
         await runAndWait(self.ctx, [self.mapNotify, self.enterNotify, self.redraw], fn)
 
@@ -91,6 +93,8 @@ class Window(GWindow):
         self.mapped = True
 
     async def unmap(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         fn = partial(xcb.xcbUnmapWindow, self.ctx.connection, self.id)
         await runAndWait(
             self.ctx, [self.unmapNotify, self.destroyNotify, self.leaveNotify], fn
@@ -102,6 +106,8 @@ class Window(GWindow):
 
     @alock
     async def setFocus(self, focus: bool):
+        assert not self.ctx.closed, 'conn is closed'
+
         self.focused = focus
         wid = None
 
@@ -151,6 +157,8 @@ class Window(GWindow):
         newBorderWidth: int | None = None,
         #        newStackMode: int | None = None # TODO: should we have this?
     ):
+        assert not self.ctx.closed, 'conn is closed'
+
         compare = {
             (newX, 'x'): xcb.XCBConfigWindowX,
             (newY, 'y'): xcb.XCBConfigWindowY,
@@ -200,6 +208,8 @@ class Window(GWindow):
     #        await runAndWait(self.ctx, [self.configureNotify], fn)
 
     async def setBorderColor(self, color: int):
+        assert not self.ctx.closed, 'conn is closed'
+
         xcb.xcbChangeWindowAttributesChecked(
             self.ctx.connection, self.id, xcb.XCBCwBorderPixel, uintarr([color])
         )
@@ -207,6 +217,8 @@ class Window(GWindow):
         xcb.xcbFlush(self.ctx.connection)
 
     async def toTop(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         xcb.xcbConfigureWindow(
             self.ctx.connection,
             self.id,
@@ -215,6 +227,8 @@ class Window(GWindow):
         )
 
     async def toBottom(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         xcb.xcbConfigureWindow(
             self.ctx.connection,
             self.id,
@@ -223,6 +237,8 @@ class Window(GWindow):
         )
 
     async def close(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         fn = partial(xcb.xcbDestroyWindow, self.ctx.connection, self.id)
 
         await runAndWait(self.ctx, [self.destroyNotify, self.leaveNotify], fn)
@@ -236,6 +252,8 @@ class Window(GWindow):
         width: int | None = None,
         height: int | None = None,
     ) -> np.ndarray:
+        assert not self.ctx.closed, 'conn is closed'
+
         width = width or self.width
         height = height or self.height
         useShm = self.ctx.gctx.avail('MIT-SHM')  # type: ignore
@@ -301,6 +319,8 @@ class Window(GWindow):
         return out
 
     async def reparent(self, parent: 'Window', x: int, y: int):
+        assert not self.ctx.closed, 'conn is closed'
+
         fn = partial(
             xcb.xcbReparentWindow, self.ctx.connection, self.id, parent.id, x, y
         )
@@ -308,6 +328,8 @@ class Window(GWindow):
         await runAndWait(self.ctx, [reparent], fn)
 
     async def kill(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         # the nuclear option
         # ? should we wait for something here lol?
         xcb.xcbKillClient(self.ctx.connection, self.id)

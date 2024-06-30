@@ -99,6 +99,8 @@ class Mouse(GMouse):
         self.ctx = ctx
 
     def location(self) -> tuple[int, int]:
+        assert not self.ctx.closed, 'conn is closed'
+
         resp = xcb.xcbQueryPointerReply(
             self.ctx.connection,
             xcb.xcbQueryPointer(self.ctx.connection, self.ctx._root),
@@ -118,6 +120,8 @@ class Mouse(GMouse):
         fore: int = 0,
         back: int = 0xFFFFFF,
     ):
+        assert not self.ctx.closed, 'conn is closed'
+
         cursorId = cursors[name]
 
         font = xcb.xcbGenerateId(self.ctx.connection)
@@ -185,6 +189,8 @@ class Button(GButton):
                     break
 
     def grab(self, ctx: 'Ctx', window: 'GWindow', *mods: 'GMod'):
+        assert not ctx.closed, 'conn is closed'
+
         log('grab', DEBUG, f'grabbing {self} with modifiers {mods} on {window}')
         mod = 0
         for _mod in mods:
@@ -206,6 +212,8 @@ class Button(GButton):
         xcb.xcbFlush(ctx.connection)
 
     def ungrab(self, ctx: 'Ctx', window: 'GWindow', *mods: 'GMod'):
+        assert not ctx.closed, 'conn is closed'
+
         log('grab', DEBUG, f'ungrabbing {self} with modifiers {mods} on {window}')
         mod = 0
         for _mod in mods:
@@ -221,6 +229,8 @@ class Button(GButton):
         xcb.xcbFlush(ctx.connection)
 
     def press(self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: Mod):
+        assert not ctx.closed, 'conn is closed'
+
         log('press', DEBUG, f'pressing {self} with modifiers {modifiers}')
 
         for mod in modifiers:
@@ -240,6 +250,8 @@ class Button(GButton):
         xcb.xcbFlush(ctx.connection)
 
     def release(self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: Mod):
+        assert not ctx.closed, 'conn is closed'
+
         log('press', DEBUG, f'releasing {self} with modifiers {modifiers}')
 
         for mod in modifiers:

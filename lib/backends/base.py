@@ -2,6 +2,9 @@ from _cffi_backend import _CDataBase
 
 
 def parseArgs(args):
+#    print(args)
+#    import inspect, os, colorama; stack = inspect.stack(); whiteSpace = len(stack); print(*((lines:=[f'{" "*(whiteSpace := whiteSpace - 1)}L {colorama.Fore.GREEN}{x.function}{colorama.Style.RESET_ALL} | {os.path.basename(x.filename)}:{x.lineno}\n' for x in stack]).reverse() or lines)) # noqa
+
     out = []
 
     for arg in args:

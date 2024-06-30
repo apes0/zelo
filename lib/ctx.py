@@ -82,3 +82,6 @@ class Ctx:
             return False
 
         return True
+
+    def disconnect(self):
+        self.gctx.disconnect()

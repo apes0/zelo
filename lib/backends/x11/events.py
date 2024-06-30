@@ -265,7 +265,6 @@ async def error(event, ctx: 'Ctx'):
     major = xcb.xcbErrorsGetNameForMajorCode(errCtx, event.majorCode)
     minor = xcb.xcbErrorsGetNameForMinorCode(errCtx, event.majorCode, event.minorCode)
     error = xcb.xcbErrorsGetNameForError(errCtx, event.errorCode, extension)
-    xcb.xcbErrorsContextFree(errCtx)
 
     def toStr(obj):
         if obj == xcb.NULL:
@@ -285,6 +284,7 @@ async def error(event, ctx: 'Ctx'):
         ERROR,
         f'{toStr(error)}: {toStr(extension[0])}, {toStr(major)}: {toStr(minor)} for resource {event.resourceId}',
     )
+    xcb.xcbErrorsContextFree(errCtx)
 
 
 @handler(xcb.XCBKeyPress)
@@ -428,14 +428,15 @@ async def setup(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
 
 
 async def update(ctx: 'Ctx', conn: 'GConnection'):
-    if xcb.xcbConnectionHasError(ctx.connection) or ctx.closed:
+    if ctx.closed or xcb.xcbConnectionHasError(ctx.connection):
         conn.disconnect()
         return
 
-    while True:
+    while not ctx.closed: # we might get closed ig lol
         event = xcb.xcbPollForEvent(ctx.connection)
         if event == xcb.NULL:
             return
+
         eventType: int = event.responseType & ~0x80
         if handler := handlers.get(eventType, None):
             ctx.nurs.start_soon(handler, event, ctx)

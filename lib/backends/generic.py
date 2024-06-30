@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from .events import Event
 
 # these are definitions for what functions and classes the backends should have
+# (basically a header file)
 # TODO: logging?
 # NOTE: some methods are async when they dont use async functions - this is just for consistency
 
@@ -54,6 +55,8 @@ class GCtx:
     ) -> 'GWindow':
         raise NotImplementedError
 
+    def disconnect(self):
+        raise NotImplementedError
 
 # window
 class GWindow:

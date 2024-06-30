@@ -152,5 +152,5 @@ async def startWm(pre: Pre, tctx: TCtx, done: trio.Event):
 
 @preEnd(startWm)
 async def stopWm(pre: Pre, ctx: TCtx, done: trio.Event):
-    stop(pre.data)
+    await stop(pre.data)
     done.set()

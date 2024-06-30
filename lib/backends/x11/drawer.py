@@ -29,6 +29,7 @@ class Image(GImage):
         x: int,
         y: int,
     ) -> None:
+        assert not ctx.closed, 'conn is closed'
         self.x: int = x
         self.y: int = y
 
@@ -77,6 +78,8 @@ class Image(GImage):
             self.set(img)
 
     def set(self, img):
+        assert not self.ctx.closed, 'conn is closed'
+
         img = cv2.resize(img, (self.width, self.height))
 
         _, _, px = img.shape
@@ -147,6 +150,8 @@ class Image(GImage):
         xcb.xcbFlush(self.ctx.connection)
 
     def draw(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         if self.useShm and not self.ctx.gctx.sharedPixmaps:  # type: ignore
             xcb.xcbShmPutImage(
                 self.ctx.connection,
@@ -183,12 +188,15 @@ class Image(GImage):
         xcb.xcbFlush(self.ctx.connection)
 
     def destroy(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         if self.useShm:
             xcb.removeShm(self.ctx.connection, self.shm)
         else:
             xcb.xcbImageDestroy(self.image)
 
         xcb.xcbFreePixmap(self.ctx.connection, self.pixmap)
+        self.pixmap = xcb.NULL
         xcb.xcbFlush(self.ctx.connection)
 
     def move(self, x: int, y: int):
@@ -243,6 +251,8 @@ class Text(GText):
         return out, rendered.width, rendered.rows
 
     def set(self, text: str):
+        assert not self.ctx.closed, 'conn is closed'
+
         self.text = text
         rendered, width, height = self.render()
 
@@ -257,10 +267,14 @@ class Text(GText):
         self.width, self.height = width, height
 
     def draw(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         if self.image:
             self.image.draw()
 
     def destroy(self):
+        assert not self.ctx.closed, 'conn is closed'
+
         if self.image:
             self.image.destroy()
 
@@ -285,6 +299,8 @@ class Rectangle(
         height: int,
         color: int = 0x000000,
     ) -> None:
+        assert not ctx.closed, 'conn is closed'
+        
         self.x = x
         self.y = y
         self.width = width
@@ -301,6 +317,8 @@ class Rectangle(
         xcb.xcbCreateGc(ctx.connection, self.gc, window.id, mask, args)
 
     def draw(self):
+        assert not self.ctx.closed, 'conn is closed'
+        
         xcb.xcbPolyFillRectangle(
             self.ctx.connection, self.window.id, self.gc, 1, self.rect
         )
@@ -308,6 +326,8 @@ class Rectangle(
         xcb.xcbFlush(self.ctx.connection)
 
     def resize(self, width: int, height: int):
+        assert not self.ctx.closed, 'conn is closed'
+        
         self.rect.width = width
         self.rect.height = height
 

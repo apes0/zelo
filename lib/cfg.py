@@ -41,7 +41,7 @@ cfg = Cfg()
 keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     #    ((Key('super_l'),), Mod('')): lambda _ctx: spawn('ulauncher-toggle'),
     ((Key('t'),), Mod('control')): lambda ctx: spawn('alacritty'),
-    ((Key('s'),), Mod('control')): lambda ctx: stop(ctx),
+    ((Key('s'),), Mod('control')): lambda ctx: ctx.start_soon(stop(ctx)),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
     ((Key('x'),), Mod('control')): lambda ctx: (
         ctx.nurs.start_soon(ctx.focused.screenshot) if ctx.focused else None
@@ -73,8 +73,8 @@ cfg.extensions = {
         #        'topSpacing': main.y,
     },
     MouseFocus: {},
-    #    Wallpaper: {'wall': wall},
-    Wallpaper: {'wall': 'video.gif', 'video': True},
+    Wallpaper: {'wall': wall},
+#    Wallpaper: {'wall': 'video.gif', 'video': True},
     Shortcuts: {'shortcuts': keys},
     Workspaces: {
         'prev': ((Key('left'), Key('super_l')), Mod('control')),
