@@ -144,7 +144,7 @@ async def startWm(pre: Pre, tctx: TCtx, done: trio.Event):
 
         async with trio.open_nursery() as nurs:
             ctx.nurs = nurs
-            ctx.dname = chararr(tctx.env['DISPLAY'].encode())
+            ctx.gctxConf['display'] = tctx.env['DISPLAY'].encode()
             await nurs.start(load('events').setup, ctx)
             await nurs.start(ctx.watcher.start, ctx)
             task_status.started()

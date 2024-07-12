@@ -415,7 +415,7 @@ ignore = [9, 10, 14, 89]  # list of events to ignore
 async def setup(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
     # this is, in practice, the init function for the ctx
     gctx = GCtx(ctx)
-    gctx.dname = gctx.dname if hasattr(ctx, 'dname') else xcb.NULL
+    gctx.dname = ctx.gctxConf.get('display', xcb.NULL)
     gctx.screenp = intp(0)
     ctx.gctx = gctx
 

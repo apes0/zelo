@@ -27,6 +27,7 @@ class Ctx:
         self.closed = False
         self.nurs: trio.Nursery
         self.cfg: 'Cfg'
+        self.gctxConf = {}
 
     def getWindow(self, _id: int) -> 'GWindow':
         if _id == self._root:
