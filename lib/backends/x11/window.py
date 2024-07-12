@@ -16,6 +16,7 @@ from ...debcfg import log
 if TYPE_CHECKING:
     from ...ctx import Ctx
     from ..events import Event
+    from .gctx import Ctx as GCtx
 
 
 async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
@@ -28,7 +29,8 @@ async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
         event.addListener(ctx, wait)
 
     fn()
-    xcb.xcbFlush(ctx.connection)
+    gctx: GCtx = ctx._getGCtx()
+    xcb.xcbFlush(gctx.connection)
 
     await ev.wait()
 
@@ -85,7 +87,9 @@ class Window(GWindow):
     async def map(self):
         assert not self.ctx.closed, 'conn is closed'
 
-        fn = partial(xcb.xcbMapWindow, self.ctx.connection, self.id)
+        gctx: GCtx = self.ctx._getGCtx()
+
+        fn = partial(xcb.xcbMapWindow, gctx.connection, self.id)
         await runAndWait(self.ctx, [self.mapNotify, self.enterNotify, self.redraw], fn)
 
         log('windows', DEBUG, f'mapped {self}')
@@ -95,7 +99,9 @@ class Window(GWindow):
     async def unmap(self):
         assert not self.ctx.closed, 'conn is closed'
 
-        fn = partial(xcb.xcbUnmapWindow, self.ctx.connection, self.id)
+        gctx: GCtx = self.ctx._getGCtx()
+
+        fn = partial(xcb.xcbUnmapWindow, gctx.connection, self.id)
         await runAndWait(
             self.ctx, [self.unmapNotify, self.destroyNotify, self.leaveNotify], fn
         )
@@ -107,6 +113,8 @@ class Window(GWindow):
     @alock
     async def setFocus(self, focus: bool):
         assert not self.ctx.closed, 'conn is closed'
+
+        gctx: GCtx = self.ctx._getGCtx()
 
         self.focused = focus
         wid = None
@@ -134,13 +142,13 @@ class Window(GWindow):
             return
 
         xcb.xcbSetInputFocus(
-            self.ctx.connection,
+            gctx.connection,
             xcb.XCBInputFocusNone,
             wid,
             xcb.XCBCurrentTime,
         )
 
-        xcb.xcbFlush(self.ctx.connection)
+        xcb.xcbFlush(gctx.connection)
 
         log(['windows', 'focus'], DEBUG, f'set {self}\'s focus to {focus}')
 
@@ -158,6 +166,8 @@ class Window(GWindow):
         #        newStackMode: int | None = None # TODO: should we have this?
     ):
         assert not self.ctx.closed, 'conn is closed'
+
+        gctx: GCtx = self.ctx._getGCtx()
 
         compare = {
             (newX, 'x'): xcb.XCBConfigWindowX,
@@ -189,14 +199,14 @@ class Window(GWindow):
 
         fn = partial(
             xcb.xcbConfigureWindow,
-            self.ctx.connection,
+            gctx.connection,
             self.id,
             changed,
             vals,
         )
 
         fn()
-        xcb.xcbFlush(self.ctx.connection)
+        xcb.xcbFlush(gctx.connection)
 
         log(
             'windows',
@@ -210,17 +220,21 @@ class Window(GWindow):
     async def setBorderColor(self, color: int):
         assert not self.ctx.closed, 'conn is closed'
 
+        gctx: GCtx = self.ctx._getGCtx()
+
         xcb.xcbChangeWindowAttributesChecked(
-            self.ctx.connection, self.id, xcb.XCBCwBorderPixel, uintarr([color])
+            gctx.connection, self.id, xcb.XCBCwBorderPixel, uintarr([color])
         )
 
-        xcb.xcbFlush(self.ctx.connection)
+        xcb.xcbFlush(gctx.connection)
 
     async def toTop(self):
         assert not self.ctx.closed, 'conn is closed'
 
+        gctx: GCtx = self.ctx._getGCtx()
+
         xcb.xcbConfigureWindow(
-            self.ctx.connection,
+            gctx.connection,
             self.id,
             xcb.XCBConfigWindowStackMode,
             uintarr([xcb.XCBStackModeAbove]),
@@ -229,8 +243,10 @@ class Window(GWindow):
     async def toBottom(self):
         assert not self.ctx.closed, 'conn is closed'
 
+        gctx: GCtx = self.ctx._getGCtx()
+
         xcb.xcbConfigureWindow(
-            self.ctx.connection,
+            gctx.connection,
             self.id,
             xcb.XCBConfigWindowStackMode,
             uintarr([xcb.XCBStackModeBelow]),
@@ -239,7 +255,9 @@ class Window(GWindow):
     async def close(self):
         assert not self.ctx.closed, 'conn is closed'
 
-        fn = partial(xcb.xcbDestroyWindow, self.ctx.connection, self.id)
+        gctx: GCtx = self.ctx._getGCtx()
+
+        fn = partial(xcb.xcbDestroyWindow, gctx.connection, self.id)
 
         await runAndWait(self.ctx, [self.destroyNotify, self.leaveNotify], fn)
 
@@ -254,19 +272,21 @@ class Window(GWindow):
     ) -> np.ndarray:
         assert not self.ctx.closed, 'conn is closed'
 
+        gctx: GCtx = self.ctx._getGCtx()
+
         width = width or self.width
         height = height or self.height
         useShm = self.ctx.gctx.avail('MIT-SHM')  # type: ignore
 
         if useShm:
             shm = xcb.createShm(
-                self.ctx.connection, height * width * 4
+                gctx.connection, height * width * 4
             )  # TODO: get the *actual* depth here
 
             resp = xcb.xcbShmGetImageReply(
-                self.ctx.connection,
+                gctx.connection,
                 xcb.xcbShmGetImageUnchecked(
-                    self.ctx.connection,
+                    gctx.connection,
                     self.id,
                     x,
                     y,
@@ -287,9 +307,9 @@ class Window(GWindow):
             out = ffi.buffer(shm.addr, resp.size)
         else:
             resp = xcb.xcbGetImageReply(
-                self.ctx.connection,
+                gctx.connection,
                 xcb.xcbGetImage(
-                    self.ctx.connection,
+                    gctx.connection,
                     xcb.XCBImageFormatZPixmap,
                     self.id,
                     x,
@@ -314,25 +334,27 @@ class Window(GWindow):
             out = out.copy()  # if this isnt here, we get a segfault loool
             # i think this happens because numpy tries to reference the, now freed, memory
             # (probably because memcpy-ing before doing anything is slower lol)
-            xcb.removeShm(self.ctx.connection, shm)
+            xcb.removeShm(gctx.connection, shm)
         out = out.reshape((height, width, depth))
         return out
 
     async def reparent(self, parent: 'Window', x: int, y: int):
         assert not self.ctx.closed, 'conn is closed'
 
-        fn = partial(
-            xcb.xcbReparentWindow, self.ctx.connection, self.id, parent.id, x, y
-        )
+        gctx: GCtx = self.ctx._getGCtx()
+
+        fn = partial(xcb.xcbReparentWindow, gctx.connection, self.id, parent.id, x, y)
 
         await runAndWait(self.ctx, [reparent], fn)
 
     async def kill(self):
         assert not self.ctx.closed, 'conn is closed'
 
+        gctx: GCtx = self.ctx._getGCtx()
+
         # the nuclear option
         # ? should we wait for something here lol?
-        xcb.xcbKillClient(self.ctx.connection, self.id)
-        xcb.xcbFlush(self.ctx.connection)
+        xcb.xcbKillClient(gctx.connection, self.id)
+        xcb.xcbFlush(gctx.connection)
 
         log('windows', DEBUG, f'killed {self}')

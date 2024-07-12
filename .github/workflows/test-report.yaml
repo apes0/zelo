@@ -20,5 +20,5 @@ jobs:
         artifact: test-results
         token: ${{ github.token }}
         name: Test Report
-        path: 'junit/*.xml'
+        path: 'test-results.xml'
         reporter: java-junit

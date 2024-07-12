@@ -22,7 +22,7 @@ def alock(afn):
 
             await afn(*a, **kwa)
         except trio.Cancelled:
-            pass # we still need to get to the finishing code, otherwise, we break the whole lock because i isn't decreased
+            pass  # we still need to get to the finishing code, otherwise, we break the whole lock because i isn't decreased
 
         myEv.set()
         i -= 1
@@ -50,7 +50,7 @@ def calock(afn):
 
             await afn(self, *a, **kwa)
         except trio.Cancelled:
-            pass # same as alock
+            pass  # same as alock
 
         myEv.set()
         i[self] -= 1

@@ -10,7 +10,6 @@
 - decide wheather to use the generic types or using the backend's types for typing
 - docs and docstrings
 - use the sequence thing in x11 backend
-- actually implement GCtx lol
 - always use checked function for xcb to catch errors
 - make all scripts be bash
 - use Xvideo (x plugin, not porn) and implement a Video class for the x backend (?)

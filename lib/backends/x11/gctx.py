@@ -6,12 +6,16 @@ from .window import Window
 
 if TYPE_CHECKING:
     from ...ctx import Ctx as Ctxt
-    from ..generic import GWindow
+    from ..generic import GWindow, CData
 
 
 class Ctx(GCtx):
     def __init__(self, ctx: 'Ctxt') -> None:
         self.ctx = ctx
+        self.connection: CData
+        self.dname: CData
+        self.screenp: CData
+        self.values: CData
         self.extResps = {}
         self.sharedPixmaps: bool = False
 
@@ -20,15 +24,15 @@ class Ctx(GCtx):
 
     def sendEvent(self, event, window: 'GWindow') -> None:
         assert not self.ctx.closed, 'conn is closed'
-        
+
         xcb.xcbSendEvent(
-            self.ctx.connection,
+            self.connection,
             1,
             window.id,
             xcb.XCBEventMaskKeyPress | xcb.XCBEventMaskKeyRelease,
             charpC(event),
         )
-        xcb.xcbFlush(self.ctx.connection)
+        xcb.xcbFlush(self.connection)
 
     def createWindow(
         self,
@@ -41,10 +45,10 @@ class Ctx(GCtx):
         ignore: bool,
     ):
         assert not self.ctx.closed, 'conn is closed'
-        
-        window = xcb.xcbGenerateId(self.ctx.connection)
+
+        window = xcb.xcbGenerateId(self.connection)
         xcb.xcbCreateWindow(
-            self.ctx.connection,
+            self.connection,
             xcb.XCBCopyFromParent,
             window,
             parent.id,
@@ -69,5 +73,5 @@ class Ctx(GCtx):
     def disconnect(self):
         assert not self.ctx.closed, 'conn is closed'
 
-        xcb.xcbDisconnect(self.ctx.connection)
-        self.ctx.connection = xcb.NULL
+        xcb.xcbDisconnect(self.connection)
+        self.connection = xcb.NULL

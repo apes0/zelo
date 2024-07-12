@@ -73,6 +73,7 @@ async def createNotify(event, ctx: 'Ctx'):
 
 @handler(xcb.XCBMapRequest)
 async def mapRequest(event, ctx: 'Ctx'):
+    gctx = ctx._getGCtx()
     # NOTE: its not our responsibility to map or focus the window, the tiler should do so
     event = xcb.XcbMapRequestEventT(mapRequestTC(event))
     _id: int = event.window
@@ -81,9 +82,9 @@ async def mapRequest(event, ctx: 'Ctx'):
     window.parent = ctx.getWindow(event.parent)
     # TODO: this is the only instance of ctx.values in the code, so we should remove it
     # its just a leftover from the initial code and i think i can remove it
-    ctx.values[0] = xcb.XCBEventMaskEnterWindow | xcb.XCBEventMaskLeaveWindow
+    gctx.values[0] = xcb.XCBEventMaskEnterWindow | xcb.XCBEventMaskLeaveWindow
     xcb.xcbChangeWindowAttributesChecked(
-        ctx.connection, _id, xcb.XCBCwEventMask, ctx.values
+        gctx.connection, _id, xcb.XCBCwEventMask, gctx.values
     )
 
     await window.mapRequest.trigger(ctx)
@@ -113,15 +114,17 @@ async def confRequest(event, ctx: 'Ctx'):
             change.append(max(value, 0))  # safety first :)
             window.__dict__[lable] = value
 
+    gctx = ctx._getGCtx()
+
     vals = uintarr(change)
     xcb.xcbConfigureWindow(
-        ctx.connection,
+        gctx.connection,
         event.window,
         valueMask,
         vals,
     )
 
-    xcb.xcbFlush(ctx.connection)
+    xcb.xcbFlush(gctx.connection)
 
     await window.configureRequest.trigger(ctx)
     await events.configureRequest.trigger(ctx, window)
@@ -257,8 +260,10 @@ async def motionNotify(event, ctx: 'Ctx'):
 async def error(event, ctx: 'Ctx'):
     event = xcb.XcbGenericErrorT(genericErrorTC(event))
 
+    gctx = ctx._getGCtx()
+
     _errCtx = xcbErrorContext()
-    xcb.xcbErrorsContextNew(ctx.connection, _errCtx)
+    xcb.xcbErrorsContextNew(gctx.connection, _errCtx)
     errCtx = _errCtx[0]
     extension = charpp()
 
@@ -409,9 +414,10 @@ ignore = [9, 10, 14, 89]  # list of events to ignore
 # TODO: support event 34 (XCB_MAPPING_NOTIFY)
 async def setup(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
     # this is, in practice, the init function for the ctx
-    ctx.dname = ctx.dname if hasattr(ctx, 'dname') else xcb.NULL
-    ctx.screenp = intp(0)
-    ctx.gctx = GCtx(ctx)
+    gctx = GCtx(ctx)
+    gctx.dname = gctx.dname if hasattr(ctx, 'dname') else xcb.NULL
+    gctx.screenp = intp(0)
+    ctx.gctx = gctx
 
     conn: GConnection = Connection(
         ctx
@@ -422,18 +428,20 @@ async def setup(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
     async def _update():
         await update(ctx, conn)
 
-    ctx.watcher.watch(xcb.xcbGetFileDescriptor(ctx.connection), _update)
+    ctx.watcher.watch(xcb.xcbGetFileDescriptor(gctx.connection), _update)
 
     task_status.started()
 
 
 async def update(ctx: 'Ctx', conn: 'GConnection'):
-    if ctx.closed or xcb.xcbConnectionHasError(ctx.connection):
+    gctx = ctx._getGCtx()
+
+    if ctx.closed or xcb.xcbConnectionHasError(gctx.connection):
         conn.disconnect()
         return
 
-    while not ctx.closed: # we might get closed ig lol
-        event = xcb.xcbPollForEvent(ctx.connection)
+    while not ctx.closed:  # we might get closed ig lol
+        event = xcb.xcbPollForEvent(gctx.connection)
         if event == xcb.NULL:
             return
 
@@ -441,6 +449,5 @@ async def update(ctx: 'Ctx', conn: 'GConnection'):
         if handler := handlers.get(eventType, None):
             ctx.nurs.start_soon(handler, event, ctx)
         elif eventType not in ignore:
-#            ctx.gctx = cast(GCtx, ctx.gctx)
-#            print(eventType - ctx.gctx.extResps['RANDR'])
+            #            print(eventType - gctx.extResps['RANDR'])
             log('others', WARN, f'No handler for: {eventType}')

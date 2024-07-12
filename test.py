@@ -7,12 +7,12 @@ from logging import DEBUG
 import trio
 import sys
 
-#for c in cfg:
+# for c in cfg:
 #    cfg[c] = False
 
-#logger.setLevel(DEBUG)
+# logger.setLevel(DEBUG)
 
-#cfg['events'] = True
+# cfg['events'] = True
 
 repeat = 3
 
@@ -46,7 +46,7 @@ async def main():
 
     for test in tests:
         async with trio.open_nursery() as nurs:
-#            nurs.start_soon(a, nurs)
+            #            nurs.start_soon(a, nurs)
             for _ in range(repeat):
                 nurs.start_soon(run, test, nurs)
 

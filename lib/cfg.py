@@ -74,7 +74,7 @@ cfg.extensions = {
     },
     MouseFocus: {},
     Wallpaper: {'wall': wall},
-#    Wallpaper: {'wall': 'video.gif', 'video': True},
+    #    Wallpaper: {'wall': 'video.gif', 'video': True},
     Shortcuts: {'shortcuts': keys},
     Workspaces: {
         'prev': ((Key('left'), Key('super_l')), Mod('control')),

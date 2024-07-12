@@ -9,7 +9,7 @@ from .api.window import Window
 if TYPE_CHECKING:
     from ._cfg import Cfg
     from .backends.events import Event
-    from .backends.generic import CData, GCtx, GMouse, GScreen, GWindow
+    from .backends.generic import GCtx, GMouse, GScreen, GWindow
     from .extension import Extension
 
 
@@ -17,11 +17,7 @@ class Ctx:
     def __init__(self):
         self._root: int
         self.root: GWindow
-        self.dname: CData
-        self.screenp: CData
-        self.connection: CData
         self.screen: GScreen
-        self.values: CData
         self.gctx: GCtx
         self.windows: dict[int, GWindow] = {}
         self.watcher = Watcher(self)
@@ -78,10 +74,22 @@ class Ctx:
     def editable(self, win: 'GWindow') -> bool:
         # tells us if we can touch a window
         # NOTE: we can always do shit to windows, but this basically checks if we should
-        if win.ignore or not win.mapped or win.id == self._root or win.destroyed or win.id not in self.windows:
+        if (
+            win.ignore
+            or not win.mapped
+            or win.id == self._root
+            or win.destroyed
+            or win.id not in self.windows
+        ):
             return False
 
         return True
 
     def disconnect(self):
         self.gctx.disconnect()
+
+    def _getGCtx(self) -> Any:
+        # NOTE: this was made for typing reasons
+        # NOTE: basically, i just dont want to ``cast`` everywhere lol
+        # NOTE: fuck python typing
+        return self.gctx

@@ -1,12 +1,12 @@
 # from .ewmh import AtomStore
 from .mouse import Mouse
 from .. import xcb
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 from ..generic import GConnection
 from .window import Window
 from .types import intarr
 from .screen import Display, Screen
-from .keys import Mod, Key
+from .keys import Mod
 from .types import chararr
 from ...debcfg import log
 from logging import DEBUG
@@ -25,8 +25,9 @@ def init(fn):
 
 class Connection(GConnection):
     def __init__(self, ctx: 'Ctx') -> None:
-        self.conn = xcb.xcbConnect(ctx.dname, ctx.screenp)
-        ctx.connection = self.conn
+        gctx: GCtx = ctx._getGCtx()
+        self.conn = xcb.xcbConnect(gctx.dname, gctx.screenp)
+        gctx.connection = self.conn
         assert not xcb.xcbConnectionHasError(self.conn), 'Xcb connection error'
 
         for fn in initers:
@@ -38,8 +39,9 @@ class Connection(GConnection):
 
 @init
 def initScreens(ctx: 'Ctx'):
-    conn = ctx.connection
-    ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, ctx.screenp[0]))
+    gctx: GCtx = ctx._getGCtx()
+    conn = gctx.connection
+    ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, gctx.screenp[0]))
     ctx._root = ctx.screen.root
 
     screenRes = xcb.xcbRandrGetScreenResourcesReply(
@@ -66,20 +68,21 @@ def initScreens(ctx: 'Ctx'):
 
 @init
 def initWindows(ctx: 'Ctx'):
-    conn = ctx.connection
+    gctx: GCtx = ctx._getGCtx()
+    conn = gctx.connection
 
     ctx.root = Window(0, 0, 0, ctx._root, ctx)
-    ctx.values = intarr([0, 0, 0])  # magic values
-    ctx.values[0] = (
+    gctx.values = intarr([0, 0, 0])  # magic values
+    gctx.values[0] = (
         xcb.XCBEventMaskSubstructureRedirect
         | xcb.XCBEventMaskStructureNotify
         | xcb.XCBEventMaskSubstructureNotify
         | xcb.XCBEventMaskPropertyChange
         | xcb.XCBEventMaskExposure
-    )
+    )  # TODO: remove this shit lol
 
     xcb.xcbChangeWindowAttributesChecked(
-        conn, ctx._root, xcb.XCBCwEventMask, ctx.values
+        conn, ctx._root, xcb.XCBCwEventMask, gctx.values
     )
     xcb.xcbUngrabKey(conn, xcb.XCBGrabAny, ctx._root, xcb.XCBModMaskAny)
 
@@ -127,8 +130,10 @@ def initMouse(ctx: 'Ctx'):
 
 @init
 def initModMap(ctx: 'Ctx'):
+    gctx: GCtx = ctx._getGCtx()
+
     rep = xcb.xcbGetModifierMappingReply(
-        ctx.connection, xcb.xcbGetModifierMappingUnchecked(ctx.connection), xcb.NULL
+        gctx.connection, xcb.xcbGetModifierMappingUnchecked(gctx.connection), xcb.NULL
     )
 
     mappings = xcb.xcbGetModifierMappingKeycodes(rep)
@@ -144,11 +149,6 @@ def initModMap(ctx: 'Ctx'):
                 *Mod.mappings.get(mod, []),
                 key,
             ]
-
-
-@init
-def initSyms(ctx: 'Ctx'):
-    Key.syms = xcb.xcbKeySymbolsAlloc(ctx.connection)
 
 
 # list of all extensions i had on my x server (via ``xdpyinfo -display :1 -queryExtensions``):
@@ -187,32 +187,32 @@ def initSyms(ctx: 'Ctx'):
 
 @init
 def extensions(ctx: 'Ctx'):
-    ctx.gctx = cast('GCtx', ctx.gctx)
+    gctx: GCtx = ctx._getGCtx()
     reqs = {}
-    names = ['RANDR', 'MIT-SHM', 'XTEST']
+    names = ['RANDR', 'MIT-SHM', 'XTEST', 'RENDER']
 
     for name in names:
         reqs[name] = xcb.xcbQueryExtensionUnchecked(
-            ctx.connection, len(name), chararr(name.encode())
+            gctx.connection, len(name), chararr(name.encode())
         )
 
     for name, req in reqs.items():
-        rep = xcb.xcbQueryExtensionReply(ctx.connection, req, xcb.NULL)
+        rep = xcb.xcbQueryExtensionReply(gctx.connection, req, xcb.NULL)
 
-        ctx.gctx.extResps[name] = rep
+        gctx.extResps[name] = rep
         log('backend', DEBUG, f'{name} is {"not "*(not rep.present)}present')
 
 
 @init
 def shm(ctx: 'Ctx'):
-    ctx.gctx = cast('GCtx', ctx.gctx)
-    if not ctx.gctx.avail('MIT-SHM'):
+    gctx: GCtx = ctx._getGCtx()
+    if not gctx.avail('MIT-SHM'):
         return
 
     rep = xcb.xcbShmQueryVersionReply(
-        ctx.connection, xcb.xcbShmQueryVersion(ctx.connection), xcb.NULL
+        gctx.connection, xcb.xcbShmQueryVersion(gctx.connection), xcb.NULL
     )
 
-    ctx.gctx.sharedPixmaps = bool(rep.sharedPixmaps)
+    gctx.sharedPixmaps = bool(rep.sharedPixmaps)
 
     log('backend', DEBUG, f'shared pixmaps are {"not "*(not rep.sharedPixmaps)}present')

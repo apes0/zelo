@@ -30,7 +30,6 @@ class GConnection:
         raise NotImplementedError
 
 
-# TODO: use this in ctx, basically as a ctx for the backend
 # gctx
 class GCtx:
     def __init__(self, ctx: 'Ctx') -> None:
@@ -39,9 +38,6 @@ class GCtx:
 
     def __repr__(self) -> str:
         return '<GCtx>'
-
-    def sendEvent(self, event, window: 'GWindow') -> None:
-        raise NotImplementedError
 
     def createWindow(
         self,
@@ -57,6 +53,7 @@ class GCtx:
 
     def disconnect(self):
         raise NotImplementedError
+
 
 # window
 class GWindow:
@@ -79,22 +76,23 @@ class GWindow:
 
         # events:
 
-        self.keyPress: 'Event'
-        self.keyRelease: 'Event'
-        self.buttonPress: 'Event'
-        self.buttonRelease: 'Event'
-        self.mapRequest: 'Event'
-        self.mapNotify: 'Event'
-        self.unmapNotify: 'Event'
-        self.destroyNotify: 'Event'
-        self.createNotify: 'Event'
-        self.configureNotify: 'Event'
-        self.configureRequest: 'Event'
-        self.enterNotify: 'Event'
-        self.leaveNotify: 'Event'
-        self.redraw: 'Event'
-        self.reparented: 'Event'
-        self.ignored: 'Event'
+        # NOTE: these are the actual events, im leaving them here, since they are "constant"
+        self.keyPress = Event('keyPress', GKey, GMod)
+        self.keyRelease = Event('keyRelease', GKey, GMod)
+        self.buttonPress = Event('buttonPress', GButton, GMod)
+        self.buttonRelease = Event('buttonRelease', GButton, GMod)
+        self.mapRequest = Event('mapRequest')
+        self.mapNotify = Event('mapNotify')
+        self.unmapNotify = Event('unmapNotify')
+        self.destroyNotify = Event('destroyNotify')
+        self.createNotify = Event('createNotify')
+        self.configureNotify = Event('configureNotify')
+        self.configureRequest = Event('configureRequest')
+        self.enterNotify = Event('enterNotify')
+        self.leaveNotify = Event('leaveNotify')
+        self.redraw = Event('redraw')  # exposure notify for x
+        self.reparented = Event('reparented', GWindow)  # my parent
+        self.ignored = Event('ignored')  # when we are marked as ignored
 
         raise NotImplementedError
 
@@ -167,9 +165,6 @@ class GKey:
 
     def __repr__(self) -> str:
         return f'<Key {self.lable} ({self.key})>'
-
-    def load(self, ctx: 'Ctx'):
-        raise NotImplementedError
 
     def grab(self, ctx: 'Ctx', window: GWindow, *modifiers: GMod):
         raise NotImplementedError

@@ -41,8 +41,8 @@ async def popen(nurs: trio.Nursery, cmd: str, env: dict | None = None) -> trio.P
                 cmd.split(' '),
                 task_status=task_status,
                 check=False,
-                stdout=dn, # thank fuck for these
-                stderr=dn, # thank fuck for these
+                stdout=dn,  # thank fuck for these
+                stderr=dn,  # thank fuck for these
                 env=env,
             )
         except BaseException:

@@ -52,6 +52,7 @@ def preEnd(pre: Pre):
 
     return deco
 
+
 @pre('X11')
 @alock
 async def startX(pre: Pre, ctx: TCtx, done: trio.Event):
@@ -70,7 +71,7 @@ async def startX(pre: Pre, ctx: TCtx, done: trio.Event):
     pre.data = proc
 
     for _ in range(20):
-        await trio.sleep(0.1) # i think xrefresh makes a lock????
+        await trio.sleep(0.1)  # i think xrefresh makes a lock????
         p = await popen(ctx.nurs, f'xrefresh -d {new}')
         if await p.wait():
             await pclose(p)
@@ -78,7 +79,9 @@ async def startX(pre: Pre, ctx: TCtx, done: trio.Event):
 
         await pclose(p)
 
-    assert (proc.poll() == None), f'Something went wrong with Xephyr (returned {proc.poll()} on display {i})'
+    assert (
+        proc.poll() == None
+    ), f'Something went wrong with Xephyr (returned {proc.poll()} on display {i})'
 
     ctx.env['DISPLAY'] = new
     done.set()

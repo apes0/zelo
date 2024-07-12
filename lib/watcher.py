@@ -42,7 +42,7 @@ class Watcher:
                 # we might have already removed the watcher while this was blocking...
                 # which is why we are using .get
 
-    async def start(self, ctx: 'Ctx', task_status: trio._core._run._TaskStatus):
+    async def start(self, ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
         # NOTE: i dont wanna run this in another thread but i might have to
         await trio.to_thread.run_sync(self.loop, ctx, task_status.started)
 
