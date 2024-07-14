@@ -1,6 +1,18 @@
 #!/usr/bin/zsh
 
+git submodule update --init --recursive || (
+
+# sometimes anongit is down lol, pia implemented a fix for this, so im copying it :)
+# https://github.com/pia-foss/desktop-dep-build/blob/master/anongit-freedesktop-org-is-down.sh
+
+for config in .git/modules/libxcb-*/config; do
+    echo "editing $config"
+    git config --file="$config" submodule.m4.url "https://gitlab.freedesktop.org/xorg/util/xcb-util-m4.git"
+done
+
 git submodule update --init --recursive
+)
+
 
 mypath=${0:a:h}
 cd $mypath
