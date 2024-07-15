@@ -1,6 +1,7 @@
 #!/usr/bin/zsh
 
-git submodule update --init --recursive || (
+timeout 20 git submodule update --init --recursive --depth=1 || (
+echo 'anongit timed out'
 
 # sometimes anongit is down lol, pia implemented a fix for this, so im copying it :)
 # https://github.com/pia-foss/desktop-dep-build/blob/master/anongit-freedesktop-org-is-down.sh
@@ -10,7 +11,7 @@ for config in .git/modules/libxcb-*/config; do
     git config --file="$config" submodule.m4.url "https://gitlab.freedesktop.org/xorg/util/xcb-util-m4.git"
 done
 
-git submodule update --init --recursive
+git submodule update --init --recursive --depth=1
 )
 
 
