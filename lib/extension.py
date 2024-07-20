@@ -4,6 +4,9 @@ from .backends.events import Event
 from .debcfg import log
 import traceback
 from typing import TYPE_CHECKING, Any, Callable
+import pickle
+import trio
+import os.path
 
 from utils.fns import get
 
@@ -13,6 +16,15 @@ if TYPE_CHECKING:
 # TODO: export what types of variables can be editted
 # FIXME: some extensions cannot be reused for some reason?
 
+dataDir = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), # /lib
+    '..', # /
+    'extensions', # /extensions
+    'data' # /extensions/data
+)
+
+fileFmt = '{ext}-{name}.pkl' # format for file names
+# TODO: should we put the file here?
 
 class Extension:
     def __init__(self, ctx: 'Ctx', cfg: dict, resolve={}) -> None:
@@ -47,6 +59,17 @@ class Extension:
 
     def unloader(self):
         pass  # the way to add custom unloading code
+
+    async def _openFile(self, name: str, mode: str):
+        return await trio.open_file(os.path.join(dataDir, fileFmt.format(ext=self.__class__.__name__, name=name)), mode)
+
+    async def loadData(self, name: str) -> object:
+        file = await self._openFile(name, 'rb')
+        return pickle.loads(await file.read())
+
+    async def saveData(self, name: str, data: object):
+        file = await self._openFile(name, 'wb')
+        await file.write(pickle.dumps(data))
 
 
 def setupExtensions(ctx: 'Ctx', extensions: dict):

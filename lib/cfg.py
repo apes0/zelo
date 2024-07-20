@@ -118,8 +118,8 @@ cfg.extensions = {
     Tabs: {},
     Borders: {'width': 5, 'focused': theme.fore, 'unfocused': theme.back},
     #    Winfo: {},
-    #    ShareServer:{},
-    #    ShareClient:{'addr': '0.0.0.0'},
+#    ShareServer:{},
+#    ShareClient:{'addr': '0.0.0.0'},
     #    Animation: {},
 }
 

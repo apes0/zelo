@@ -176,3 +176,6 @@ log
 a.out
 
 libxcb-errors/
+
+# lib data
+/extensions/data/*.pkl

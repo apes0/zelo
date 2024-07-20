@@ -12,7 +12,10 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives.serialization import (
     Encoding,
     PublicFormat,
+    PrivateFormat,
     load_pem_public_key,
+    load_pem_private_key,
+    NoEncryption
 )
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -36,18 +39,21 @@ if TYPE_CHECKING:
 # TODO: exclude/fetch window shortcuts on the client
 # TODO: client shortcut to sent io to the root window on the server
 # TODO: document this
+# TODO: multicast announce that we are running:
+# https://github.com/python-trio/trio/issues/537
+# https://stackoverflow.com/questions/603852/how-do-you-udp-multicast-in-python
 # FIXME: memory leaks when we dont use shm, must be something with screenshotting
 
 # This is how it works (from the server side):
-# First, we generate a public and private rsa key
-# We send the public one to the client
-# We receive back the password, encrypted with the public key
-# We decrypt it and compare it with our own
+# We send a pregenerated public key to the client
+# We receive back a fernet key, encrypted with the public key
+# We send the client our own fernet key, encrypter with the client's fernet key
+# Then we both xor the 2 keys we have
+# This is the final Fernet key, from now on everything is encrypter with it
+# We receive a password
+# We compare it with our own
 # If they don't match, close the connection
-# Otherwise, we read the client's next message, containing its own rsa public key
-# We send it our fernet key encrypted with its own public key, and it sends us its fernet key encrypted with our public key
-# We xor them, and use that as the actual fernet key
-# Finally, we enter a loop where we send (encrypted) window info until the client disconnects
+# Finally, we enter a loop where we send window info until the client disconnects
 
 # NOTE: fernet inflates message by around 33% at the best case...
 # source:
@@ -65,10 +71,6 @@ if TYPE_CHECKING:
 #         dat += struct.pack('B', random.randint(0, 255))
 
 #     print(len(fernet.encrypt(dat))/size)
-
-# NOTE: we regenerate the rsa key for every connection
-# That makes it impossible to just capture the message containing the password and reuse it
-# If we didn't, the you could just listen for the message with the password and repeat it, because it uses the same public key
 
 defPort = 3315  # eels lol
 
@@ -98,8 +100,16 @@ def decryptRsa(priv: rsa.RSAPrivateKey, data: bytes):
 def genKeys():
     priv = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     pub = priv.public_key()
-    pubBytes = pub.public_bytes(Encoding.PEM, PublicFormat.PKCS1)
-    return priv, pub, pubBytes
+
+    return priv, pub
+
+
+def pubBytes(pub: rsa.RSAPublicKey):
+    return pub.public_bytes(Encoding.PEM, PublicFormat.PKCS1)
+
+
+def privBytes(priv: rsa.RSAPrivateKey):
+    return priv.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, encryption_algorithm=NoEncryption())
 
 
 def xorb(b1: bytes, b2: bytes):
@@ -131,6 +141,31 @@ async def recv(stream: trio.SocketStream):
     return await _recv(stream, l)
 
 
+async def serverSwap(stream: trio.SocketStream, pubkey: str, privkey: str) -> Fernet:
+    await send(stream, pubkey.encode())
+    key = decryptRsa(
+        load_pem_private_key(privkey.encode(), None), await recv(stream)
+    )
+    _key = urlsafe_b64decode(Fernet.generate_key())
+    fernet = Fernet(urlsafe_b64encode(key))
+    await send(stream, fernet.encrypt(_key))
+
+    return Fernet(urlsafe_b64encode(xorb(key, _key)))
+
+
+async def clientSwap(stream: trio.SocketStream) -> Fernet:
+    public = await recv(stream)
+    key = Fernet.generate_key()
+
+    await send(stream,
+        encryptRsa(load_pem_public_key(public), urlsafe_b64decode(key))
+    )
+    fernet = Fernet(key)
+    _key = fernet.decrypt(await recv(stream))
+
+    return Fernet(urlsafe_b64encode(xorb(urlsafe_b64decode(key), _key)))
+
+
 class ShareServer(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.port = defPort
@@ -148,28 +183,22 @@ class ShareServer(Extension):
         ctx.nurs.start_soon(self.serve)
 
     async def serve(self):
-        async def _serve(stream: trio.SocketStream):
-            # generate the keys
-            myPriv, myPub, myPubBytes = genKeys()
+        try:
+            self.pubkey = load_pem_public_key(await self.loadData('pubkey'))
+            self.privkey = load_pem_private_key(await self.loadData('privkey'), None)
+        except:
+            self.privkey, self.pubkey = genKeys()
+            await self.saveData('pubkey', pubBytes(self.pubkey))
+            await self.saveData('privkey', privBytes(self.privkey))
 
-            await send(stream, myPubBytes)  # send the pubkey
-            auth = decryptRsa(myPriv, await recv(stream))  # recieve the auth
+        async def _serve(stream: trio.SocketStream):
+            fernet = await serverSwap(stream, pubBytes(self.pubkey).decode(), privBytes(self.privkey).decode())
+
+            auth = fernet.decrypt(await recv(stream))
 
             if auth != self.auth:  # check the auth
                 await stream.aclose()
                 return
-
-            clientPub: rsa.RSAPublicKey
-            clientPub = load_pem_public_key(await recv(stream))  # type: ignore
-            clientKey = decryptRsa(myPriv, await recv(stream))  # get the client's fkey
-
-            myKey = urlsafe_b64decode(Fernet.generate_key())  # generate my own key
-            await send(
-                stream, encryptRsa(clientPub, myKey)
-            )  # send encrypted fernet key
-
-            key = xorb(clientKey, myKey)
-            fernet = Fernet(urlsafe_b64encode(key))
 
             await self.conn(fernet, stream)
 
@@ -248,26 +277,9 @@ class ShareClient(Extension):
             await trio.sleep(self.retry)
 
     async def _connect(self, stream: trio.SocketStream):
-        serverPub = load_pem_public_key(await recv(stream))  # type: ignore
-        serverPub: rsa.RSAPublicKey
+        fernet = await clientSwap(stream)
 
-        await send(
-            stream, encryptRsa(serverPub, self.auth)
-        )  # send the auth encrypted with the server's key
-
-        myPriv, myPub, myPubBytes = genKeys()  # generate our own keys
-        myKey = urlsafe_b64decode(Fernet.generate_key())  # No mikey, thats so not right
-
-        await send(stream, myPubBytes)  # ? do we need to encrypt here?
-        await send(
-            stream, encryptRsa(serverPub, myKey)
-        )  # encrypt with the server's key
-
-        serverKey = decryptRsa(myPriv, await recv(stream))  # decrypt with our own key
-        key = xorb(serverKey, myKey)
-        print(len(serverKey), len(myKey), len(key))
-        print(urlsafe_b64encode(key), len(urlsafe_b64encode(key)))
-        fernet = Fernet(urlsafe_b64encode(key))
+        await send(stream, fernet.encrypt(self.auth))
 
         while True:
             data = fernet.decrypt(await recv(stream))
