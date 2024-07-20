@@ -41,7 +41,7 @@ cfg = Cfg()
 keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     #    ((Key('super_l'),), Mod('')): lambda _ctx: spawn('ulauncher-toggle'),
     ((Key('t'),), Mod('control')): lambda ctx: spawn('alacritty'),
-    ((Key('s'),), Mod('control')): lambda ctx: ctx.start_soon(stop(ctx)),
+    ((Key('s'),), Mod('control')): lambda ctx: ctx.nurs.start_soon(stop, ctx),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
     ((Key('x'),), Mod('control')): lambda ctx: (
         ctx.nurs.start_soon(ctx.focused.screenshot) if ctx.focused else None
@@ -118,8 +118,8 @@ cfg.extensions = {
     Tabs: {},
     Borders: {'width': 5, 'focused': theme.fore, 'unfocused': theme.back},
     #    Winfo: {},
-#    ShareServer:{},
-#    ShareClient:{'addr': '0.0.0.0'},
+    #    ShareServer:{},
+    #    ShareClient:{'addr': '0.0.0.0'},
     #    Animation: {},
 }
 

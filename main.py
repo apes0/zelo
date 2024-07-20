@@ -15,14 +15,14 @@ import trio
 async def main():
     ctx = Ctx()
     ctx.cfg = cfg
-    async with trio.open_nursery() as nurs:
-        ctx.nurs = nurs
-        try:
+    try:
+        async with trio.open_nursery() as nurs:
+            ctx.nurs = nurs
             await nurs.start(load('events').setup, ctx)
             await nurs.start(ctx.watcher.start, ctx)
-        except:
-            log('errors', FATAL, f'main function encountered {traceback.format_exc()}')
-            return
+    except:
+        log('errors', FATAL, f'main function encountered {traceback.format_exc()}')
+        return
         # ? maybe init extensions here?
 
 
