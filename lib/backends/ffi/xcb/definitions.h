@@ -654,7 +654,7 @@ typedef struct xcb_randr_crtc_change_t
     xcb_randr_crtc_t crtc;
     xcb_randr_mode_t mode;
     unsigned short rotation;
-    unsigned int pad0[2];
+    unsigned char pad0[2];
     short x;
     short y;
     unsigned short width;
@@ -687,14 +687,14 @@ typedef struct xcb_randr_output_property_t
     xcb_atom_t atom;
     xcb_timestamp_t timestamp;
     unsigned int status;
-    unsigned int pad0[11];
+    unsigned char pad0[11];
 } xcb_randr_output_property_t;
 typedef struct xcb_randr_provider_change_t
 {
     xcb_timestamp_t timestamp;
     xcb_window_t window;
     xcb_randr_provider_t provider;
-    unsigned int pad0[16];
+    unsigned char pad0[16];
 } xcb_randr_provider_change_t;
 typedef struct xcb_randr_provider_property_t
 {
@@ -703,13 +703,13 @@ typedef struct xcb_randr_provider_property_t
     xcb_atom_t atom;
     xcb_timestamp_t timestamp;
     unsigned int state;
-    unsigned int pad0[11];
+    unsigned char pad0[11];
 } xcb_randr_provider_property_t;
 typedef struct xcb_randr_resource_change_t
 {
     xcb_timestamp_t timestamp;
     xcb_window_t window;
-    unsigned int pad0[20];
+    unsigned char pad0[20];
 } xcb_randr_resource_change_t;
 typedef union xcb_randr_notify_data_t
 {
@@ -842,7 +842,8 @@ typedef enum xcb_window_class_t
     XCB_WINDOW_CLASS_INPUT_ONLY = 2
 } xcb_window_class_t;
 
-typedef struct xcb_query_extension_reply_t {
+typedef struct xcb_query_extension_reply_t
+{
     unsigned char response_type;
     unsigned char pad0;
     unsigned short sequence;
@@ -852,27 +853,32 @@ typedef struct xcb_query_extension_reply_t {
     unsigned char first_event;
     unsigned char first_error;
 } xcb_query_extension_reply_t;
-typedef struct xcb_get_modifier_mapping_cookie_t {
+typedef struct xcb_get_modifier_mapping_cookie_t
+{
     unsigned int sequence;
 } xcb_get_modifier_mapping_cookie_t;
-typedef struct xcb_get_modifier_mapping_reply_t {
-    unsigned char  response_type;
-    unsigned char  keycodes_per_modifier;
+typedef struct xcb_get_modifier_mapping_reply_t
+{
+    unsigned char response_type;
+    unsigned char keycodes_per_modifier;
     unsigned short sequence;
     unsigned int length;
-    unsigned char  pad0[24];
+    unsigned char pad0[24];
 } xcb_get_modifier_mapping_reply_t;
-typedef enum xcb_stack_mode_t {
+typedef enum xcb_stack_mode_t
+{
     XCB_STACK_MODE_ABOVE = 0,
     XCB_STACK_MODE_BELOW = 1,
     XCB_STACK_MODE_TOP_IF = 2,
     XCB_STACK_MODE_BOTTOM_IF = 3,
     XCB_STACK_MODE_OPPOSITE = 4
 } xcb_stack_mode_t;
-typedef struct xcb_get_image_cookie_t {
+typedef struct xcb_get_image_cookie_t
+{
     unsigned int sequence;
 } xcb_get_image_cookie_t;
-typedef struct xcb_get_image_reply_t {
+typedef struct xcb_get_image_reply_t
+{
     unsigned char response_type;
     unsigned char depth;
     unsigned short sequence;
@@ -883,10 +889,12 @@ typedef struct xcb_get_image_reply_t {
 typedef struct extension_info_t extension_info_t;
 typedef struct xcb_errors_context_t xcb_errors_context_t;
 typedef unsigned int xcb_shm_seg_t;
-typedef struct xcb_shm_get_image_cookie_t {
+typedef struct xcb_shm_get_image_cookie_t
+{
     unsigned int sequence;
 } xcb_shm_get_image_cookie_t;
-typedef struct xcb_shm_get_image_reply_t {
+typedef struct xcb_shm_get_image_reply_t
+{
     unsigned char response_type;
     unsigned char depth;
     unsigned short sequence;
@@ -895,25 +903,29 @@ typedef struct xcb_shm_get_image_reply_t {
     unsigned int size;
 } xcb_shm_get_image_reply_t;
 typedef struct xcb_extension_t xcb_extension_t;
-typedef struct xcb_query_extension_cookie_t {
+typedef struct xcb_query_extension_cookie_t
+{
     unsigned int sequence;
 } xcb_query_extension_cookie_t;
-typedef struct xcb_shm_query_version_cookie_t {
+typedef struct xcb_shm_query_version_cookie_t
+{
     unsigned int sequence;
 } xcb_shm_query_version_cookie_t;
-typedef struct xcb_shm_query_version_reply_t {
-    unsigned char  response_type;
-    unsigned char  shared_pixmaps;
+typedef struct xcb_shm_query_version_reply_t
+{
+    unsigned char response_type;
+    unsigned char shared_pixmaps;
     unsigned short sequence;
     unsigned int length;
     unsigned short major_version;
     unsigned short minor_version;
     unsigned short uid;
     unsigned short gid;
-    unsigned char  pixmap_format;
-    unsigned char  pad0[15];
+    unsigned char pixmap_format;
+    unsigned char pad0[15];
 } xcb_shm_query_version_reply_t;
-typedef struct xcb_reparent_notify_event_t {
+typedef struct xcb_reparent_notify_event_t
+{
     unsigned char response_type;
     unsigned char pad0;
     unsigned short sequence;
@@ -1005,7 +1017,7 @@ xcb_void_cookie_t xcb_destroy_window(xcb_connection_t *c, xcb_window_t window);
 void xcb_image_destroy(xcb_image_t *image);
 xcb_void_cookie_t xcb_create_window(xcb_connection_t *conn, unsigned char depth, xcb_window_t wid, xcb_window_t parent, short x, short y, unsigned short width, unsigned short height, unsigned short border_width, unsigned short _class, xcb_visualid_t visual, unsigned int value_mask, const void *value_list);
 xcb_void_cookie_t xcb_test_fake_input(xcb_connection_t *c, unsigned char type, unsigned char detail, unsigned int time, xcb_window_t root, short rootX, short rootY, unsigned char deviceid);
-const struct xcb_query_extension_reply_t* xcb_get_extension_data(xcb_connection_t *c, xcb_extension_t *ext);
+const struct xcb_query_extension_reply_t *xcb_get_extension_data(xcb_connection_t *c, xcb_extension_t *ext);
 xcb_get_modifier_mapping_cookie_t xcb_get_modifier_mapping_unchecked(xcb_connection_t *c);
 xcb_get_modifier_mapping_reply_t *xcb_get_modifier_mapping_reply(xcb_connection_t *c, xcb_get_modifier_mapping_cookie_t cookie, xcb_generic_error_t **e);
 xcb_keycode_t *xcb_get_modifier_mapping_keycodes(const xcb_get_modifier_mapping_reply_t *R);
