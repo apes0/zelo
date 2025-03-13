@@ -1,42 +1,45 @@
 from _cffi_backend import _CDataBase
 from xcb_cffi import lib, ffi
+from typing import Any
 from .base import Base, parseArgs
 
+# some random types to get shit to work
+
+class Ptr[T](Base):
+    def __init__(self, obj: T):
+        self.obj: T = obj
+
+type CPtr[T] = T
+
 NULL = ffi.NULL
+void = Ptr
+enum = Ptr
 
 # types
-
 # skipping Xcbkeysymbols, because its not fully defined
-
+class Xcbkeysymbols(Base):
+    def __init__(self, obj):
+        self.obj = obj
 # skipping ExtensionInfoT, because its not fully defined
-
-
+class ExtensionInfoT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 class XcbAtomEnumT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbAtomT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbButtonIndexT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbButtonPressEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.child: int = obj.child
         self.detail: int = obj.detail
         self.event: int = obj.event
@@ -51,57 +54,39 @@ class XcbButtonPressEventT(Base):
         self.sequence: int = obj.sequence
         self.state: int = obj.state
         self.time: int = obj.time
-
-
 class XcbButtonT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbClientMessageDataT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.data16: _CDataBase = obj.data16
         self.data32: _CDataBase = obj.data32
         self.data8: _CDataBase = obj.data8
-
-
 class XcbClientMessageEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.data: _CDataBase = obj.data
         self.format: int = obj.format
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.type: int = obj.type
         self.window: int = obj.window
-
-
 class XcbColormapT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbConfigWindowT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbConfigureNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.aboveSibling: int = obj.above_sibling
         self.borderWidth: int = obj.border_width
         self.event: int = obj.event
@@ -115,13 +100,10 @@ class XcbConfigureNotifyEventT(Base):
         self.window: int = obj.window
         self.x: int = obj.x
         self.y: int = obj.y
-
-
 class XcbConfigureRequestEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.borderWidth: int = obj.border_width
         self.height: int = obj.height
         self.parent: int = obj.parent
@@ -134,16 +116,14 @@ class XcbConfigureRequestEventT(Base):
         self.window: int = obj.window
         self.x: int = obj.x
         self.y: int = obj.y
-
-
 # skipping XcbConnectionT, because its not fully defined
-
-
+class XcbConnectionT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 class XcbCreateNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.borderWidth: int = obj.border_width
         self.height: int = obj.height
         self.overrideRedirect: int = obj.override_redirect
@@ -156,46 +136,31 @@ class XcbCreateNotifyEventT(Base):
         self.window: int = obj.window
         self.x: int = obj.x
         self.y: int = obj.y
-
-
 class XcbCursorT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbCwT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbDestroyNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.event: int = obj.event
         self.pad0: int = obj.pad0
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.window: int = obj.window
-
-
 class XcbDrawableT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbEnterNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.child: int = obj.child
         self.detail: int = obj.detail
         self.event: int = obj.event
@@ -210,23 +175,18 @@ class XcbEnterNotifyEventT(Base):
         self.sequence: int = obj.sequence
         self.state: int = obj.state
         self.time: int = obj.time
-
-
 # skipping XcbErrorsContextT, because its not fully defined
-
-
+class XcbErrorsContextT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 class XcbEventMaskT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbExposeEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.count: int = obj.count
         self.height: int = obj.height
         self.pad0: int = obj.pad0
@@ -237,50 +197,36 @@ class XcbExposeEventT(Base):
         self.window: int = obj.window
         self.x: int = obj.x
         self.y: int = obj.y
-
-
 # skipping XcbExtensionT, because its not fully defined
-
-
+class XcbExtensionT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 class XcbFocusInEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.detail: int = obj.detail
         self.event: int = obj.event
         self.mode: int = obj.mode
         self.pad0: _CDataBase = obj.pad0
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
-
-
 class XcbFontT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbGcT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbGcontextT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbGenericErrorT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.errorCode: int = obj.error_code
         self.fullSequence: int = obj.full_sequence
         self.majorCode: int = obj.major_code
@@ -290,65 +236,47 @@ class XcbGenericErrorT(Base):
         self.resourceId: int = obj.resource_id
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
-
-
 class XcbGenericEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.fullSequence: int = obj.full_sequence
         self.pad: _CDataBase = obj.pad
         self.pad0: int = obj.pad0
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
-
-
 class XcbGetAtomNameCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbGetAtomNameReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.length: int = obj.length
         self.nameLen: int = obj.name_len
         self.pad0: int = obj.pad0
         self.pad1: _CDataBase = obj.pad1
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
-
-
 class XcbGetAtomNameRequestT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.atom: int = obj.atom
         self.length: int = obj.length
         self.majorOpcode: int = obj.major_opcode
         self.pad0: int = obj.pad0
-
-
 class XcbGetGeometryCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbGetGeometryReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.borderWidth: int = obj.border_width
         self.depth: int = obj.depth
         self.height: int = obj.height
@@ -360,82 +288,58 @@ class XcbGetGeometryReplyT(Base):
         self.width: int = obj.width
         self.x: int = obj.x
         self.y: int = obj.y
-
-
 class XcbGetImageCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbGetImageReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.depth: int = obj.depth
         self.length: int = obj.length
         self.pad0: _CDataBase = obj.pad0
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.visual: int = obj.visual
-
-
 class XcbGetKeyboardMappingCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbGetKeyboardMappingReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.keysymsPerKeycode: int = obj.keysyms_per_keycode
         self.length: int = obj.length
         self.pad0: _CDataBase = obj.pad0
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
-
-
 class XcbGetModifierMappingCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbGetModifierMappingReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.keycodesPerModifier: int = obj.keycodes_per_modifier
         self.length: int = obj.length
         self.pad0: _CDataBase = obj.pad0
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
-
-
 class XcbGetPropertyCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbGetPropertyReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.bytesAfter: int = obj.bytes_after
         self.format: int = obj.format
         self.length: int = obj.length
@@ -444,28 +348,19 @@ class XcbGetPropertyReplyT(Base):
         self.sequence: int = obj.sequence
         self.type: int = obj.type
         self.valueLen: int = obj.value_len
-
-
 class XcbGetPropertyTypeT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbGetWindowAttributesCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbGetWindowAttributesReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.Class: int = obj._class
         self.allEventMasks: int = obj.all_event_masks
         self.backingPixel: int = obj.backing_pixel
@@ -485,34 +380,22 @@ class XcbGetWindowAttributesReplyT(Base):
         self.visual: int = obj.visual
         self.winGravity: int = obj.win_gravity
         self.yourEventMask: int = obj.your_event_mask
-
-
 class XcbGxT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbImageFormatT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbImageOrderT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbImageT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.base: _CDataBase = obj.base
         self.bitOrder: int = obj.bit_order
         self.bpp: int = obj.bpp
@@ -527,40 +410,28 @@ class XcbImageT(Base):
         self.stride: int = obj.stride
         self.unit: int = obj.unit
         self.width: int = obj.width
-
-
 class XcbInputFocusT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbInternAtomCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbInternAtomReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.atom: int = obj.atom
         self.length: int = obj.length
         self.pad0: int = obj.pad0
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
-
-
 class XcbKeyPressEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.child: int = obj.child
         self.detail: int = obj.detail
         self.event: int = obj.event
@@ -575,37 +446,26 @@ class XcbKeyPressEventT(Base):
         self.sequence: int = obj.sequence
         self.state: int = obj.state
         self.time: int = obj.time
-
-
 # skipping XcbKeySymbolsT, because its not fully defined
-
-
+class XcbKeySymbolsT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 class XcbKeycodeT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbKeysymT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbLineStyleT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbMapNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.event: int = obj.event
         self.overrideRedirect: int = obj.override_redirect
         self.pad0: int = obj.pad0
@@ -613,39 +473,27 @@ class XcbMapNotifyEventT(Base):
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.window: int = obj.window
-
-
 class XcbMapRequestEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.pad0: int = obj.pad0
         self.parent: int = obj.parent
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.window: int = obj.window
-
-
 class XcbMapStateT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbModMaskT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbMotionNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.child: int = obj.child
         self.detail: int = obj.detail
         self.event: int = obj.event
@@ -660,35 +508,23 @@ class XcbMotionNotifyEventT(Base):
         self.sequence: int = obj.sequence
         self.state: int = obj.state
         self.time: int = obj.time
-
-
 class XcbPixmapT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbPropModeT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbQueryExtensionCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbQueryExtensionReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.firstError: int = obj.first_error
         self.firstEvent: int = obj.first_event
         self.length: int = obj.length
@@ -697,21 +533,15 @@ class XcbQueryExtensionReplyT(Base):
         self.present: int = obj.present
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
-
-
 class XcbQueryPointerCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbQueryPointerReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.child: int = obj.child
         self.length: int = obj.length
         self.mask: int = obj.mask
@@ -724,21 +554,15 @@ class XcbQueryPointerReplyT(Base):
         self.sequence: int = obj.sequence
         self.winX: int = obj.win_x
         self.winY: int = obj.win_y
-
-
 class XcbQueryTreeCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbQueryTreeReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.childrenLen: int = obj.children_len
         self.length: int = obj.length
         self.pad0: int = obj.pad0
@@ -747,41 +571,40 @@ class XcbQueryTreeReplyT(Base):
         self.responseType: int = obj.response_type
         self.root: int = obj.root
         self.sequence: int = obj.sequence
-
-
 class XcbRandrCrtcChangeIteratorT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.data: _CDataBase = obj.data
         self.index: int = obj.index
         self.rem: int = obj.rem
-
-
-# skipping XcbRandrCrtcChangeT, because its not fully defined
-
-
+class XcbRandrCrtcChangeT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.crtc: int = obj.crtc
+        self.height: int = obj.height
+        self.mode: int = obj.mode
+        self.pad0: _CDataBase = obj.pad0
+        self.rotation: int = obj.rotation
+        self.timestamp: int = obj.timestamp
+        self.width: int = obj.width
+        self.window: int = obj.window
+        self.x: int = obj.x
+        self.y: int = obj.y
 class XcbRandrCrtcT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbRandrGetCrtcInfoCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbRandrGetCrtcInfoReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.height: int = obj.height
         self.length: int = obj.length
         self.mode: int = obj.mode
@@ -796,21 +619,15 @@ class XcbRandrGetCrtcInfoReplyT(Base):
         self.width: int = obj.width
         self.x: int = obj.x
         self.y: int = obj.y
-
-
 class XcbRandrGetScreenResourcesCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbRandrGetScreenResourcesReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.configTimestamp: int = obj.config_timestamp
         self.length: int = obj.length
         self.namesLen: int = obj.names_len
@@ -822,77 +639,73 @@ class XcbRandrGetScreenResourcesReplyT(Base):
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.timestamp: int = obj.timestamp
-
-
 class XcbRandrModeT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 # skipping XcbRandrNotifyDataT, because its not fully defined
-
+class XcbRandrNotifyDataT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 # skipping XcbRandrNotifyEventT, because its not fully defined
-
-
+class XcbRandrNotifyEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 class XcbRandrNotifyMaskT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbRandrNotifyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 # skipping XcbRandrOutputChangeT, because its not fully defined
-
+class XcbRandrOutputChangeT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 # skipping XcbRandrOutputPropertyT, because its not fully defined
-
-
+class XcbRandrOutputPropertyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 class XcbRandrOutputT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
-# skipping XcbRandrProviderChangeT, because its not fully defined
-
+        if obj == ffi.NULL:return
+class XcbRandrProviderChangeT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.pad0: _CDataBase = obj.pad0
+        self.provider: int = obj.provider
+        self.timestamp: int = obj.timestamp
+        self.window: int = obj.window
 # skipping XcbRandrProviderPropertyT, because its not fully defined
-
-
+class XcbRandrProviderPropertyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
 class XcbRandrProviderT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
-# skipping XcbRandrResourceChangeT, because its not fully defined
-
-
+        if obj == ffi.NULL:return
+class XcbRandrResourceChangeT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.pad0: _CDataBase = obj.pad0
+        self.timestamp: int = obj.timestamp
+        self.window: int = obj.window
 class XcbRectangleT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.height: int = obj.height
         self.width: int = obj.width
         self.x: int = obj.x
         self.y: int = obj.y
-
-
 class XcbReparentNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.event: int = obj.event
         self.overrideRedirect: int = obj.override_redirect
         self.pad0: int = obj.pad0
@@ -903,13 +716,10 @@ class XcbReparentNotifyEventT(Base):
         self.window: int = obj.window
         self.x: int = obj.x
         self.y: int = obj.y
-
-
 class XcbScreenT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.allowedDepthsLen: int = obj.allowed_depths_len
         self.backingStores: int = obj.backing_stores
         self.blackPixel: int = obj.black_pixel
@@ -926,20 +736,14 @@ class XcbScreenT(Base):
         self.whitePixel: int = obj.white_pixel
         self.widthInMillimeters: int = obj.width_in_millimeters
         self.widthInPixels: int = obj.width_in_pixels
-
-
 class XcbSendEventDestT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbSetupT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.bitmapFormatBitOrder: int = obj.bitmap_format_bit_order
         self.bitmapFormatScanlinePad: int = obj.bitmap_format_scanline_pad
         self.bitmapFormatScanlineUnit: int = obj.bitmap_format_scanline_unit
@@ -960,51 +764,36 @@ class XcbSetupT(Base):
         self.rootsLen: int = obj.roots_len
         self.status: int = obj.status
         self.vendorLen: int = obj.vendor_len
-
-
 class XcbShm(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.addr: _CDataBase = obj.addr
         self.id: int = obj.id
-
-
 class XcbShmGetImageCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbShmGetImageReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.depth: int = obj.depth
         self.length: int = obj.length
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.size: int = obj.size
         self.visual: int = obj.visual
-
-
 class XcbShmQueryVersionCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbShmQueryVersionReplyT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.gid: int = obj.gid
         self.length: int = obj.length
         self.majorVersion: int = obj.major_version
@@ -1015,34 +804,22 @@ class XcbShmQueryVersionReplyT(Base):
         self.sequence: int = obj.sequence
         self.sharedPixmaps: int = obj.shared_pixmaps
         self.uid: int = obj.uid
-
-
 class XcbShmSegT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbStackModeT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbTimestampT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbUnmapNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.event: int = obj.event
         self.fromConfigure: int = obj.from_configure
         self.pad0: int = obj.pad0
@@ -1050,46 +827,29 @@ class XcbUnmapNotifyEventT(Base):
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.window: int = obj.window
-
-
 class XcbVisualidT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbVoidCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-
-
 class XcbWindowClassT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbWindowEnumT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
-
+        if obj == ffi.NULL:return
 class XcbWindowT(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
-
+        if obj == ffi.NULL:return
 
 # funcs and vars
-
 XCBAtomAny: int = lib.XCB_ATOM_ANY
 XCBAtomArc: int = lib.XCB_ATOM_ARC
 XCBAtomAtom: int = lib.XCB_ATOM_ATOM
@@ -1345,164 +1105,97 @@ XCBWindowClassCopyFromParent: int = lib.XCB_WINDOW_CLASS_COPY_FROM_PARENT
 XCBWindowClassInputOnly: int = lib.XCB_WINDOW_CLASS_INPUT_ONLY
 XCBWindowClassInputOutput: int = lib.XCB_WINDOW_CLASS_INPUT_OUTPUT
 XCBWindowNone: int = lib.XCB_WINDOW_NONE
-createShm = lambda *a: XcbShm(lib.create_shm(*parseArgs(a)))
-removeShm = lambda *a: (lib.remove_shm(*parseArgs(a)))
-xcbAuxGetScreen = lambda *a: XcbScreenT(lib.xcb_aux_get_screen(*parseArgs(a)))
-xcbChangeProperty = lambda *a: XcbVoidCookieT(lib.xcb_change_property(*parseArgs(a)))
-xcbChangeWindowAttributesChecked = lambda *a: XcbVoidCookieT(
-    lib.xcb_change_window_attributes_checked(*parseArgs(a))
-)
-xcbCloseFont = lambda *a: XcbVoidCookieT(lib.xcb_close_font(*parseArgs(a)))
-xcbConfigureWindow = lambda *a: XcbVoidCookieT(lib.xcb_configure_window(*parseArgs(a)))
-xcbConnect = lambda *a: (lib.xcb_connect(*parseArgs(a)))
-xcbConnectionHasError = lambda *a: (lib.xcb_connection_has_error(*parseArgs(a)))
-xcbCopyArea = lambda *a: XcbVoidCookieT(lib.xcb_copy_area(*parseArgs(a)))
-xcbCreateGc = lambda *a: XcbVoidCookieT(lib.xcb_create_gc(*parseArgs(a)))
-xcbCreateGlyphCursor = lambda *a: XcbVoidCookieT(
-    lib.xcb_create_glyph_cursor(*parseArgs(a))
-)
-xcbCreatePixmap = lambda *a: XcbVoidCookieT(lib.xcb_create_pixmap(*parseArgs(a)))
-xcbCreateWindow = lambda *a: XcbVoidCookieT(lib.xcb_create_window(*parseArgs(a)))
-xcbDeleteProperty = lambda *a: XcbVoidCookieT(lib.xcb_delete_property(*parseArgs(a)))
-xcbDestroyWindow = lambda *a: XcbVoidCookieT(lib.xcb_destroy_window(*parseArgs(a)))
-xcbDisconnect = lambda *a: (lib.xcb_disconnect(*parseArgs(a)))
-xcbErrorsContextFree = lambda *a: (lib.xcb_errors_context_free(*parseArgs(a)))
-xcbErrorsContextNew = lambda *a: (lib.xcb_errors_context_new(*parseArgs(a)))
-xcbErrorsGetNameForError = lambda *a: (lib.xcb_errors_get_name_for_error(*parseArgs(a)))
-xcbErrorsGetNameForMajorCode = lambda *a: (
-    lib.xcb_errors_get_name_for_major_code(*parseArgs(a))
-)
-xcbErrorsGetNameForMinorCode = lambda *a: (
-    lib.xcb_errors_get_name_for_minor_code(*parseArgs(a))
-)
-xcbFlush = lambda *a: (lib.xcb_flush(*parseArgs(a)))
-xcbFreeCursor = lambda *a: XcbVoidCookieT(lib.xcb_free_cursor(*parseArgs(a)))
-xcbFreePixmap = lambda *a: XcbVoidCookieT(lib.xcb_free_pixmap(*parseArgs(a)))
-xcbGenerateId = lambda *a: (lib.xcb_generate_id(*parseArgs(a)))
-xcbGetAtomName = lambda *a: XcbGetAtomNameCookieT(lib.xcb_get_atom_name(*parseArgs(a)))
-xcbGetAtomNameName = lambda *a: (lib.xcb_get_atom_name_name(*parseArgs(a)))
-xcbGetAtomNameReply = lambda *a: XcbGetAtomNameReplyT(
-    lib.xcb_get_atom_name_reply(*parseArgs(a))
-)
-xcbGetExtensionData = lambda *a: (lib.xcb_get_extension_data(*parseArgs(a)))
-xcbGetFileDescriptor = lambda *a: (lib.xcb_get_file_descriptor(*parseArgs(a)))
-xcbGetGeometry = lambda *a: XcbGetGeometryCookieT(lib.xcb_get_geometry(*parseArgs(a)))
-xcbGetGeometryReply = lambda *a: XcbGetGeometryReplyT(
-    lib.xcb_get_geometry_reply(*parseArgs(a))
-)
-xcbGetImage = lambda *a: XcbGetImageCookieT(lib.xcb_get_image(*parseArgs(a)))
-xcbGetImageData = lambda *a: (lib.xcb_get_image_data(*parseArgs(a)))
-xcbGetImageDataLength = lambda *a: (lib.xcb_get_image_data_length(*parseArgs(a)))
-xcbGetImageReply = lambda *a: XcbGetImageReplyT(lib.xcb_get_image_reply(*parseArgs(a)))
-xcbGetKeyboardMapping = lambda *a: XcbGetKeyboardMappingCookieT(
-    lib.xcb_get_keyboard_mapping(*parseArgs(a))
-)
-xcbGetKeyboardMappingReply = lambda *a: XcbGetKeyboardMappingReplyT(
-    lib.xcb_get_keyboard_mapping_reply(*parseArgs(a))
-)
-xcbGetMaximumRequestLength = lambda *a: (
-    lib.xcb_get_maximum_request_length(*parseArgs(a))
-)
-xcbGetModifierMappingKeycodes = lambda *a: XcbKeycodeT(
-    lib.xcb_get_modifier_mapping_keycodes(*parseArgs(a))
-)
-xcbGetModifierMappingReply = lambda *a: XcbGetModifierMappingReplyT(
-    lib.xcb_get_modifier_mapping_reply(*parseArgs(a))
-)
-xcbGetModifierMappingUnchecked = lambda *a: XcbGetModifierMappingCookieT(
-    lib.xcb_get_modifier_mapping_unchecked(*parseArgs(a))
-)
-xcbGetProperty = lambda *a: XcbGetPropertyCookieT(lib.xcb_get_property(*parseArgs(a)))
-xcbGetPropertyReply = lambda *a: XcbGetPropertyReplyT(
-    lib.xcb_get_property_reply(*parseArgs(a))
-)
-xcbGetPropertyValue = lambda *a: (lib.xcb_get_property_value(*parseArgs(a)))
-xcbGetSetup = lambda *a: (lib.xcb_get_setup(*parseArgs(a)))
-xcbGetWindowAttributes = lambda *a: XcbGetWindowAttributesCookieT(
-    lib.xcb_get_window_attributes(*parseArgs(a))
-)
-xcbGetWindowAttributesReply = lambda *a: XcbGetWindowAttributesReplyT(
-    lib.xcb_get_window_attributes_reply(*parseArgs(a))
-)
-xcbGrabButton = lambda *a: XcbVoidCookieT(lib.xcb_grab_button(*parseArgs(a)))
-xcbGrabKey = lambda *a: XcbVoidCookieT(lib.xcb_grab_key(*parseArgs(a)))
-xcbImageCreateNative = lambda *a: XcbImageT(lib.xcb_image_create_native(*parseArgs(a)))
-xcbImageDestroy = lambda *a: (lib.xcb_image_destroy(*parseArgs(a)))
-xcbImagePut = lambda *a: XcbVoidCookieT(lib.xcb_image_put(*parseArgs(a)))
-xcbImageText8 = lambda *a: XcbVoidCookieT(lib.xcb_image_text_8(*parseArgs(a)))
-xcbInternAtom = lambda *a: XcbInternAtomCookieT(lib.xcb_intern_atom(*parseArgs(a)))
-xcbInternAtomReply = lambda *a: XcbInternAtomReplyT(
-    lib.xcb_intern_atom_reply(*parseArgs(a))
-)
-xcbKeySymbolsAlloc = lambda *a: (lib.xcb_key_symbols_alloc(*parseArgs(a)))
-xcbKeySymbolsFree = lambda *a: (lib.xcb_key_symbols_free(*parseArgs(a)))
-xcbKeySymbolsGetKeycode = lambda *a: XcbKeycodeT(
-    lib.xcb_key_symbols_get_keycode(*parseArgs(a))
-)
-xcbKillClient = lambda *a: XcbVoidCookieT(lib.xcb_kill_client(*parseArgs(a)))
-xcbMapWindow = lambda *a: XcbVoidCookieT(lib.xcb_map_window(*parseArgs(a)))
-xcbOpenFont = lambda *a: XcbVoidCookieT(lib.xcb_open_font(*parseArgs(a)))
-xcbPollForEvent = lambda *a: XcbGenericEventT(lib.xcb_poll_for_event(*parseArgs(a)))
-xcbPolyFillRectangle = lambda *a: XcbVoidCookieT(
-    lib.xcb_poly_fill_rectangle(*parseArgs(a))
-)
-xcbQueryExtensionReply = lambda *a: XcbQueryExtensionReplyT(
-    lib.xcb_query_extension_reply(*parseArgs(a))
-)
-xcbQueryExtensionUnchecked = lambda *a: XcbQueryExtensionCookieT(
-    lib.xcb_query_extension_unchecked(*parseArgs(a))
-)
-xcbQueryPointer = lambda *a: XcbQueryPointerCookieT(
-    lib.xcb_query_pointer(*parseArgs(a))
-)
-xcbQueryPointerReply = lambda *a: XcbQueryPointerReplyT(
-    lib.xcb_query_pointer_reply(*parseArgs(a))
-)
-xcbQueryTree = lambda *a: XcbQueryTreeCookieT(lib.xcb_query_tree(*parseArgs(a)))
-xcbQueryTreeChildren = lambda *a: XcbWindowT(lib.xcb_query_tree_children(*parseArgs(a)))
-xcbQueryTreeReply = lambda *a: XcbQueryTreeReplyT(
-    lib.xcb_query_tree_reply(*parseArgs(a))
-)
-xcbRandrGetCrtcInfo = lambda *a: XcbRandrGetCrtcInfoCookieT(
-    lib.xcb_randr_get_crtc_info(*parseArgs(a))
-)
-xcbRandrGetCrtcInfoReply = lambda *a: XcbRandrGetCrtcInfoReplyT(
-    lib.xcb_randr_get_crtc_info_reply(*parseArgs(a))
-)
-xcbRandrGetScreenResources = lambda *a: XcbRandrGetScreenResourcesCookieT(
-    lib.xcb_randr_get_screen_resources(*parseArgs(a))
-)
-xcbRandrGetScreenResourcesCrtcs = lambda *a: XcbRandrCrtcT(
-    lib.xcb_randr_get_screen_resources_crtcs(*parseArgs(a))
-)
-xcbRandrGetScreenResourcesCrtcsLength = lambda *a: (
-    lib.xcb_randr_get_screen_resources_crtcs_length(*parseArgs(a))
-)
-xcbRandrGetScreenResourcesReply = lambda *a: XcbRandrGetScreenResourcesReplyT(
-    lib.xcb_randr_get_screen_resources_reply(*parseArgs(a))
-)
-xcbRandrSelectInput = lambda *a: XcbVoidCookieT(
-    lib.xcb_randr_select_input(*parseArgs(a))
-)
-xcbReparentWindow = lambda *a: XcbVoidCookieT(lib.xcb_reparent_window(*parseArgs(a)))
-xcbSendEvent = lambda *a: XcbVoidCookieT(lib.xcb_send_event(*parseArgs(a)))
-xcbSetInputFocus = lambda *a: XcbVoidCookieT(lib.xcb_set_input_focus(*parseArgs(a)))
-xcbShmCreatePixmap = lambda *a: XcbVoidCookieT(lib.xcb_shm_create_pixmap(*parseArgs(a)))
-xcbShmGetImageReply = lambda *a: XcbShmGetImageReplyT(
-    lib.xcb_shm_get_image_reply(*parseArgs(a))
-)
-xcbShmGetImageUnchecked = lambda *a: XcbShmGetImageCookieT(
-    lib.xcb_shm_get_image_unchecked(*parseArgs(a))
-)
-xcbShmPutImage = lambda *a: XcbVoidCookieT(lib.xcb_shm_put_image(*parseArgs(a)))
-xcbShmQueryVersion = lambda *a: XcbShmQueryVersionCookieT(
-    lib.xcb_shm_query_version(*parseArgs(a))
-)
-xcbShmQueryVersionReply = lambda *a: XcbShmQueryVersionReplyT(
-    lib.xcb_shm_query_version_reply(*parseArgs(a))
-)
-xcbTestFakeInput = lambda *a: XcbVoidCookieT(lib.xcb_test_fake_input(*parseArgs(a)))
-xcbUngrabButton = lambda *a: XcbVoidCookieT(lib.xcb_ungrab_button(*parseArgs(a)))
-xcbUngrabKey = lambda *a: XcbVoidCookieT(lib.xcb_ungrab_key(*parseArgs(a)))
-xcbUnmapWindow = lambda *a: XcbVoidCookieT(lib.xcb_unmap_window(*parseArgs(a)))
-xcbWaitForEvent = lambda *a: XcbGenericEventT(lib.xcb_wait_for_event(*parseArgs(a)))
+
+def createShm(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbShm:return XcbShm(lib.create_shm(*parseArgs(a0, a1, )))
+def removeShm(a0: CPtr[XcbConnectionT], a1: XcbShm, ) -> void:return void(lib.remove_shm(*parseArgs(a0, a1, )))
+def xcbAuxGetScreen(a0: CPtr[XcbConnectionT], a1: int, ) -> CPtr[XcbScreenT]:return XcbScreenT(lib.xcb_aux_get_screen(*parseArgs(a0, a1, )))
+def xcbChangeProperty(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_change_property(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, )))
+def xcbChangeWindowAttributesChecked(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_change_window_attributes_checked(*parseArgs(a0, a1, a2, a3, )))
+def xcbCloseFont(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_close_font(*parseArgs(a0, a1, )))
+def xcbConfigureWindow(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_configure_window(*parseArgs(a0, a1, a2, a3, )))
+def xcbConnect(a0: Ptr[int], a1: Ptr[int], ) -> CPtr[XcbConnectionT]:return XcbConnectionT(lib.xcb_connect(*parseArgs(a0, a1, )))
+def xcbConnectionHasError(a0: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_connection_has_error(*parseArgs(a0, )))
+def xcbCopyArea(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: int, a8: int, a9: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_copy_area(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, )))
+def xcbCreateGc(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_gc(*parseArgs(a0, a1, a2, a3, a4, )))
+def xcbCreateGlyphCursor(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: int, a8: int, a9: int, a10: int, a11: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_glyph_cursor(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, )))
+def xcbCreatePixmap(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_pixmap(*parseArgs(a0, a1, a2, a3, a4, a5, )))
+def xcbCreateWindow(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: int, a8: int, a9: int, a10: int, a11: int, a12: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_window(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, )))
+def xcbDeleteProperty(a0: CPtr[XcbConnectionT], a1: int, a2: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_delete_property(*parseArgs(a0, a1, a2, )))
+def xcbDestroyWindow(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_destroy_window(*parseArgs(a0, a1, )))
+def xcbDisconnect(a0: CPtr[XcbConnectionT], ) -> void:return void(lib.xcb_disconnect(*parseArgs(a0, )))
+def xcbErrorsContextFree(a0: CPtr[XcbErrorsContextT], ) -> void:return void(lib.xcb_errors_context_free(*parseArgs(a0, )))
+def xcbErrorsContextNew(a0: CPtr[XcbConnectionT], a1: CPtr[XcbErrorsContextT], ) -> int:return int(lib.xcb_errors_context_new(*parseArgs(a0, a1, )))
+def xcbErrorsGetNameForError(a0: CPtr[XcbErrorsContextT], a1: int, a2: Ptr[int], ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_error(*parseArgs(a0, a1, a2, )))
+def xcbErrorsGetNameForMajorCode(a0: CPtr[XcbErrorsContextT], a1: int, ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_major_code(*parseArgs(a0, a1, )))
+def xcbErrorsGetNameForMinorCode(a0: CPtr[XcbErrorsContextT], a1: int, a2: int, ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_minor_code(*parseArgs(a0, a1, a2, )))
+def xcbFlush(a0: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_flush(*parseArgs(a0, )))
+def xcbFreeCursor(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_free_cursor(*parseArgs(a0, a1, )))
+def xcbFreePixmap(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_free_pixmap(*parseArgs(a0, a1, )))
+def xcbGenerateId(a0: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_generate_id(*parseArgs(a0, )))
+def xcbGetAtomName(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbGetAtomNameCookieT:return XcbGetAtomNameCookieT(lib.xcb_get_atom_name(*parseArgs(a0, a1, )))
+def xcbGetAtomNameName(a0: CPtr[XcbGetAtomNameReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_get_atom_name_name(*parseArgs(a0, )))
+def xcbGetAtomNameReply(a0: CPtr[XcbConnectionT], a1: XcbGetAtomNameCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetAtomNameReplyT]:return XcbGetAtomNameReplyT(lib.xcb_get_atom_name_reply(*parseArgs(a0, a1, a2, )))
+def xcbGetExtensionData(a0: CPtr[XcbConnectionT], a1: CPtr[XcbExtensionT], ) -> CPtr[XcbQueryExtensionReplyT]:return XcbQueryExtensionReplyT(lib.xcb_get_extension_data(*parseArgs(a0, a1, )))
+def xcbGetFileDescriptor(a0: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_get_file_descriptor(*parseArgs(a0, )))
+def xcbGetGeometry(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbGetGeometryCookieT:return XcbGetGeometryCookieT(lib.xcb_get_geometry(*parseArgs(a0, a1, )))
+def xcbGetGeometryReply(a0: CPtr[XcbConnectionT], a1: XcbGetGeometryCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetGeometryReplyT]:return XcbGetGeometryReplyT(lib.xcb_get_geometry_reply(*parseArgs(a0, a1, a2, )))
+def xcbGetImage(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: int, ) -> XcbGetImageCookieT:return XcbGetImageCookieT(lib.xcb_get_image(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, )))
+def xcbGetImageData(a0: CPtr[XcbGetImageReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_get_image_data(*parseArgs(a0, )))
+def xcbGetImageDataLength(a0: CPtr[XcbGetImageReplyT], ) -> int:return int(lib.xcb_get_image_data_length(*parseArgs(a0, )))
+def xcbGetImageReply(a0: CPtr[XcbConnectionT], a1: XcbGetImageCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetImageReplyT]:return XcbGetImageReplyT(lib.xcb_get_image_reply(*parseArgs(a0, a1, a2, )))
+def xcbGetKeyboardMapping(a0: CPtr[XcbConnectionT], a1: int, a2: int, ) -> XcbGetKeyboardMappingCookieT:return XcbGetKeyboardMappingCookieT(lib.xcb_get_keyboard_mapping(*parseArgs(a0, a1, a2, )))
+def xcbGetKeyboardMappingReply(a0: CPtr[XcbConnectionT], a1: XcbGetKeyboardMappingCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetKeyboardMappingReplyT]:return XcbGetKeyboardMappingReplyT(lib.xcb_get_keyboard_mapping_reply(*parseArgs(a0, a1, a2, )))
+def xcbGetMaximumRequestLength(a0: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_get_maximum_request_length(*parseArgs(a0, )))
+def xcbGetModifierMappingKeycodes(a0: CPtr[XcbGetModifierMappingReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_get_modifier_mapping_keycodes(*parseArgs(a0, )))
+def xcbGetModifierMappingReply(a0: CPtr[XcbConnectionT], a1: XcbGetModifierMappingCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetModifierMappingReplyT]:return XcbGetModifierMappingReplyT(lib.xcb_get_modifier_mapping_reply(*parseArgs(a0, a1, a2, )))
+def xcbGetModifierMappingUnchecked(a0: CPtr[XcbConnectionT], ) -> XcbGetModifierMappingCookieT:return XcbGetModifierMappingCookieT(lib.xcb_get_modifier_mapping_unchecked(*parseArgs(a0, )))
+def xcbGetProperty(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, ) -> XcbGetPropertyCookieT:return XcbGetPropertyCookieT(lib.xcb_get_property(*parseArgs(a0, a1, a2, a3, a4, a5, a6, )))
+def xcbGetPropertyReply(a0: CPtr[XcbConnectionT], a1: XcbGetPropertyCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetPropertyReplyT]:return XcbGetPropertyReplyT(lib.xcb_get_property_reply(*parseArgs(a0, a1, a2, )))
+def xcbGetPropertyValue(a0: CPtr[XcbGetPropertyReplyT], ) -> Ptr[void]:return Ptr(lib.xcb_get_property_value(*parseArgs(a0, )))
+def xcbGetSetup(a0: CPtr[XcbConnectionT], ) -> CPtr[XcbSetupT]:return XcbSetupT(lib.xcb_get_setup(*parseArgs(a0, )))
+def xcbGetWindowAttributes(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbGetWindowAttributesCookieT:return XcbGetWindowAttributesCookieT(lib.xcb_get_window_attributes(*parseArgs(a0, a1, )))
+def xcbGetWindowAttributesReply(a0: CPtr[XcbConnectionT], a1: XcbGetWindowAttributesCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetWindowAttributesReplyT]:return XcbGetWindowAttributesReplyT(lib.xcb_get_window_attributes_reply(*parseArgs(a0, a1, a2, )))
+def xcbGrabButton(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: int, a8: int, a9: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_grab_button(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, )))
+def xcbGrabKey(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_grab_key(*parseArgs(a0, a1, a2, a3, a4, a5, a6, )))
+def xcbImageCreateNative(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: XcbImageFormatT, a4: int, a5: Ptr[void], a6: int, a7: Ptr[int], ) -> CPtr[XcbImageT]:return XcbImageT(lib.xcb_image_create_native(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, )))
+def xcbImageDestroy(a0: CPtr[XcbImageT], ) -> void:return void(lib.xcb_image_destroy(*parseArgs(a0, )))
+def xcbImagePut(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: CPtr[XcbImageT], a4: int, a5: int, a6: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_image_put(*parseArgs(a0, a1, a2, a3, a4, a5, a6, )))
+def xcbImageText8(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: Ptr[int], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_image_text_8(*parseArgs(a0, a1, a2, a3, a4, a5, a6, )))
+def xcbInternAtom(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: Ptr[int], ) -> XcbInternAtomCookieT:return XcbInternAtomCookieT(lib.xcb_intern_atom(*parseArgs(a0, a1, a2, a3, )))
+def xcbInternAtomReply(a0: CPtr[XcbConnectionT], a1: XcbInternAtomCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbInternAtomReplyT]:return XcbInternAtomReplyT(lib.xcb_intern_atom_reply(*parseArgs(a0, a1, a2, )))
+def xcbKeySymbolsAlloc(a0: CPtr[XcbConnectionT], ) -> CPtr[Xcbkeysymbols]:return Xcbkeysymbols(lib.xcb_key_symbols_alloc(*parseArgs(a0, )))
+def xcbKeySymbolsFree(a0: CPtr[Xcbkeysymbols], ) -> void:return void(lib.xcb_key_symbols_free(*parseArgs(a0, )))
+def xcbKeySymbolsGetKeycode(a0: CPtr[Xcbkeysymbols], a1: int, ) -> Ptr[int]:return Ptr(lib.xcb_key_symbols_get_keycode(*parseArgs(a0, a1, )))
+def xcbKillClient(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_kill_client(*parseArgs(a0, a1, )))
+def xcbMapWindow(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_map_window(*parseArgs(a0, a1, )))
+def xcbOpenFont(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: Ptr[int], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_open_font(*parseArgs(a0, a1, a2, a3, )))
+def xcbPollForEvent(a0: CPtr[XcbConnectionT], ) -> CPtr[XcbGenericEventT]:return XcbGenericEventT(lib.xcb_poll_for_event(*parseArgs(a0, )))
+def xcbPolyFillRectangle(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: CPtr[XcbRectangleT], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_poly_fill_rectangle(*parseArgs(a0, a1, a2, a3, a4, )))
+def xcbQueryExtensionReply(a0: CPtr[XcbConnectionT], a1: XcbQueryExtensionCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbQueryExtensionReplyT]:return XcbQueryExtensionReplyT(lib.xcb_query_extension_reply(*parseArgs(a0, a1, a2, )))
+def xcbQueryExtensionUnchecked(a0: CPtr[XcbConnectionT], a1: int, a2: Ptr[int], ) -> XcbQueryExtensionCookieT:return XcbQueryExtensionCookieT(lib.xcb_query_extension_unchecked(*parseArgs(a0, a1, a2, )))
+def xcbQueryPointer(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbQueryPointerCookieT:return XcbQueryPointerCookieT(lib.xcb_query_pointer(*parseArgs(a0, a1, )))
+def xcbQueryPointerReply(a0: CPtr[XcbConnectionT], a1: XcbQueryPointerCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbQueryPointerReplyT]:return XcbQueryPointerReplyT(lib.xcb_query_pointer_reply(*parseArgs(a0, a1, a2, )))
+def xcbQueryTree(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbQueryTreeCookieT:return XcbQueryTreeCookieT(lib.xcb_query_tree(*parseArgs(a0, a1, )))
+def xcbQueryTreeChildren(a0: CPtr[XcbQueryTreeReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_query_tree_children(*parseArgs(a0, )))
+def xcbQueryTreeReply(a0: CPtr[XcbConnectionT], a1: XcbQueryTreeCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbQueryTreeReplyT]:return XcbQueryTreeReplyT(lib.xcb_query_tree_reply(*parseArgs(a0, a1, a2, )))
+def xcbRandrGetCrtcInfo(a0: CPtr[XcbConnectionT], a1: int, a2: int, ) -> XcbRandrGetCrtcInfoCookieT:return XcbRandrGetCrtcInfoCookieT(lib.xcb_randr_get_crtc_info(*parseArgs(a0, a1, a2, )))
+def xcbRandrGetCrtcInfoReply(a0: CPtr[XcbConnectionT], a1: XcbRandrGetCrtcInfoCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbRandrGetCrtcInfoReplyT]:return XcbRandrGetCrtcInfoReplyT(lib.xcb_randr_get_crtc_info_reply(*parseArgs(a0, a1, a2, )))
+def xcbRandrGetScreenResources(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbRandrGetScreenResourcesCookieT:return XcbRandrGetScreenResourcesCookieT(lib.xcb_randr_get_screen_resources(*parseArgs(a0, a1, )))
+def xcbRandrGetScreenResourcesCrtcs(a0: CPtr[XcbRandrGetScreenResourcesReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_randr_get_screen_resources_crtcs(*parseArgs(a0, )))
+def xcbRandrGetScreenResourcesCrtcsLength(a0: CPtr[XcbRandrGetScreenResourcesReplyT], ) -> int:return int(lib.xcb_randr_get_screen_resources_crtcs_length(*parseArgs(a0, )))
+def xcbRandrGetScreenResourcesReply(a0: CPtr[XcbConnectionT], a1: XcbRandrGetScreenResourcesCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbRandrGetScreenResourcesReplyT]:return XcbRandrGetScreenResourcesReplyT(lib.xcb_randr_get_screen_resources_reply(*parseArgs(a0, a1, a2, )))
+def xcbRandrSelectInput(a0: CPtr[XcbConnectionT], a1: int, a2: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_randr_select_input(*parseArgs(a0, a1, a2, )))
+def xcbReparentWindow(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_reparent_window(*parseArgs(a0, a1, a2, a3, a4, )))
+def xcbSendEvent(a0: CPtr[XcbConnectionT], a1: bool, a2: int, a3: int, a4: Ptr[int], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_send_event(*parseArgs(a0, a1, a2, a3, a4, )))
+def xcbSetInputFocus(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_set_input_focus(*parseArgs(a0, a1, a2, a3, )))
+def xcbShmCreatePixmap(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_shm_create_pixmap(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, )))
+def xcbShmGetImageReply(a0: CPtr[XcbConnectionT], a1: XcbShmGetImageCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbShmGetImageReplyT]:return XcbShmGetImageReplyT(lib.xcb_shm_get_image_reply(*parseArgs(a0, a1, a2, )))
+def xcbShmGetImageUnchecked(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: int, a8: int, a9: int, ) -> XcbShmGetImageCookieT:return XcbShmGetImageCookieT(lib.xcb_shm_get_image_unchecked(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, )))
+def xcbShmPutImage(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: int, a8: int, a9: int, a10: int, a11: int, a12: int, a13: int, a14: int, a15: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_shm_put_image(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, )))
+def xcbShmQueryVersion(a0: CPtr[XcbConnectionT], ) -> XcbShmQueryVersionCookieT:return XcbShmQueryVersionCookieT(lib.xcb_shm_query_version(*parseArgs(a0, )))
+def xcbShmQueryVersionReply(a0: CPtr[XcbConnectionT], a1: XcbShmQueryVersionCookieT, a2: CPtr[XcbGenericErrorT], ) -> CPtr[XcbShmQueryVersionReplyT]:return XcbShmQueryVersionReplyT(lib.xcb_shm_query_version_reply(*parseArgs(a0, a1, a2, )))
+def xcbTestFakeInput(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, a4: int, a5: int, a6: int, a7: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_test_fake_input(*parseArgs(a0, a1, a2, a3, a4, a5, a6, a7, )))
+def xcbUngrabButton(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_ungrab_button(*parseArgs(a0, a1, a2, a3, )))
+def xcbUngrabKey(a0: CPtr[XcbConnectionT], a1: int, a2: int, a3: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_ungrab_key(*parseArgs(a0, a1, a2, a3, )))
+def xcbUnmapWindow(a0: CPtr[XcbConnectionT], a1: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_unmap_window(*parseArgs(a0, a1, )))
+def xcbWaitForEvent(a0: CPtr[XcbConnectionT], ) -> CPtr[XcbGenericEventT]:return XcbGenericEventT(lib.xcb_wait_for_event(*parseArgs(a0, )))

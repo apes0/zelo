@@ -1,17 +1,25 @@
 from _cffi_backend import _CDataBase
-from cairo_cffi import lib, ffi
+from pango_cffi import lib, ffi
+from typing import Any
 from .base import Base, parseArgs
 
+# some random types to get shit to work
+
+class Ptr[T](Base):
+    def __init__(self, obj: T):
+        self.obj: T = obj
+
+type CPtr[T] = T
+
 NULL = ffi.NULL
+void = Ptr
+enum = Ptr
 
 # types
-
-
 class FtBitmap(Base):
     def __init__(self, obj):
         self.obj = obj
-        if obj == ffi.NULL:
-            return
+        if obj == ffi.NULL:return
         self.buffer: _CDataBase = obj.buffer
         self.numGrays: int = obj.num_grays
         self.palette: _CDataBase = obj.palette
@@ -21,9 +29,6 @@ class FtBitmap(Base):
         self.rows: int = obj.rows
         self.width: int = obj.width
 
-
-# skipping FtBitmap, because its not fully defined
-
 # funcs and vars
 
-render = lambda *a: FtBitmap(lib.render(*parseArgs(a)))
+def render(a0: Ptr[int], a1: Ptr[int], a2: int, a3: int, ) -> FtBitmap:return FtBitmap(lib.render(*parseArgs(a0, a1, a2, a3, )))

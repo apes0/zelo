@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from html import escape
 from .. import xcb
-from ..cairo import render
+from ..pango import render
 from xcb_cffi import ffi
 from ..generic import GImage, GWindow, GRectangle, GText
 

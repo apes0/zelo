@@ -17,7 +17,7 @@ from cffi import FFI
 
 xcb = 'xcb_cffi'
 wayland = 'wayland_cffi'
-cairo = 'cairo_cffi'
+pango = 'pango_cffi'
 standalone = '_standalone'  # this doesn't need to get built lol
 
 wrappers = {
@@ -69,14 +69,14 @@ buildX = partial(
     ],
     xcb,
 )
-buildCairo = partial(
-    build, 'cairo', ['pango', 'pangoft2', 'fontconfig', 'freetype2'], cairo
+buildpango = partial(
+    build, 'pango', ['pango', 'pangoft2', 'fontconfig', 'freetype2'], pango
 )
 
 
 buildWayland = partial(build, 'wayland', ['wayland-server'], wayland)
 
-builds = {wayland: buildWayland, cairo: buildCairo, xcb: buildX, standalone: lambda: 0}
+builds = {wayland: buildWayland, pango: buildpango, xcb: buildX, standalone: lambda: 0}
 
 
 def assertModule(imp, build):
@@ -111,8 +111,8 @@ log('backend', DEBUG, f'chose backend {imp}')
 
 assertModule(imp, _build)  # assert that we have the xcb/wayland module
 assertModule(
-    cairo, buildCairo
-)  # assert that we have the cairo module for text rendering
+    pango, buildpango
+)  # assert that we have the pango module for text rendering
 
 
 def load(

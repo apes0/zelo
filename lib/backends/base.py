@@ -1,9 +1,12 @@
 from _cffi_backend import _CDataBase
+from typing import Any
+
+# TODO: move Ptr[], CPtr, void and enum to here
 
 
-def parseArgs(args):
-#    print(args)
-#    import inspect, os, colorama; stack = inspect.stack(); whiteSpace = len(stack); print(*((lines:=[f'{" "*(whiteSpace := whiteSpace - 1)}L {colorama.Fore.GREEN}{x.function}{colorama.Style.RESET_ALL} | {os.path.basename(x.filename)}:{x.lineno}\n' for x in stack]).reverse() or lines)) # noqa
+def parseArgs(*args) -> list[Any]:
+    #    print(args)
+    #    import inspect, os, colorama; stack = inspect.stack(); whiteSpace = len(stack); print(*((lines:=[f'{" "*(whiteSpace := whiteSpace - 1)}L {colorama.Fore.GREEN}{x.function}{colorama.Style.RESET_ALL} | {os.path.basename(x.filename)}:{x.lineno}\n' for x in stack]).reverse() or lines)) # noqa
 
     out = []
 
@@ -32,6 +35,6 @@ class Base:
     def __repr__(self) -> str:
         return f'''<{self.__class__.__name__}: \n    {"""
     """.join([f"{obj} = {val}" for obj, val in self.__dict__.items()])}\n>'''
+
     # triple quotes here make this work with py 3.10 lol
     # TODO: do this better lol
-    # also black doesnt like this lmao, so uhhhhhhh

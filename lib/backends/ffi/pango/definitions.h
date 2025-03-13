@@ -1,4 +1,4 @@
-typedef struct FT_Bitmap_
+typedef struct
 {
     unsigned int rows;
     unsigned int width;
