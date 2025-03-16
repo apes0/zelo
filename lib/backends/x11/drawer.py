@@ -5,7 +5,7 @@ from html import escape
 from .. import xcb
 from ..pango import render
 from xcb_cffi import ffi
-from ..generic import GImage, GWindow, GRectangle, GText
+from ..generic import GImage, GWindow, GRectangle, GText, applyPre
 
 from typing import TYPE_CHECKING
 
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 # do text rendering, image drawing, etc.
 
 
+@applyPre
 class Image(GImage):
     def __init__(
         self,
@@ -210,6 +211,7 @@ class Image(GImage):
         self.y = y
 
 
+@applyPre
 class Text(GText):
     def __init__(
         self,
@@ -292,6 +294,7 @@ class Text(GText):
             self.image.y = y
 
 
+@applyPre
 class Rectangle(
     GRectangle
 ):  # ? maybe implement this for any polygon and then just use that for a rectangle

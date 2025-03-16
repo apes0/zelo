@@ -1,4 +1,5 @@
 import logging
+from logging import CRITICAL, DEBUG, ERROR, FATAL, INFO, WARN, WARNING
 
 logger = logging.getLogger('zelo')
 formatter = logging.Formatter('%(levelname)-8s %(message)s')
@@ -21,18 +22,19 @@ cfg = {
     'keys': False,  # key related logs
     'buttons': False,  # button related logs
     'focus': False,  # focus changes
+    'drawable': False,  # basically anything from api/drawable.py
     'errors': True,  # backend errors
     'backend': False,  # backend debug info
     'windows': False,  # anything to do with windows
-    'extensions': False,  # extension logs
+    'extensions': True,  # extension logs
     'others': True,  # anything else that's logging
 }
 
 
-def log(name: str | list[str], level: int, message: str, single=True):
+def shouldLog(name: str | list[str], single=True):
     if isinstance(name, str):
         if not (cfg['all'] or cfg.get(name, cfg['others'])):
-            return
+            return False
 
     elif isinstance(name, list):
         log = False
@@ -41,14 +43,23 @@ def log(name: str | list[str], level: int, message: str, single=True):
                 log = True
                 break
             elif not single:
-                return
+                return False
 
         if not log:
-            return
-
-        name = ', '.join(name)
+            return False
 
     else:
-        return
+        return False
 
+    return True
+
+
+def _log(name: str | list[str], level: int, message: str):
+    if isinstance(name, list):
+        name = ', '.join(name)
     logger.log(level, f'{name}: {message}')
+
+
+def log(name: str | list[str], level: int, message: str, single=True):
+    if shouldLog(name, single):
+        _log(name, level, message)

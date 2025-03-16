@@ -1,7 +1,7 @@
 from functools import partial
 import numpy as np
 
-from ..generic import GWindow, GKey, GButton, GMod
+from ..generic import GWindow, GKey, GButton, GMod, applyPre
 from .. import xcb
 from xcb_cffi import ffi
 import trio
@@ -9,9 +9,6 @@ from .types import uintarr, maxUVal
 from typing import TYPE_CHECKING, Callable
 from ...lock import alock, calock
 from ..events import Event, focusChange, reparent, ignored
-
-from logging import DEBUG
-from ...debcfg import log
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
@@ -38,6 +35,7 @@ async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
         event.removeListener(ctx, wait)
 
 
+@applyPre
 class Window(GWindow):
     def __init__(self, height, width, borderWidth, _id, ctx: 'Ctx') -> None:
         self.height: int = height
@@ -92,8 +90,6 @@ class Window(GWindow):
         fn = partial(xcb.xcbMapWindow, gctx.connection, self.id)
         await runAndWait(self.ctx, [self.mapNotify, self.enterNotify, self.redraw], fn)
 
-        log('windows', DEBUG, f'mapped {self}')
-
         self.mapped = True
 
     async def unmap(self):
@@ -105,8 +101,6 @@ class Window(GWindow):
         await runAndWait(
             self.ctx, [self.unmapNotify, self.destroyNotify, self.leaveNotify], fn
         )
-
-        log('windows', DEBUG, f'unmapped {self}')
 
         self.mapped = False
 
@@ -149,8 +143,6 @@ class Window(GWindow):
         )
 
         xcb.xcbFlush(gctx.connection)
-
-        log(['windows', 'focus'], DEBUG, f'set {self}\'s focus to {focus}')
 
         # no waiting to do here :)
         # ? should we wait for focusin/out??
@@ -208,12 +200,6 @@ class Window(GWindow):
         fn()
         xcb.xcbFlush(gctx.connection)
 
-        log(
-            'windows',
-            DEBUG,
-            f'configured {self} with x={newX or self.x}, y={newY or self.y}, w={newWidth or self.width}, h={newHeight or self.height}, border width={newBorderWidth or self.borderWidth}',
-        )
-
     # TODO: what are we missing here
     #        await runAndWait(self.ctx, [self.configureNotify], fn)
 
@@ -260,8 +246,6 @@ class Window(GWindow):
         fn = partial(xcb.xcbDestroyWindow, gctx.connection, self.id)
 
         await runAndWait(self.ctx, [self.destroyNotify, self.leaveNotify], fn)
-
-        log('windows', DEBUG, f'closed {self}')
 
     async def screenshot(
         self,
@@ -356,5 +340,3 @@ class Window(GWindow):
         # ? should we wait for something here lol?
         xcb.xcbKillClient(gctx.connection, self.id)
         xcb.xcbFlush(gctx.connection)
-
-        log('windows', DEBUG, f'killed {self}')

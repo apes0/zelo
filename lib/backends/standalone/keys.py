@@ -1,14 +1,16 @@
 from lib.backends.generic import GWindow
 from lib.ctx import Ctx
-from ..generic import GMod, GKey
+from ..generic import GMod, GKey, applyPre
 
 
+@applyPre
 class Mod(GMod):
     def __init__(self, *names: str) -> None:
         self.mod = 0
         self.mods = names
 
 
+@applyPre
 class Key(GKey):
     def __init__(self, lable: str) -> None:
         self.lable = lable

@@ -31,7 +31,7 @@ from utils.log import logTerm, log
 # debcfg['all'] = True
 
 logTerm()
-log('log')
+# ('log')
 
 if TYPE_CHECKING:
     from lib.backends.generic import GKey, GMod

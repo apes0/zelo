@@ -1,4 +1,4 @@
-from ..generic import GWindow, GKey, GButton, GMod
+from ..generic import GWindow, GKey, GButton, GMod, applyPre
 from ..events import Event
 
 from typing import TYPE_CHECKING
@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from .gctx import Ctx as GCtx
 
 
+@applyPre
 class Window(GWindow):
     def __init__(
         self, height: int, width: int, borderWidth: int, _id: int, ctx: 'Ctx'

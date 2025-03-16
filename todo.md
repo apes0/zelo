@@ -51,7 +51,6 @@
 - organize this shit into categories
 - fix all mypy errors
 - add mypy to the github actions
-- add black formatting to the github action
 - benchmarks
 - support transparency
 - standalone running of widgets and such
@@ -59,5 +58,8 @@
 - cli help
 - cli -d --display argument
 - remote debugging
-- custom cursor (http://uw714doc.xinuos.com/en/man/html.X3xlib/XCreateFontCursor.X3xlib.html)
+- custom cursor (<http://uw714doc.xinuos.com/en/man/html.X3xlib/XCreateFontCursor.X3xlib.html>)
 - make image.set for x11 be fast
+- move everything to massert (check ``bandit -r .``)
+- add parameter names for typed cffi functions (see ``xcb_cffi.lib.func.__doc__``) ((only idea i have for how to do this is reading the source file))
+- fix x shm images not always being redrawn (no idea why)

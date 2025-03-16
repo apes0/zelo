@@ -1,31 +1,111 @@
-from typing import TYPE_CHECKING, Callable
+import inspect
+from typing import TYPE_CHECKING, Any, Callable
 
-import _cffi_backend
-import cffi
 import numpy as np
+
+from ..debcfg import DEBUG, INFO, log, shouldLog
 
 if TYPE_CHECKING:
     from ..ctx import Ctx
-    from .events import Event
 
 # these are definitions for what functions and classes the backends should have
 # (basically a header file)
-# TODO: logging?
 # NOTE: some methods are async when they dont use async functions - this is just for consistency
 
-CData = _cffi_backend._CDataBase  # cffi.FFI.CData
+# CData = _cffi_backend._CDataBase  # cffi.FFI.CData
+CData = Any
 
 # NOTE: we need the file to load from in front of the class
+
+
+# NOTE: this is the best logging solution i could come up with :3
+# The other idea i had was to have every logged func be prefixed by a _ and then i could define the
+# function without a _ here and use that to log, but i dont like that
+
+
+def pre(fn):
+    def deco(fn2):
+        fn2.pre = fn
+        return fn2
+
+    return deco
+
+
+# TODO: support multiple pre's
+# TODO: make connection check pre
+
+
+def logCall(name: str | list[str], level: int):
+    def deco(fn):
+        msg = f'calling {fn.__qualname__}({{args}})'
+        if shouldLog(name):
+            return pre(
+                lambda *a, **kwa: log(
+                    name,
+                    level,
+                    msg.format(
+                        args=(
+                            ', '.join(map(repr, a))
+                            + (
+                                ', '
+                                + ', '.join(f'{n}={repr(v)}' for n, v in kwa.items())
+                                if kwa
+                                else ''
+                            )
+                        )
+                    ),
+                )
+            )(fn)
+        else:
+            return fn
+
+    # ig the pyramids were built just by calling ``black`` on the land
+
+    return deco
+
+
+def applyPre(cls: type) -> type:
+    def makea(orobj, obj):
+        async def f(*a, **kwa):  # type:ignore
+            orobj.pre(*a, **kwa)
+            return await obj(*a, **kwa)
+
+        return f
+
+    def make(orobj, obj):
+        def f(*a, **kwa):
+            orobj.pre(*a, **kwa)
+            return obj(*a, **kwa)
+
+        return f
+
+    base = cls
+    if cls.__base__ and cls.__base__ != object:  # check if we arent the base class
+        base = cls.__base__
+
+    for name in dir(base):
+        orobj = getattr(base, name)
+        if hasattr(orobj, 'pre'):
+            obj = getattr(cls, name)
+            isasync = inspect.iscoroutinefunction(obj)
+
+            newF = makea(orobj, obj) if isasync else make(orobj, obj)
+            if base == cls:  # TODO: should we just always set newF.pre?
+                newF.pre = orobj.pre
+            setattr(cls, name, newF)
+
+    return cls
 
 
 # connection
 class GConnection:
     def __init__(self) -> None:
-        self.conn: cffi.FFI.CData
+        self.conn: Any
 
     def __repr__(self) -> str:
         return '<Connection>'
 
+    @logCall('backend', INFO)
     def disconnect(self):
         raise NotImplementedError
 
@@ -39,6 +119,7 @@ class GCtx:
     def __repr__(self) -> str:
         return '<GCtx>'
 
+    @logCall(['backend', 'windows'], DEBUG)
     def createWindow(
         self,
         x: int,
@@ -51,6 +132,7 @@ class GCtx:
     ) -> 'GWindow':
         raise NotImplementedError
 
+    @logCall(['backend', 'windows'], INFO)
     def disconnect(self):
         raise NotImplementedError
 
@@ -76,7 +158,8 @@ class GWindow:
 
         # events:
 
-        # NOTE: these are the actual events, im leaving them here, since they are "constant"
+        from .events import Event
+
         self.keyPress = Event('keyPress', GKey, GMod)
         self.keyRelease = Event('keyRelease', GKey, GMod)
         self.buttonPress = Event('buttonPress', GButton, GMod)
@@ -99,12 +182,15 @@ class GWindow:
     def __repr__(self) -> str:
         return f'<Window {self.id}>'
 
+    @logCall('windows', DEBUG)
     async def toTop(self):
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def toBottom(self):
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def screenshot(
         self,
         x: int = 0,
@@ -114,15 +200,19 @@ class GWindow:
     ) -> np.ndarray:
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def map(self):
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def unmap(self):
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def setFocus(self, focus: bool):
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def configure(
         self,
         newX=None,
@@ -133,15 +223,19 @@ class GWindow:
     ):
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def reparent(self, parent: 'GWindow', x: int, y: int):
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def close(self):
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def kill(self):
         raise NotImplementedError
 
+    @logCall('windows', DEBUG)
     async def setBorderColor(self, color: int):
         raise NotImplementedError
 
@@ -149,6 +243,7 @@ class GWindow:
 # keys
 class GMod:
     def __init__(self, *names: str) -> None:
+        self.names = names
         self.mod: int
         raise NotImplementedError
 
@@ -166,15 +261,19 @@ class GKey:
     def __repr__(self) -> str:
         return f'<Key {self.lable} ({self.key})>'
 
+    @logCall(['keys', 'grab'], DEBUG)
     def grab(self, ctx: 'Ctx', window: GWindow, *modifiers: GMod):
         raise NotImplementedError
 
+    @logCall(['keys', 'grab'], DEBUG)
     def ungrab(self, ctx: 'Ctx', window: GWindow, *modifiers: GMod):
         raise NotImplementedError
 
+    @logCall(['keys', 'press'], DEBUG)
     def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: GMod):
         raise NotImplementedError
 
+    @logCall(['keys', 'press'], DEBUG)
     def release(self, ctx: 'Ctx', window: 'GWindow', *modifiers: GMod):
         raise NotImplementedError
 
@@ -189,15 +288,19 @@ class GButton:
     def __repr__(self) -> str:
         return f'<Button {self.lable} ({self.button})>'
 
+    @logCall(['buttons', 'grab'], DEBUG)
     def grab(self, ctx: 'Ctx', window: GWindow, *mods: GMod):
         raise NotImplementedError
 
+    @logCall(['buttons', 'grab'], DEBUG)
     def ungrab(self, ctx: 'Ctx', window: GWindow, *mods: GMod):
         raise NotImplementedError
 
+    @logCall(['buttons', 'press'], DEBUG)
     def press(self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: GMod):
         raise NotImplementedError
 
+    @logCall(['buttons', 'press'], DEBUG)
     def release(
         self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: GMod
     ):  # ? do we need x and y here?
@@ -215,6 +318,7 @@ class GMouse:
     def location(self) -> tuple[int, int]:
         raise NotImplementedError
 
+    @logCall('backend', DEBUG)
     def setCursor(self, window: 'GWindow', _font: str, name: str, fore=None, back=None):
         raise NotImplementedError
 
@@ -233,6 +337,7 @@ class GImage:
         x: int,
         y: int,
     ) -> None:
+        self.ctx: Ctx = ctx
         self.width = width
         self.height = height
         self.x = x
@@ -241,17 +346,21 @@ class GImage:
         raise NotImplementedError
 
     def __repr__(self) -> str:
-        return '<Image>'
+        return '<Image>'  # TODO: more proper reprs lol
 
+    @logCall('drawable', DEBUG)
     def draw(self):
         raise NotImplementedError
 
+    @logCall('drawable', DEBUG)
     def set(self, img: np.ndarray):
         raise NotImplementedError
 
+    @logCall('drawable', DEBUG)
     def destroy(self):
         raise NotImplementedError
 
+    @logCall('drawable', DEBUG)
     def move(self, x: int, y: int):
         raise NotImplementedError
 
@@ -278,14 +387,17 @@ class GRectangle:  # ? maybe implement this for any polygon and then just use th
         raise NotImplementedError
 
     def __repr__(self) -> str:
-        return '<Rectangle>'
+        return '<Rectangle>'  # TODO: proper repr lol
 
+    @logCall('drawable', DEBUG)
     def draw(self):
         raise NotImplementedError
 
+    @logCall('drawable', DEBUG)
     def resize(self, width: int, height: int):
         raise NotImplementedError
 
+    @logCall('drawable', DEBUG)
     def move(self, x: int, y: int):
         raise NotImplementedError
 
@@ -314,15 +426,19 @@ class GText:
     def __repr__(self) -> str:
         return f'<Text {self.text} with font {self.font}>'
 
+    @logCall('drawable', DEBUG)
     def draw(self):
         raise NotImplementedError
 
+    @logCall('drawable', DEBUG)
     def set(self, text: str):
         raise NotImplementedError
 
+    @logCall('drawable', DEBUG)
     def destroy(self):
         raise NotImplementedError
 
+    @logCall('drawable', DEBUG)
     def move(self, x: int, y: int):
         raise NotImplementedError
 

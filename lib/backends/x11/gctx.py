@@ -1,4 +1,4 @@
-from ..generic import GCtx
+from ..generic import GCtx, applyPre
 from typing import TYPE_CHECKING
 from .. import xcb
 from .types import charpC, uintarr
@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from ..generic import GWindow, CData
 
 
+@applyPre
 class Ctx(GCtx):
     def __init__(self, ctx: 'Ctxt') -> None:
         self.ctx = ctx

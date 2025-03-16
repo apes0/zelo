@@ -1,14 +1,10 @@
-from lib.backends.generic import GKey, GMod, GWindow
+from lib.backends.generic import GKey, GMod, GWindow, applyPre
 from .keysyms import keys
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 from .. import xcb
-
-from logging import DEBUG
-from ...debcfg import log
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
-    from .gctx import Ctx as GCtx
 
 modMap = {
     'shift': xcb.XCBModMaskShift,
@@ -29,6 +25,7 @@ modMap = {
 }
 
 
+@applyPre
 class Mod(GMod):
     mappings = {}
 
@@ -39,6 +36,7 @@ class Mod(GMod):
                 self.mod |= modMap[mod]
 
 
+@applyPre
 class Key(GKey):
     cache: dict[str, int] = {
         'any': xcb.XCBGrabAny
@@ -86,7 +84,6 @@ class Key(GKey):
 
         gctx = ctx._getGCtx()
 
-        log('grab', DEBUG, f'grabbing {self} with modifiers {modifiers}')
         if self.key is None:
             self.load(ctx)
 
@@ -112,7 +109,6 @@ class Key(GKey):
 
         gctx = ctx._getGCtx()
 
-        log('grab', DEBUG, f'ungrabbing {self} with modifiers {modifiers}')
         if self.key is None:
             self.load(ctx)
 
@@ -129,7 +125,6 @@ class Key(GKey):
 
         gctx = ctx._getGCtx()
 
-        log('press', DEBUG, f'pressing {self} with modifiers {modifiers}')
         if self.key is None:
             self.load(ctx)
 
@@ -162,7 +157,6 @@ class Key(GKey):
 
         gctx = ctx._getGCtx()
 
-        log('press', DEBUG, f'releasing {self} with modifiers {modifiers}')
         if self.key is None:
             self.load(ctx)
 

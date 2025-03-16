@@ -1,9 +1,6 @@
 from .. import xcb
 from .types import chararr, uintarr
-from ..generic import GButton, GMouse
-
-from logging import DEBUG
-from ...debcfg import log
+from ..generic import GButton, GMouse, applyPre
 
 from .keys import Mod, Key
 
@@ -95,6 +92,7 @@ cursors = {
 }  # stole this from qtile
 
 
+@applyPre
 class Mouse(GMouse):
     def __init__(self, ctx: 'Ctx') -> None:
         self.ctx = ctx
@@ -175,6 +173,7 @@ mappings = {
 }
 
 
+@applyPre
 class Button(GButton):
     def __init__(self, lable: str | None = None, button: int | None = None) -> None:
         self.lable: str
@@ -198,7 +197,6 @@ class Button(GButton):
 
         gctx: GCtx = ctx._getGCtx()
 
-        log('grab', DEBUG, f'grabbing {self} with modifiers {mods} on {window}')
         mod = 0
         for _mod in mods:
             mod |= _mod.mod
@@ -223,7 +221,6 @@ class Button(GButton):
 
         gctx: GCtx = ctx._getGCtx()
 
-        log('grab', DEBUG, f'ungrabbing {self} with modifiers {mods} on {window}')
         mod = 0
         for _mod in mods:
             mod |= _mod.mod
@@ -241,8 +238,6 @@ class Button(GButton):
         assert not ctx.closed, 'conn is closed'
 
         gctx: GCtx = ctx._getGCtx()
-
-        log('press', DEBUG, f'pressing {self} with modifiers {modifiers}')
 
         for mod in modifiers:
             Key(code=mod.mappings[mod.mod][0]).press(ctx, window, flush=False)
@@ -264,8 +259,6 @@ class Button(GButton):
         assert not ctx.closed, 'conn is closed'
 
         gctx: GCtx = ctx._getGCtx()
-
-        log('press', DEBUG, f'releasing {self} with modifiers {modifiers}')
 
         for mod in modifiers:
             Key(code=Mod.mappings[mod.mod][0]).release(ctx, window, flush=False)

@@ -2,7 +2,7 @@
 from .mouse import Mouse
 from .. import xcb
 from typing import TYPE_CHECKING
-from ..generic import GConnection
+from ..generic import GConnection, applyPre
 from .window import Window
 from .types import intarr
 from .screen import Display, Screen
@@ -23,6 +23,7 @@ def init(fn):
     initers.append(fn)
 
 
+@applyPre
 class Connection(GConnection):
     def __init__(self, ctx: 'Ctx') -> None:
         gctx: GCtx = ctx._getGCtx()
