@@ -1,5 +1,5 @@
 from lib.backends.generic import GWindow
-from lib.extension import Extension, single
+from lib.extension import Extension
 from typing import TYPE_CHECKING, Callable
 from itertools import combinations
 from lib.backends.events import keyPress, keyRelease
@@ -17,7 +17,6 @@ def arun(ctx: 'Ctx', fn: Callable):
     return arunner
 
 
-@single
 class Shortcuts(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.keys = []

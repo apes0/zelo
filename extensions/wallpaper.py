@@ -1,7 +1,7 @@
-from lib.extension import Extension, single
+from lib.extension import Extension
 from typing import TYPE_CHECKING
 from lib.backends.events import redraw
-from lib.api.drawer import Image, Text
+from lib.api.drawer import Image
 import cv2
 import trio
 
@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 # TODO: support multiple wallpapers for each screen
 
 
-@single
 class Wallpaper(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.wall: str

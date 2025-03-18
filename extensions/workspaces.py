@@ -1,6 +1,7 @@
-from lib.extension import Extension
 from typing import TYPE_CHECKING
+
 from extensions.shortcuts import Shortcuts, arun
+from lib.extension import Extension, initExt
 from utils.fns import multiple
 
 if TYPE_CHECKING:
@@ -24,17 +25,21 @@ class Workspaces(Extension):
         self.windows = {}
         self.focused = {}
 
-        shortcuts: Shortcuts = Shortcuts(  # type:ignore
-            ctx,
+    async def __ainit__(self):
+        shortcuts = await initExt(
+            Shortcuts,  # type:ignore
+            self.ctx,
             {
                 'shortcuts': {
-                    self.next: arun(ctx, self.nextSpace),
-                    self.prev: arun(ctx, self.prevSpace),
+                    self.next: arun(self.ctx, self.nextSpace),
+                    self.prev: arun(self.ctx, self.prevSpace),
                     self.move: self.toggleMove,
                 }
             },
         )
-        shortcuts.register()
+
+        if shortcuts:
+            shortcuts.register()
 
     def toggleMove(self, ctx: 'Ctx'):
         if not ctx.focused:

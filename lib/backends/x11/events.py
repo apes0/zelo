@@ -423,7 +423,7 @@ async def setup(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
         ctx
     )  # TODO: put this in the ctx and rename the current ``connection``
 
-    setupExtensions(ctx, ctx.cfg.extensions)
+    await setupExtensions(ctx, ctx.cfg.extensions)
 
     async def _update():
         await update(ctx, conn)

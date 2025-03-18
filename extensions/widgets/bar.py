@@ -1,6 +1,9 @@
-from .widget import Widget
-from lib.api.drawer import Rectangle
 from typing import TYPE_CHECKING
+
+from lib.api.drawer import Rectangle
+from lib.extension import initExt
+
+from .widget import Widget
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -20,14 +23,23 @@ class Bar(Widget):
         )
 
         self.insts: list[Widget] = []
+        self.sizes = []
 
+    async def initer(self, widget, cfg: dict):
+        e = await initExt(widget, self.ctx, {**cfg, 'win': self.win, 'x': 0, 'y': 0})
+        if e:
+            self.insts.append(e)
+        else:
+            print('hhh')
+
+    async def __ainit__(self):
+        await super().__ainit__()
         for widget, cfg in self.widgets:
-            self.insts.append(widget(ctx, {**cfg, 'win': self.win, 'x': 0, 'y': 0}))
+            self.ctx.startSoon(self.initer, widget, cfg)
 
-        self.rect = Rectangle(ctx, self.win, 0, 0, self.width, self.height, self.back)
-
-        ctx.startSoon(self.draw)
-        self.addListener(self.win.redraw, self.draw)
+        self.rect = Rectangle(
+            self.ctx, self.win, 0, 0, self.width, self.height, self.back
+        )
 
     async def draw(self):
         await self.setSize(self.width, self.height)
@@ -38,6 +50,12 @@ class Bar(Widget):
         await self.move()
 
     async def move(self):
+        sizes = [widget._size for widget in self.insts]
+        if sizes == self.sizes:
+            return
+
+        self.sizes = sizes
+
         s = sum([widget._size[0] for widget in self.insts])
         spacing = (self.width - s) / (max(len(self.insts), 1) + 1)
         assert spacing > 0, 'The bar is too small...'

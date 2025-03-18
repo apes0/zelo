@@ -1,6 +1,8 @@
-from .widget import Widget
-from lib.api.drawer import Text as _Text
 from typing import TYPE_CHECKING
+
+from lib.api.drawer import Text as _Text
+
+from .widget import Widget
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -15,8 +17,11 @@ class Text(Widget):
 
         super().__init__(ctx, cfg, resolve={'fore': int, 'back': int})
 
+    async def __ainit__(self):
+        await super().__ainit__()
+
         self._text = _Text(
-            ctx,
+            self.ctx,
             self.win,
             0,
             0,
@@ -25,7 +30,8 @@ class Text(Widget):
             self.fore,
             self.back,
         )
-        ctx.startSoon(self.setSize, self._text.width, self._text.height)
+
+        await self.setSize(self._text.width, self._text.height)
 
     async def draw(self):
         self._text.draw()

@@ -1,8 +1,11 @@
-import dbus
-from .widget import Widget
-from lib.api.drawer import Text, Rectangle
-import trio
 from typing import TYPE_CHECKING
+
+import dbus
+import trio
+
+from lib.api.drawer import Rectangle, Text
+
+from .widget import Widget
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
@@ -17,7 +20,7 @@ class Song:
 
 def getSong():
     bus = dbus.SessionBus()
-    for service in bus.list_names():
+    for service in bus.list_names() or []:
         if service.startswith('org.mpris.MediaPlayer2.'):
             player = bus.get_object(service, '/org/mpris/MediaPlayer2')
             status = player.Get(
@@ -60,9 +63,14 @@ class NowPlaying(Widget):
 
         super().__init__(ctx, cfg, resolve={'fore': int, 'back': int})
 
-        self.text = Text(ctx, self.win, 0, 0, None, self.font, self.fore, self.back)
-        self.rect = Rectangle(ctx, self.win, 0, 0, self.width, 1, self.back)
-        ctx.startSoon(self._update)
+    async def __ainit__(self):
+        await super().__ainit__()
+        self.ctx.startSoon(self._update)
+
+        self.text = Text(
+            self.ctx, self.win, 0, 0, None, self.font, self.fore, self.back
+        )
+        self.rect = Rectangle(self.ctx, self.win, 0, 0, self.width, 1, self.back)
 
     def getText(self):
         status, song = getSong()
@@ -77,6 +85,7 @@ class NowPlaying(Widget):
         ttime = trio.current_time()
 
         while True:
+            # TODO: dont poll as often
             text = self.getText()
 
             # restart when we see a new song
