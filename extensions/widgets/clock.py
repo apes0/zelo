@@ -29,7 +29,7 @@ class Clock(Widget):
             self.fore,
             self.back,
         )
-        ctx.nurs.start_soon(self._update)
+        ctx.startSoon(self._update)
 
     async def _update(self):
         while True:

@@ -62,7 +62,7 @@ class NowPlaying(Widget):
 
         self.text = Text(ctx, self.win, 0, 0, None, self.font, self.fore, self.back)
         self.rect = Rectangle(ctx, self.win, 0, 0, self.width, 1, self.back)
-        ctx.nurs.start_soon(self._update)
+        ctx.startSoon(self._update)
 
     def getText(self):
         status, song = getSong()

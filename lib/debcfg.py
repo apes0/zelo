@@ -27,6 +27,7 @@ cfg = {
     'backend': False,  # backend debug info
     'windows': False,  # anything to do with windows
     'extensions': True,  # extension logs
+    'startSoon': True,  # stuff erroring in start soon calls
     'others': True,  # anything else that's logging
 }
 

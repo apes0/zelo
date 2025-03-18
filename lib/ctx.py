@@ -1,8 +1,10 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable, Awaitable
 
 import trio
 
 from lib.watcher import Watcher
+from .debcfg import log, ERROR
+import traceback
 
 from .api.window import Window
 
@@ -11,6 +13,13 @@ if TYPE_CHECKING:
     from .backends.events import Event
     from .backends.generic import GCtx, GMouse, GScreen, GWindow
     from .extension import Extension
+
+
+async def _wrapper(afn):
+    try:
+        await afn
+    except:
+        log('startSoon', ERROR, f'{afn} encountered:\n {traceback.format_exc()}')
 
 
 class Ctx:
@@ -88,6 +97,9 @@ class Ctx:
 
     def disconnect(self):
         self.gctx.disconnect()
+
+    def startSoon(self, fn: Callable[..., Awaitable], *args):
+        self.nurs.start_soon(_wrapper, fn(*args))
 
     def _getGCtx(self) -> Any:
         # NOTE: this was made for typing reasons

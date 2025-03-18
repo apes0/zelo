@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives.serialization import (
     PrivateFormat,
     load_pem_public_key,
     load_pem_private_key,
-    NoEncryption
+    NoEncryption,
 )
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -109,7 +109,9 @@ def pubBytes(pub: rsa.RSAPublicKey):
 
 
 def privBytes(priv: rsa.RSAPrivateKey):
-    return priv.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, encryption_algorithm=NoEncryption())
+    return priv.private_bytes(
+        Encoding.PEM, PrivateFormat.PKCS8, encryption_algorithm=NoEncryption()
+    )
 
 
 def xorb(b1: bytes, b2: bytes):
@@ -143,9 +145,7 @@ async def recv(stream: trio.SocketStream):
 
 async def serverSwap(stream: trio.SocketStream, pubkey: str, privkey: str) -> Fernet:
     await send(stream, pubkey.encode())
-    key = decryptRsa(
-        load_pem_private_key(privkey.encode(), None), await recv(stream)
-    )
+    key = decryptRsa(load_pem_private_key(privkey.encode(), None), await recv(stream))
     _key = urlsafe_b64decode(Fernet.generate_key())
     fernet = Fernet(urlsafe_b64encode(key))
     await send(stream, fernet.encrypt(_key))
@@ -157,9 +157,7 @@ async def clientSwap(stream: trio.SocketStream) -> Fernet:
     public = await recv(stream)
     key = Fernet.generate_key()
 
-    await send(stream,
-        encryptRsa(load_pem_public_key(public), urlsafe_b64decode(key))
-    )
+    await send(stream, encryptRsa(load_pem_public_key(public), urlsafe_b64decode(key)))
     fernet = Fernet(key)
     _key = fernet.decrypt(await recv(stream))
 
@@ -180,7 +178,7 @@ class ShareServer(Extension):
 
         self.addListener(mapNotify, self.map)
         self.addListener(unmapNotify, self.unmap)
-        ctx.nurs.start_soon(self.serve)
+        ctx.startSoon(self.serve)
 
     async def serve(self):
         try:
@@ -192,7 +190,9 @@ class ShareServer(Extension):
             await self.saveData('privkey', privBytes(self.privkey))
 
         async def _serve(stream: trio.SocketStream):
-            fernet = await serverSwap(stream, pubBytes(self.pubkey).decode(), privBytes(self.privkey).decode())
+            fernet = await serverSwap(
+                stream, pubBytes(self.pubkey).decode(), privBytes(self.privkey).decode()
+            )
 
             auth = fernet.decrypt(await recv(stream))
 
@@ -261,7 +261,7 @@ class ShareClient(Extension):
 
         super().__init__(ctx, cfg)
 
-        ctx.nurs.start_soon(self.connect)
+        ctx.startSoon(self.connect)
 
     async def connect(self):
         while True:

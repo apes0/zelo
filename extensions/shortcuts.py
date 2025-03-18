@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 def arun(ctx: 'Ctx', fn: Callable):
     def arunner(*args):
-        ctx.nurs.start_soon(fn, *args)
+        ctx.startSoon(fn, *args)
 
     return arunner
 

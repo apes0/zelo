@@ -21,7 +21,7 @@ class Widget(Extension):
             self.x, self.y, 1, 1, 0, parent=self.win, ignore=True
         )
         # the window to draw in
-        self.ctx.nurs.start_soon(self.win.map)
+        self.ctx.startSoon(self.win.map)
         self.addListener(self.win.redraw, self.draw)
 
     async def draw(self):

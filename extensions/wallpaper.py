@@ -42,7 +42,7 @@ class Wallpaper(Extension):
             self.cap = cv2.VideoCapture(self.wall)
             self.fps = self.cap.get(cv2.CAP_PROP_FPS)
 
-            ctx.nurs.start_soon(self.drawVideo)
+            ctx.startSoon(self.drawVideo)
 
         self.addListener(redraw, self.drawImg)
 

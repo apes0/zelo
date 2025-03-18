@@ -44,7 +44,7 @@ keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     ((Key('s'),), Mod('control')): lambda ctx: ctx.nurs.start_soon(stop, ctx),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
     ((Key('x'),), Mod('control')): lambda ctx: (
-        ctx.nurs.start_soon(ctx.focused.screenshot) if ctx.focused else None
+        ctx.startSoon(ctx.focused.screenshot) if ctx.focused else None
     ),
     # ((Key('m'),), Mod('control')): lambda ctx: (
     #     toCursor(ctx, ctx.focused) if ctx.focused else None

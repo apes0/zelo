@@ -25,7 +25,7 @@ class Text(Widget):
             self.fore,
             self.back,
         )
-        ctx.nurs.start_soon(self.setSize, self._text.width, self._text.height)
+        ctx.startSoon(self.setSize, self._text.width, self._text.height)
 
     async def draw(self):
         self._text.draw()
