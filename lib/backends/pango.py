@@ -1,19 +1,9 @@
 from _cffi_backend import _CDataBase
 from pango_cffi import lib, ffi
 from typing import Any
-from .base import Base, parseArgs
-
-# some random types to get shit to work
-
-class Ptr[T](Base):
-    def __init__(self, obj: T):
-        self.obj: T = obj
-
-type CPtr[T] = T
+from .base import Base, parseArgs, Ptr, CPtr, void, enum
 
 NULL = ffi.NULL
-void = Ptr
-enum = Ptr
 
 # types
 class FtBitmap(Base):

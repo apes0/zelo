@@ -3,8 +3,6 @@ import sys
 from itertools import chain
 from typing import Callable
 
-# TODO: export types like ptr and NULL to a different file (probably base.py?)
-
 # WARN: touching this is hell, this whole thing took me like a week to figure out
 # This is what the output should resemble:
 # class Ptr[T](Base):
@@ -120,19 +118,9 @@ def generate(_name, lib, ffi) -> str:
     text += f'''from _cffi_backend import _CDataBase
 from {name} import lib, ffi
 from typing import Any
-from .base import Base, parseArgs
-
-# some random types to get shit to work
-
-class Ptr[T](Base):
-    def __init__(self, obj: T):
-        self.obj: T = obj
-
-type CPtr[T] = T
+from .base import Base, parseArgs, Ptr, CPtr, void, enum
 
 NULL = ffi.NULL
-void = Ptr
-enum = Ptr
 
 # types
 '''
@@ -186,7 +174,6 @@ class {toCamelCase(_type, cls=True)}(Base):
                 if '//' in l:
                     l = l.split('//')[0].strip(' ')
                 if fname in l:
-                    print(l)
                     try:
                         _args = l.split('(')[1].strip(';').strip(')').split(',')
                         if len(_args) == len(args):
@@ -199,7 +186,6 @@ class {toCamelCase(_type, cls=True)}(Base):
                     except:
                         pass
 
-            print(argnames)
             assert len(argnames) == len(
                 args
             ), f'couldnt make definition for {fname}, fix your styling lol'

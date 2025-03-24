@@ -38,3 +38,17 @@ class Base:
 
     # triple quotes here make this work with py 3.10 lol
     # TODO: do this better lol
+
+
+# some random types to get shit to work
+
+
+class Ptr[T](Base):
+    def __init__(self, obj: T):
+        self.obj: T = obj
+
+
+type CPtr[T] = T
+
+void = Ptr
+enum = Ptr
