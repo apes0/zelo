@@ -61,5 +61,4 @@
 - custom cursor (<http://uw714doc.xinuos.com/en/man/html.X3xlib/XCreateFontCursor.X3xlib.html>)
 - make image.set for x11 be fast
 - move everything to massert (check ``bandit -r .``)
-- add parameter names for typed cffi functions (see ``xcb_cffi.lib.func.__doc__``) ((only idea i have for how to do this is reading the source file))
 - fix x shm images not always being redrawn (no idea why)

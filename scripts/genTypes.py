@@ -3,6 +3,8 @@ import sys
 from itertools import chain
 from typing import Callable
 
+# TODO: export types like ptr and NULL to a different file (probably base.py?)
+
 # WARN: touching this is hell, this whole thing took me like a week to figure out
 # This is what the output should resemble:
 # class Ptr[T](Base):
@@ -159,8 +161,8 @@ class {toCamelCase(_type, cls=True)}(Base):
     text += '''
 # funcs and vars
 '''
-    defs = open(f'lib/backends/ffi/{_name}/definitions.h').read()
-    src = open(f'lib/backends/ffi/{_name}/source.c').read()
+    defs = open(f'lib/backends/ffi/{_name}/definitions.h').read().splitlines()
+    # src = open(f'lib/backends/ffi/{_name}/source.c').read()
 
     for name, val in lib.__dict__.items():
         if isinstance(val, Callable):
@@ -169,16 +171,44 @@ class {toCamelCase(_type, cls=True)}(Base):
             fname = parts[-1]
             ptr = fname[0] == '*'
             rtype = ' '.join(parts[:-1])
+
             rtype, rcast = parseType(rtype + ' *' * ptr)
             args = definition.split('(')[1].strip(';').strip(')').split(',')
             types = ''
             callArgs = ''
             n = 0
-            for n, a in enumerate(args):
+
+            # find arg names
+
+            argnames = []
+
+            for l in defs:
+                if '//' in l:
+                    l = l.split('//')[0].strip(' ')
+                if fname in l:
+                    print(l)
+                    try:
+                        _args = l.split('(')[1].strip(';').strip(')').split(',')
+                        if len(_args) == len(args):
+                            argnames = []
+                            for arg in _args:
+                                aname = arg.strip(' ').split(' ')[-1]
+                                while aname.startswith('*'):
+                                    aname = aname[1:]
+                                argnames.append(aname.strip(' '))
+                    except:
+                        pass
+
+            print(argnames)
+            assert len(argnames) == len(
+                args
+            ), f'couldnt make definition for {fname}, fix your styling lol'
+
+            for a, aname in zip(args, argnames):
                 a = a.strip(' ')
-                atype, acast = parseType(a)
-                types += f'a{n}: {atype}, '
-                callArgs += f'a{n}, '
+                atype, _acast = parseType(a)
+                types += f'{toCamelCase(aname)}: {atype}, '
+                callArgs += f'{toCamelCase(aname)}, '
             text += f'\ndef {toCamelCase(name)}({types}) -> {rtype}:{insert(name, n)}return {rcast}(lib.{name}(*parseArgs({callArgs})))'
         else:
             text += f'{toCamelCase(name)}: {type(val).__name__} = lib.{name}\n'
