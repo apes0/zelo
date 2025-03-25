@@ -94,7 +94,8 @@ async def _initExt(ext: type[T], ctx: 'Ctx', cfg: dict, force: bool) -> T:
         return cast(T, e)  # TODO: remove this cast
 
     e = ext(ctx, cfg)
-    await e.__ainit__()
+    async with trio.open_nursery() as nurs:
+        nurs.start_soon(e.__ainit__)
     ctx.extensions[ext] = e
 
     log(['backend', 'extensions'], INFO, f'loaded {ext}')
