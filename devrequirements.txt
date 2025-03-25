@@ -1,3 +1,4 @@
+setuptools
 cffi
 opencv-python
 trio
