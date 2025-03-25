@@ -5,6 +5,7 @@ from .mouse import Button
 from lib.extension import setupExtensions
 from .. import xcb
 from .types import (
+    PropertyNotifyTC,
     intp,
     uintarr,
     charpp,
@@ -33,6 +34,7 @@ from .gctx import Ctx as GCtx
 import trio
 
 if TYPE_CHECKING:
+    from .atoms import Atom
     from lib.ctx import Ctx
     from lib.backends.generic import GConnection, GWindow
 
@@ -53,6 +55,10 @@ def handler(n):
 @handler(xcb.XCBCreateNotify)
 async def createNotify(event, ctx: 'Ctx'):
     event = xcb.XcbCreateNotifyEventT(createNotifyTC(event))
+    gctx: 'GCtx' = ctx._getGCtx()
+
+    gctx.atoms[event.window] = {}
+
     window = ctx.getWindow(event.window)
     log('backend', DEBUG, f'{window} was created')
     ignore = bool(event.overrideRedirect)
@@ -82,7 +88,11 @@ async def mapRequest(event, ctx: 'Ctx'):
     window.parent = ctx.getWindow(event.parent)
     # TODO: this is the only instance of ctx.values in the code, so we should remove it
     # its just a leftover from the initial code and i think i can remove it
-    gctx.values[0] = xcb.XCBEventMaskEnterWindow | xcb.XCBEventMaskLeaveWindow
+    gctx.values[0] = (
+        xcb.XCBEventMaskEnterWindow
+        | xcb.XCBEventMaskLeaveWindow
+        | xcb.XCBEventMaskPropertyChange
+    )
     xcb.xcbChangeWindowAttributesChecked(
         gctx.connection, _id, xcb.XCBCwEventMask, gctx.values
     )
@@ -178,6 +188,10 @@ async def destroyNotify(event, ctx: 'Ctx'):
     log('backend', DEBUG, f'{win} got destroyed')
 
     win.destroyed = True
+
+    gctx = ctx._getGCtx()
+    if window in gctx.atoms:
+        del gctx.atoms[window]
 
     if ctx.focused and window == ctx.focused.id:
         win.mapped = False
@@ -400,6 +414,23 @@ async def expose(event, ctx: 'Ctx'):
 
     await window.redraw.trigger(ctx)
     await events.redraw.trigger(ctx, window)
+
+
+@handler(xcb.XCBPropertyNotify)
+async def propertyNotify(event, ctx: 'Ctx'):
+    event = xcb.XcbPropertyNotifyEventT(PropertyNotifyTC(event))
+
+    gctx: 'GCtx' = ctx._getGCtx()
+
+    winatoms: dict[int, 'Atom'] = gctx.atoms.get(event.window)
+    if not winatoms:
+        return
+
+    atom = winatoms.get(event.atom)
+    if not atom:
+        return
+
+    atom.read()
 
 
 ignore = [9, 10, 14, 89]  # list of events to ignore

@@ -506,6 +506,18 @@ class XcbPropModeT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
+class XcbPropertyNotifyEventT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.atom: int = obj.atom
+        self.pad0: int = obj.pad0
+        self.pad1: _CDataBase = obj.pad1
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.state: int = obj.state
+        self.time: int = obj.time
+        self.window: int = obj.window
 class XcbQueryExtensionCookieT(Base):
     def __init__(self, obj):
         self.obj = obj

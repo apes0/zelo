@@ -1,5 +1,5 @@
 from .types import charpC
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from .. import xcb
 import math
 
@@ -25,6 +25,7 @@ class Atom:
     def __init__(self, ctx: 'Ctx', win: 'Window', name: str) -> None:
         self.ctx = ctx
         self.win = win
+        self.value: Any
 
         if atom := atoms.get(name):
             self.id = atom[0]
@@ -34,8 +35,13 @@ class Atom:
             # and maybe cache it
             pass
 
+        gctx = ctx._getGCtx()
+        gctx.atoms[win.id] = {**gctx.atoms.get(win.id, {}), self.id: self}
+        self.read()
+
     def read(self):
-        return readers[self.type](self)
+        self.value = readers[self.type](self)
+        print(f'read {self.value}')
 
     def _read(self, off: int = 0, buf: int = 4):
         # NOTE: buf and off are "32-bit multiples", so if you want 4 bytes, you should use a buf of 1

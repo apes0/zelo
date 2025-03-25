@@ -937,6 +937,17 @@ typedef struct xcb_reparent_notify_event_t
     unsigned char override_redirect;
     unsigned char pad1[3];
 } xcb_reparent_notify_event_t;
+typedef struct xcb_property_notify_event_t
+{
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    xcb_window_t window;
+    xcb_atom_t atom;
+    xcb_timestamp_t time;
+    unsigned char state;
+    unsigned char pad1[3];
+} xcb_property_notify_event_t;
 
 // custom from source:
 

@@ -7,6 +7,7 @@ from .window import Window
 if TYPE_CHECKING:
     from ...ctx import Ctx as Ctxt
     from ..generic import GWindow, CData
+    from .atoms import Atom
 
 
 @applyPre
@@ -19,6 +20,7 @@ class Ctx(GCtx):
         self.values: CData
         self.extResps = {}
         self.sharedPixmaps: bool = False
+        self.atoms: dict['GWindow', dict[int, 'Atom']] = {}
 
     def avail(self, ext: str):
         return self.extResps[ext].present
