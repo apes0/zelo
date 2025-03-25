@@ -36,6 +36,7 @@ os.chdir(path)
 
 def toCamelCase(name: str, cls: bool = False) -> str:
     parts = name.split('_')
+    # TODO: change this to use .lower if its not a class
     out = parts[0].capitalize() if cls else parts[0]
 
     for part in parts[1:]:

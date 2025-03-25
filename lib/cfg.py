@@ -40,7 +40,7 @@ cfg = Cfg()
 
 keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
     #    ((Key('super_l'),), Mod('')): lambda _ctx: spawn('ulauncher-toggle'),
-    ((Key('t'),), Mod('control')): lambda ctx: spawn('alacritty'),
+    ((Key('t'),), Mod('control')): lambda ctx: spawn('xterm'),
     ((Key('s'),), Mod('control')): lambda ctx: ctx.nurs.start_soon(stop, ctx),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
     ((Key('x'),), Mod('control')): lambda ctx: (
@@ -59,8 +59,7 @@ cfg.theme = theme
 # layouts
 
 main = Layout()
-bar, main = main.hsplit(0.175, 0.025)
-main.unspace()
+bar, main = main.hsplit(0.08, 0, 0.025)
 
 # extensions and their config
 
@@ -70,7 +69,7 @@ cfg.extensions = {
         'mainSize': 2 / 3,
         'border': 5,
         'spacing': 10,
-        #        'topSpacing': main.y,
+        'topSpacing': main.y,
     },
     MouseFocus: {},
     Wallpaper: {'wall': wall},
