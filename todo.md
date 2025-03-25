@@ -41,8 +41,6 @@
 - theming events
 - more stuff that themes support lol (roundness and shit)
 - update x11's image.set (see extensions/share.py)
-- typing for the cffi functions
-- fix gctx typing
 - impl unloaders for whatever extensions need them :P
 - more tests
 - make text be able to be render for a specific pixel height
@@ -62,3 +60,6 @@
 - make image.set for x11 be fast
 - move everything to massert (check ``bandit -r .``)
 - fix x shm images not always being redrawn (no idea why)
+- add xrandr features
+- fix x image memory leak
+- use generic inits everywhere we can

@@ -25,14 +25,14 @@ CData = Any
 
 def pre(fn):
     def deco(fn2):
-        fn2.pre = fn
+        print('deco called')
+        if hasattr(fn2, 'pres'):
+            fn2.pres.insert(0, fn)
+        else:
+            fn2.pres = [fn]
         return fn2
 
     return deco
-
-
-# TODO: support multiple pre's
-# TODO: make connection check pre
 
 
 def logCall(name: str | list[str], level: int):
@@ -65,16 +65,18 @@ def logCall(name: str | list[str], level: int):
 
 
 def applyPre(cls: type) -> type:
-    def makea(orobj, obj):
-        async def f(*a, **kwa):  # type:ignore
-            orobj.pre(*a, **kwa)
+    def makea(pres, obj):
+        async def f(*a, **kwa):
+            for pre in pres:
+                pre(*a, **kwa)
             return await obj(*a, **kwa)
 
         return f
 
-    def make(orobj, obj):
+    def make(pres, obj):
         def f(*a, **kwa):
-            orobj.pre(*a, **kwa)
+            for pre in pres:
+                pre(*a, **kwa)
             return obj(*a, **kwa)
 
         return f
@@ -85,13 +87,17 @@ def applyPre(cls: type) -> type:
 
     for name in dir(base):
         orobj = getattr(base, name)
-        if hasattr(orobj, 'pre'):
+
+        if hasattr(orobj, 'pres'):
             obj = getattr(cls, name)
+            pres = orobj.pres
+
+            if hasattr(obj, 'pres'):
+                # additional pres from the child class take a lower priority
+                pres += obj.pres
             isasync = inspect.iscoroutinefunction(obj)
 
-            newF = makea(orobj, obj) if isasync else make(orobj, obj)
-            if base == cls:  # TODO: should we just always set newF.pre?
-                newF.pre = orobj.pre
+            newF = makea(pres, obj) if isasync else make(pres, obj)
             setattr(cls, name, newF)
 
     return cls
@@ -142,10 +148,10 @@ class GWindow:
     def __init__(
         self, height: int, width: int, borderWidth: int, _id: int, ctx: 'Ctx'
     ) -> None:
-        self.id: int
-        self.height: int
-        self.width: int
-        self.borderWidth: int
+        self.id: int = _id
+        self.height: int = height
+        self.width: int = width
+        self.borderWidth: int = borderWidth
         self.x: int = 0
         self.y: int = 0
         self.ctx: 'Ctx' = ctx
@@ -176,8 +182,6 @@ class GWindow:
         self.redraw = Event('redraw')  # exposure notify for x
         self.reparented = Event('reparented', GWindow)  # my parent
         self.ignored = Event('ignored')  # when we are marked as ignored
-
-        raise NotImplementedError
 
     def __repr__(self) -> str:
         return f'<Window {self.id}>'

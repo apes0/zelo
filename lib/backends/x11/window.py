@@ -38,38 +38,15 @@ async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
 @applyPre
 class Window(GWindow):
     def __init__(self, height, width, borderWidth, _id, ctx: 'Ctx') -> None:
-        self.height: int = height
-        self.width: int = width
-        self.borderWidth: int = borderWidth
+        super().__init__(height, width, borderWidth, _id, ctx)
         self.x: int = 0
         self.y: int = 0
-        self.id = _id
-        self.ctx: 'Ctx' = ctx
         self.parent: Window | None = None
         self.focused: bool = False
         self.mapped: bool = False
         self.destroyed: bool = False
         self._ignore = True  # set by override redirect (also we assume the worst, so we set it to true)
         self.mine: bool = False
-
-        # events:
-
-        self.keyPress = Event('keyPress', GKey, GMod)
-        self.keyRelease = Event('keyRelease', GKey, GMod)
-        self.buttonPress = Event('buttonPress', GButton, GMod)
-        self.buttonRelease = Event('buttonRelease', GButton, GMod)
-        self.mapRequest = Event('mapRequest')
-        self.mapNotify = Event('mapNotify')
-        self.unmapNotify = Event('unmapNotify')
-        self.destroyNotify = Event('destroyNotify')
-        self.createNotify = Event('createNotify')
-        self.configureNotify = Event('configureNotify')
-        self.configureRequest = Event('configureRequest')
-        self.enterNotify = Event('enterNotify')
-        self.leaveNotify = Event('leaveNotify')
-        self.redraw = Event('redraw')  # exposure notify for x
-        self.reparented = Event('reparented', GWindow)  # my parent
-        self.ignored = Event('ignored')  # when we are marked as ignored
 
     @property  # ? this is the only property, so should i add functions to ignore the win instead?
     def ignore(self):
