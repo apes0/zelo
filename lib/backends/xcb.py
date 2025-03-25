@@ -1142,6 +1142,7 @@ def xcbGetModifierMappingUnchecked(conn: CPtr[XcbConnectionT], ) -> XcbGetModifi
 def xcbGetProperty(conn: CPtr[XcbConnectionT], Delete: int, window: int, property: int, type: int, longOffset: int, longLength: int, ) -> XcbGetPropertyCookieT:return XcbGetPropertyCookieT(lib.xcb_get_property(*parseArgs(conn, Delete, window, property, type, longOffset, longLength, )))
 def xcbGetPropertyReply(conn: CPtr[XcbConnectionT], cookie: XcbGetPropertyCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetPropertyReplyT]:return XcbGetPropertyReplyT(lib.xcb_get_property_reply(*parseArgs(conn, cookie, e, )))
 def xcbGetPropertyValue(reply: CPtr[XcbGetPropertyReplyT], ) -> Ptr[void]:return Ptr(lib.xcb_get_property_value(*parseArgs(reply, )))
+def xcbGetPropertyValueLength(reply: CPtr[XcbGetPropertyReplyT], ) -> int:return int(lib.xcb_get_property_value_length(*parseArgs(reply, )))
 def xcbGetSetup(conn: CPtr[XcbConnectionT], ) -> CPtr[XcbSetupT]:return XcbSetupT(lib.xcb_get_setup(*parseArgs(conn, )))
 def xcbGetWindowAttributes(conn: CPtr[XcbConnectionT], window: int, ) -> XcbGetWindowAttributesCookieT:return XcbGetWindowAttributesCookieT(lib.xcb_get_window_attributes(*parseArgs(conn, window, )))
 def xcbGetWindowAttributesReply(conn: CPtr[XcbConnectionT], cookie: XcbGetWindowAttributesCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetWindowAttributesReplyT]:return XcbGetWindowAttributesReplyT(lib.xcb_get_window_attributes_reply(*parseArgs(conn, cookie, e, )))

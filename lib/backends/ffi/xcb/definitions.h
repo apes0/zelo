@@ -972,6 +972,7 @@ char *xcb_get_atom_name_name(const xcb_get_atom_name_reply_t *R);
 xcb_void_cookie_t xcb_send_event(xcb_connection_t *conn, bool propagate, xcb_window_t destination, unsigned int event_mask, const char *event);
 xcb_get_property_cookie_t xcb_get_property(xcb_connection_t *conn, unsigned char _delete, xcb_window_t window, xcb_atom_t property, xcb_atom_t type, unsigned int long_offset, unsigned int long_length);
 xcb_get_property_reply_t *xcb_get_property_reply(xcb_connection_t *conn, xcb_get_property_cookie_t cookie, xcb_generic_error_t **e);
+int xcb_get_property_value_length(const xcb_get_property_reply_t *reply);
 void *xcb_get_property_value(const xcb_get_property_reply_t *reply);
 xcb_void_cookie_t xcb_ungrab_button(xcb_connection_t *conn, unsigned char button, xcb_window_t grab_window, unsigned short modifiers);
 xcb_void_cookie_t xcb_create_gc(xcb_connection_t *conn, xcb_gcontext_t cid, xcb_drawable_t drawable, unsigned int value_mask, const void *value_list);

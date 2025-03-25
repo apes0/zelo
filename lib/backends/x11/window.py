@@ -1,6 +1,8 @@
 from functools import partial
 import numpy as np
 
+from lib.backends.x11.atoms import Atom
+
 from ..generic import GWindow, GKey, GButton, GMod, applyPre
 from .. import xcb
 from xcb_cffi import ffi
@@ -47,6 +49,12 @@ class Window(GWindow):
         self.destroyed: bool = False
         self._ignore = True  # set by override redirect (also we assume the worst, so we set it to true)
         self.mine: bool = False
+        self.title = Atom(ctx, self, 'WM_NAME').read()
+        # TODO: somehow update this when it changes
+        # probably with the cllient_message thingie
+
+    def updateTitle(self):
+        self.title = Atom(self.ctx, self, 'WM_NAME').read()
 
     @property  # ? this is the only property, so should i add functions to ignore the win instead?
     def ignore(self):

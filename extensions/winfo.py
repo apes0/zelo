@@ -42,6 +42,7 @@ destroyed: {win.destroyed}
 mapped: {win.mapped}
 mine: {win.mine}
 parent: {win.parent}
+title: {win.title}
 x: {win.x} y: {win.y} w: {win.width} h: {win.height}'''
         )
         self.text.draw()
