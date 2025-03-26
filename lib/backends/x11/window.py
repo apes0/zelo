@@ -49,12 +49,20 @@ class Window(GWindow):
         self.destroyed: bool = False
         self._ignore = True  # set by override redirect (also we assume the worst, so we set it to true)
         self.mine: bool = False
-        self.title = Atom(ctx, self, 'WM_NAME').read()
-        # TODO: somehow update this when it changes
-        # probably with the cllient_message thingie
+        self._title = Atom(ctx, self, 'WM_NAME')
 
-    def updateTitle(self):
-        self.title = Atom(self.ctx, self, 'WM_NAME').read()
+        # custom events:
+
+        self.titleChanged = self._title.changed
+
+    @property
+    def title(self):
+        return self._title.value
+
+    @title.setter
+    def title(self, _val):
+        pass
+        # raise NotImplementedError()
 
     @property  # ? this is the only property, so should i add functions to ignore the win instead?
     def ignore(self):

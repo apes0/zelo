@@ -430,7 +430,7 @@ async def propertyNotify(event, ctx: 'Ctx'):
     if not atom:
         return
 
-    atom.read()
+    await atom.read()
 
 
 ignore = [9, 10, 14, 89]  # list of events to ignore

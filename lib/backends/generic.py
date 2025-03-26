@@ -161,7 +161,7 @@ class GWindow:
         self.destroyed: bool
         self.parent: GWindow | None
         self.mine: bool
-        self.title: str = ''
+        self.title: str | None = ''
 
         # events:
 
@@ -183,6 +183,12 @@ class GWindow:
         self.redraw = Event('redraw')  # exposure notify for x
         self.reparented = Event('reparented', GWindow)  # my parent
         self.ignored = Event('ignored')  # when we are marked as ignored
+
+        # events that a backend makes:
+        # NOTE: we can still put a default event but we are gonna destroy it immediately, so its a
+        # pointless thing to do
+
+        self.titleChanged: Event
 
     def __repr__(self) -> str:
         return f'<Window {self.id}>'

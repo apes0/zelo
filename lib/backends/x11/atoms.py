@@ -25,7 +25,7 @@ class Atom:
     def __init__(self, ctx: 'Ctx', win: 'Window', name: str) -> None:
         self.ctx = ctx
         self.win = win
-        self.value: Any
+        self.value: Any = None
 
         if atom := atoms.get(name):
             self.id = atom[0]
@@ -37,11 +37,15 @@ class Atom:
 
         gctx = ctx._getGCtx()
         gctx.atoms[win.id] = {**gctx.atoms.get(win.id, {}), self.id: self}
-        self.read()
 
-    def read(self):
+        from ..events import Event
+
+        self.changed = Event('atomChanged')
+
+    async def read(self):
         self.value = readers[self.type](self)
-        print(f'read {self.value}')
+        await self.changed.trigger(self.ctx)
+        # print(f'read {self.value}')
 
     def _read(self, off: int = 0, buf: int = 4):
         # NOTE: buf and off are "32-bit multiples", so if you want 4 bytes, you should use a buf of 1
