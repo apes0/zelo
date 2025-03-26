@@ -161,7 +161,7 @@ class GWindow:
         self.destroyed: bool
         self.parent: GWindow | None
         self.mine: bool
-        self.title: str
+        self.title: str = ''
 
         # events:
 
