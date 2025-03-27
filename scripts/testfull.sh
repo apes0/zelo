@@ -39,13 +39,35 @@ done
 mypath=${0:a:h}
 
 # xauth bs
-xauth=$(timeout 2 bash -c "xauth info | grep -Po '[^\/]*\K(\/.*)'")
+xauth=$(timeout 2 bash -c "xauth -i info | grep -Po '[^\/]*\K(\/.*)'")
 # in case xauth stops working, we will save everything we need for subsequent runs in a file in /tmp
 [ $xauth ] && (cp $xauth /tmp/xauth; echo $xauth > /tmp/xauthpath) || xauth=$(cat /tmp/xauthpath)
 
 echo xauth file is $xauth
 
+# add xauth stuff
+
+mcookie=`/usr/bin/mcookie`
+echo magic cookie is $mcookie
+authfile=`mktemp --tmpdir serverauth.XXXXXXXXXX`
+echo new xauth file is $authfile
+
+serverargs=${serverargs}" -auth "${authfile}
+
 echo "
+# apply the xauth magic now that we have a running server
+xhost +local:
+chmod 777 $authfile
+
+for add in :$DISPLAY $(uname -n):$DISPLAY
+do
+    echo adding \$add
+    xauth -i -q -f $authfile << EOF
+add \$add . $mcookie
+EOF
+    chmod 777 $authfile
+done
+
 cd $mypath/..
 PYTHONPATH=$PYTHONPATH python3 main.py > /dev/null &
 xterm -font lucidasanstypewriter-24 -bg black -fg white -e 'su $2' &
@@ -56,8 +78,11 @@ done
 " > /tmp/test.sh
 chmod +x /tmp/test.sh
 
-
+echo starting X with args $serverargs
 startx $client "$clientargs" -- $server :$DISPLAY "$serverargs"
+
+# remove our auth file
+rm $authfile
 
 # recover the xauth magic
 cp /tmp/xauth $xauth
