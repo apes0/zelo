@@ -15,7 +15,7 @@ echo PYTHONPATH is $PYTHONPATH
 if [ "$(id -u)" != 0 ]
 then
     echo "becoming root"
-    sudo $0 $PYTHONPATH # make sure that we become root (and keep the PYTHONPATH)
+    sudo $0 $PYTHONPATH $(whoami) # make sure that we become root (and keep the PYTHONPATH and user)
     exit 1
 fi
 
@@ -26,7 +26,7 @@ chvt $(($n + 1))
 # NOTE: this is basically a minimal copy of startx
 
 client='/usr/bin/xterm'
-clientargs='-e /bin/sh /tmp/test.sh'
+clientargs='-font lucidasanstypewriter-24 -bg black -fg white -e /bin/sh /tmp/test.sh'
 server='/usr/bin/X'
 serverargs="vt$(($n + 1)) -quiet"
 
@@ -48,7 +48,7 @@ echo xauth file is $xauth
 echo "
 cd $mypath/..
 PYTHONPATH=$PYTHONPATH python3 main.py > /dev/null &
-xterm &
+xterm -font lucidasanstypewriter-24 -bg black -fg white -e 'su $2' &
 while [ 1 ]
 do
     sleep 1000000000000
