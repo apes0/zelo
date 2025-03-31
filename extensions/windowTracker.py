@@ -144,7 +144,7 @@ class Tracker:
             return
 
         # this is a bit of a hack to get windows to be on the correct screen
-        x, y = self.ctx.mouse.location()
+        x, y = await self.ctx.mouse.location()
 
         win.x = x
         win.y = y

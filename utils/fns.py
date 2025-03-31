@@ -57,7 +57,7 @@ def get(obj: Theme | Ratio | Any, root: 'Extension', field, _type):
 
 def toCursor(ctx: 'Ctx', win: 'GWindow'):
     async def afn():
-        x, y = ctx.mouse.location()
+        x, y = await ctx.mouse.location()
         await win.configure(newX=x, newY=y)
 
     ctx.nurs.start_soon(afn)

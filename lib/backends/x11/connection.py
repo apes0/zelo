@@ -1,5 +1,5 @@
 # from .ewmh import AtomStore
-from lib.backends.x11.requests import ScreenRes
+from . import requests
 from .mouse import Mouse
 from .. import xcb
 from typing import TYPE_CHECKING
@@ -54,15 +54,15 @@ async def initScreens(ctx: 'Ctx'):
     ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, gctx.screenp[0]))
     ctx._root = ctx.screen.root
 
-    screenRes = await ScreenRes(ctx, conn, ctx._root).reply()
+    screenRes = await requests.GetScreenResources(ctx, conn, ctx._root).reply()
 
     first = xcb.xcbRandrGetScreenResourcesCrtcs(screenRes)
-    requests = [
-        xcb.xcbRandrGetCrtcInfo(conn, first[n], xcb.XCBCurrentTime)
+    reqs = [
+        requests.RandrGetCrtcInfo(ctx, conn, first[n], xcb.XCBCurrentTime)
         for n in range(screenRes.numCrtcs)
     ]
 
-    crtcs = [xcb.xcbRandrGetCrtcInfoReply(conn, req, xcb.NULL) for req in requests]
+    crtcs: list[xcb.XcbRandrGetCrtcInfoReplyT] = [await req.reply() for req in reqs]
 
     for crtc in crtcs:
         if crtc == xcb.NULL or (crtc.width + crtc.height) == 0:
@@ -93,24 +93,24 @@ async def initWindows(ctx: 'Ctx'):
     xcb.xcbUngrabKey(conn, xcb.XCBGrabAny, ctx._root, xcb.XCBModMaskAny)
 
     # TODO: get x, y, border width, width, height here
-    req = xcb.xcbQueryTreeReply(conn, xcb.xcbQueryTree(conn, ctx._root), xcb.NULL)
+    req = await requests.QueryTree(ctx, conn, ctx._root).reply()
     win = xcb.xcbQueryTreeChildren(req)
-    requests = {
+    reqs = {
         win[n]: (
-            xcb.xcbGetWindowAttributes(conn, win[n]),
-            xcb.xcbGetGeometry(conn, win[n]),
+            requests.GetWindowAttributes(ctx, conn, win[n]),
+            requests.GetGeometry(ctx, conn, win[n]),
         )
         for n in range(req.childrenLen)
     }
 
-    for _id, req in requests.items():
-        attrs = xcb.xcbGetWindowAttributesReply(conn, req[0], xcb.NULL)
+    for _id, req in reqs.items():
+        attrs = await req[0].reply()
         mapped = attrs.mapState != xcb.XCBMapStateUnmapped
 
         x, y, height, width, borderWidth = 0, 0, 0, 0, 0
 
         if mapped:
-            geometry = xcb.xcbGetGeometryReply(conn, req[1], xcb.NULL)
+            geometry = await req[1].reply()
             x, y, height, width, borderWidth = (
                 geometry.x,
                 geometry.y,
@@ -138,9 +138,7 @@ async def initMouse(ctx: 'Ctx'):
 async def initModMap(ctx: 'Ctx'):
     gctx: GCtx = ctx._getGCtx()
 
-    rep = xcb.xcbGetModifierMappingReply(
-        gctx.connection, xcb.xcbGetModifierMappingUnchecked(gctx.connection), xcb.NULL
-    )
+    rep = await requests.GetModifierMapping(ctx, gctx.connection).reply()
 
     mappings = xcb.xcbGetModifierMappingKeycodes(rep)
 
@@ -198,12 +196,12 @@ async def extensions(ctx: 'Ctx'):
     names = ['RANDR', 'MIT-SHM', 'XTEST', 'RENDER']
 
     for name in names:
-        reqs[name] = xcb.xcbQueryExtensionUnchecked(
-            gctx.connection, len(name), chararr(name.encode())
+        reqs[name] = requests.QueryExtension(
+            ctx, gctx.connection, len(name), chararr(name.encode())
         )
 
     for name, req in reqs.items():
-        rep = xcb.xcbQueryExtensionReply(gctx.connection, req, xcb.NULL)
+        rep = await req.reply()
 
         gctx.extResps[name] = rep
         log('backend', DEBUG, f'{name} is {"not "*(not rep.present)}present')
@@ -215,9 +213,7 @@ async def shm(ctx: 'Ctx'):
     if not gctx.avail('MIT-SHM'):
         return
 
-    rep = xcb.xcbShmQueryVersionReply(
-        gctx.connection, xcb.xcbShmQueryVersion(gctx.connection), xcb.NULL
-    )
+    rep = await requests.ShmQueryVersion(ctx, gctx.connection).reply()
 
     gctx.sharedPixmaps = bool(rep.sharedPixmaps)
 

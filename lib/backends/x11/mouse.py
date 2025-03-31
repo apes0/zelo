@@ -1,3 +1,4 @@
+from lib.backends.x11 import requests
 from .. import xcb
 from .types import chararr, uintarr
 from ..generic import GButton, GMouse, applyPre
@@ -97,16 +98,14 @@ class Mouse(GMouse):
     def __init__(self, ctx: 'Ctx') -> None:
         self.ctx = ctx
 
-    def location(self) -> tuple[int, int]:
+    async def location(self) -> tuple[int, int]:
         assert not self.ctx.closed, 'conn is closed'
 
         gctx: GCtx = self.ctx._getGCtx()
 
-        resp = xcb.xcbQueryPointerReply(
-            gctx.connection,
-            xcb.xcbQueryPointer(gctx.connection, self.ctx._root),
-            xcb.NULL,
-        )
+        resp = await requests.QueryPointer(
+            self.ctx, gctx.connection, self.ctx._root
+        ).reply()
 
         return (
             resp.rootX,

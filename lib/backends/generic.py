@@ -326,7 +326,7 @@ class GMouse:
     def __repr__(self) -> str:
         return '<Mouse>'
 
-    def location(self) -> tuple[int, int]:
+    async def location(self) -> tuple[int, int]:
         raise NotImplementedError
 
     @logCall('backend', DEBUG)

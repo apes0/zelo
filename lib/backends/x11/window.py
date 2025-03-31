@@ -1,6 +1,7 @@
 from functools import partial
 import numpy as np
 
+from lib.backends.x11 import requests
 from lib.backends.x11.atoms import Atom
 
 from ..generic import GWindow, GKey, GButton, GMod, applyPre
@@ -260,22 +261,19 @@ class Window(GWindow):
                 gctx.connection, height * width * 4
             )  # TODO: get the *actual* depth here
 
-            resp = xcb.xcbShmGetImageReply(
+            resp = await requests.ShmGetImage(
+                self.ctx,
                 gctx.connection,
-                xcb.xcbShmGetImageUnchecked(
-                    gctx.connection,
-                    self.id,
-                    x,
-                    y,
-                    width,
-                    height,
-                    maxUVal('int'),
-                    xcb.XCBImageFormatZPixmap,
-                    shm.id,
-                    0,
-                ),
-                xcb.NULL,
-            )
+                self.id,
+                x,
+                y,
+                width,
+                height,
+                maxUVal('int'),
+                xcb.XCBImageFormatZPixmap,
+                shm.id,
+                0,
+            ).reply()
 
             depth = resp.size // (
                 width * height
@@ -283,20 +281,17 @@ class Window(GWindow):
 
             out = ffi.buffer(shm.addr, resp.size)
         else:
-            resp = xcb.xcbGetImageReply(
+            resp = await requests.GetImage(
+                self.ctx,
                 gctx.connection,
-                xcb.xcbGetImage(
-                    gctx.connection,
-                    xcb.XCBImageFormatZPixmap,
-                    self.id,
-                    x,
-                    y,
-                    width,
-                    height,
-                    maxUVal('int'),
-                ),
-                xcb.NULL,
-            )
+                xcb.XCBImageFormatZPixmap,
+                self.id,
+                x,
+                y,
+                width,
+                height,
+                maxUVal('int'),
+            ).reply()
 
             dat = xcb.xcbGetImageData(resp)
 

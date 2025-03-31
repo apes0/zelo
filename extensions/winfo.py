@@ -61,7 +61,7 @@ x: {win.x} y: {win.y} w: {win.width} h: {win.height}'''
 
     async def follow(self):
         while self.following:
-            (x, y) = self.ctx.mouse.location()
+            (x, y) = await self.ctx.mouse.location()
             d = getDisplay(self.ctx, x, y)
             if not d:
                 continue

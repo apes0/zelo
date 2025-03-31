@@ -1,3 +1,4 @@
+from lib.backends.x11 import requests
 from .types import charpC
 from typing import TYPE_CHECKING, Any
 from .. import xcb
@@ -43,19 +44,18 @@ class Atom:
         self.changed = Event('atomChanged')
 
     async def read(self):
-        self.value = readers[self.type](self)
+        self.value = await readers[self.type](self)
         await self.changed.trigger(self.ctx)
         # print(f'read {self.value}')
 
-    def _read(self, off: int = 0, buf: int = 4):
+    async def _read(self, off: int = 0, buf: int = 4):
         # NOTE: buf and off are "32-bit multiples", so if you want 4 bytes, you should use a buf of 1
         conn = self.ctx._getGCtx().connection
 
-        resp = xcb.xcbGetPropertyReply(
-            conn,
-            xcb.xcbGetProperty(conn, 0, self.win.id, self.id, self.type, off, buf),
-            xcb.NULL,
-        )
+        resp = await requests.GetProperty(
+            self.ctx, conn, 0, self.win.id, self.id, self.type, off, buf
+        ).reply()
+
         if resp == xcb.NULL:
             return 0, xcb.NULL
 
@@ -63,13 +63,13 @@ class Atom:
 
 
 @reader(xcb.XCBAtomString)
-def readString(atom: Atom):
+async def readString(atom: Atom):
     out = b''
 
     pos = 0
 
     while True:
-        read, data = atom._read(off=pos)
+        read, data = await atom._read(off=pos)
 
         if not read:
             # basically just if its empty

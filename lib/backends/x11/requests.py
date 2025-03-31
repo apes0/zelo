@@ -50,10 +50,10 @@ class RequestLoop:
     def loop(self, fin: Callable):
         trio.from_thread.run_sync(fin)
         while not self.ctx.closed:
-            print(f'{len(self.queue)} pending requests')
             while self.queue:
+                # print(f'{len(self.queue)} pending requests')
                 r: Request = self.queue.popleft()
-                print(f'handling {r}')
+                # print(f'handling {r}')
                 r.data = r.respf(self.ctx._getGCtx().connection, r.req, xcb.NULL)
                 trio.from_thread.run_sync(r.finished.set)
 
@@ -65,6 +65,21 @@ class RequestLoop:
         self._start.set()
 
 
-ScreenRes = _Request(
+GetScreenResources = _Request(
     xcb.xcbRandrGetScreenResources, xcb.xcbRandrGetScreenResourcesReply
 )
+RandrGetCrtcInfo = _Request(xcb.xcbRandrGetCrtcInfo, xcb.xcbRandrGetCrtcInfoReply)
+GetProperty = _Request(xcb.xcbGetProperty, xcb.xcbGetPropertyReply)
+QueryTree = _Request(xcb.xcbQueryTree, xcb.xcbQueryTreeReply)
+GetWindowAttributes = _Request(
+    xcb.xcbGetWindowAttributes, xcb.xcbGetWindowAttributesReply
+)
+GetGeometry = _Request(xcb.xcbGetGeometry, xcb.xcbGetGeometryReply)
+GetModifierMapping = _Request(
+    xcb.xcbGetModifierMappingUnchecked, xcb.xcbGetModifierMappingReply
+)
+QueryExtension = _Request(xcb.xcbQueryExtensionUnchecked, xcb.xcbQueryExtensionReply)
+ShmQueryVersion = _Request(xcb.xcbShmQueryVersion, xcb.xcbShmQueryVersionReply)
+QueryPointer = _Request(xcb.xcbQueryPointer, xcb.xcbQueryPointerReply)
+ShmGetImage = _Request(xcb.xcbShmGetImageUnchecked, xcb.xcbShmGetImageReply)
+GetImage = _Request(xcb.xcbGetImage, xcb.xcbGetImageReply)
