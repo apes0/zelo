@@ -1,4 +1,5 @@
 # from .ewmh import AtomStore
+from lib.backends.x11.requests import ScreenRes
 from .mouse import Mouse
 from .. import xcb
 from typing import TYPE_CHECKING
@@ -10,6 +11,7 @@ from .keys import Mod
 from .types import chararr
 from ...debcfg import log
 from logging import DEBUG
+import trio
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
@@ -26,30 +28,33 @@ def init(fn):
 @applyPre
 class Connection(GConnection):
     def __init__(self, ctx: 'Ctx') -> None:
+        self.ctx = ctx
         gctx: GCtx = ctx._getGCtx()
         self.conn = xcb.xcbConnect(gctx.dname, gctx.screenp)
         gctx.connection = self.conn
         assert not xcb.xcbConnectionHasError(self.conn), 'Xcb connection error'
 
+    async def __ainit__(self):
         for fn in initers:
-            fn(ctx)
+            await fn(self.ctx)
 
     def disconnect(self):
         xcb.xcbDisconnect(self.conn)
 
 
 @init
-def initScreens(ctx: 'Ctx'):
+async def startRequests(ctx: 'Ctx'):
+    await ctx.nurs.start(ctx._getGCtx().requestLoop.start)
+
+
+@init
+async def initScreens(ctx: 'Ctx'):
     gctx: GCtx = ctx._getGCtx()
     conn = gctx.connection
     ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, gctx.screenp[0]))
     ctx._root = ctx.screen.root
 
-    screenRes = xcb.xcbRandrGetScreenResourcesReply(
-        conn,
-        xcb.xcbRandrGetScreenResources(conn, ctx._root),
-        xcb.NULL,
-    )
+    screenRes = await ScreenRes(ctx, conn, ctx._root).reply()
 
     first = xcb.xcbRandrGetScreenResourcesCrtcs(screenRes)
     requests = [
@@ -68,7 +73,7 @@ def initScreens(ctx: 'Ctx'):
 
 
 @init
-def initWindows(ctx: 'Ctx'):
+async def initWindows(ctx: 'Ctx'):
     gctx: GCtx = ctx._getGCtx()
     conn = gctx.connection
 
@@ -125,12 +130,12 @@ def initWindows(ctx: 'Ctx'):
 
 
 @init
-def initMouse(ctx: 'Ctx'):
+async def initMouse(ctx: 'Ctx'):
     ctx.mouse = Mouse(ctx)
 
 
 @init
-def initModMap(ctx: 'Ctx'):
+async def initModMap(ctx: 'Ctx'):
     gctx: GCtx = ctx._getGCtx()
 
     rep = xcb.xcbGetModifierMappingReply(
@@ -187,7 +192,7 @@ def initModMap(ctx: 'Ctx'):
 
 
 @init
-def extensions(ctx: 'Ctx'):
+async def extensions(ctx: 'Ctx'):
     gctx: GCtx = ctx._getGCtx()
     reqs = {}
     names = ['RANDR', 'MIT-SHM', 'XTEST', 'RENDER']
@@ -205,7 +210,7 @@ def extensions(ctx: 'Ctx'):
 
 
 @init
-def shm(ctx: 'Ctx'):
+async def shm(ctx: 'Ctx'):
     gctx: GCtx = ctx._getGCtx()
     if not gctx.avail('MIT-SHM'):
         return

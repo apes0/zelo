@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 from .. import xcb
 from .types import charpC, uintarr
 from .window import Window
+from .requests import RequestLoop
+import trio
 
 if TYPE_CHECKING:
     from ...ctx import Ctx as Ctxt
@@ -21,6 +23,7 @@ class Ctx(GCtx):
         self.extResps = {}
         self.sharedPixmaps: bool = False
         self.atoms: dict['GWindow', dict[int, 'Atom']] = {}
+        self.requestLoop = RequestLoop(ctx)
 
     def avail(self, ext: str):
         return self.extResps[ext].present

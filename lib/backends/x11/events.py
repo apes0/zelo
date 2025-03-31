@@ -13,7 +13,6 @@ from .types import (
     mapRequestTC,
     confRequestTC,
     confNotifyTC,
-    clientMessageTC,
     destroyNotifyTC,
     unmapNotifyTC,
     motionNotifyTC,
@@ -28,7 +27,7 @@ from .types import (
     ReparentNotifyTC,
 )
 from .connection import Connection
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 from .. import events
 from .gctx import Ctx as GCtx
 import trio
@@ -450,9 +449,11 @@ async def setup(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
     gctx.screenp = intp(0)
     ctx.gctx = gctx
 
-    conn: GConnection = Connection(
+    conn: Connection = Connection(
         ctx
     )  # TODO: put this in the ctx and rename the current ``connection``
+
+    await conn.__ainit__()
 
     await setupExtensions(ctx, ctx.cfg.extensions)
 
