@@ -19,7 +19,6 @@ class Request[Ret]:
 
     async def reply(self) -> Ret:
         await self.finished.wait()
-        print(self.data)
         return self.data
 
 
