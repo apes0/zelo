@@ -1,8 +1,7 @@
-from .connection import Connection
+from typing import TYPE_CHECKING
 
 from .. import waylandServer as wl
-
-from typing import TYPE_CHECKING
+from .connection import Connection
 
 if TYPE_CHECKING:
     from ...ctx import Ctx

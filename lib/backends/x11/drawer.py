@@ -1,18 +1,20 @@
-from .types import uchararr, chararr, uintarr, rectangle
+from html import escape
+from typing import TYPE_CHECKING
+
 import cv2
 import numpy as np
-from html import escape
-from .. import xcb
-from ..pango import render
-from xcb_cffi import ffi
-from ..generic import GImage, GWindow, GRectangle, GText, applyPre
 
-from typing import TYPE_CHECKING
+from xcb_cffi import ffi
+
+from .. import xcb
+from ..generic import GImage, GRectangle, GText, GWindow, applyPre
+from ..pango import render
+from .types import chararr, rectangle, uchararr, uintarr
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
-    from .window import Window
     from .gctx import Ctx as GCtx
+    from .window import Window
 
 # Create gcontext and such here
 # do text rendering, image drawing, etc.

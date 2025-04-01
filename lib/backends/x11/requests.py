@@ -1,6 +1,9 @@
 from collections import deque
-from typing import Callable, TYPE_CHECKING, Concatenate, TypeVar, Any, ParamSpec
+from typing import (TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec,
+                    TypeVar)
+
 import trio
+
 from .. import xcb
 
 if TYPE_CHECKING:
@@ -37,7 +40,6 @@ def _Request(
 
 
 class RequestLoop:
-
     def __init__(self, ctx: 'Ctx') -> None:
         self.queue = deque()
         self._start = trio.Event()

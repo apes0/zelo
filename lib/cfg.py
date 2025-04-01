@@ -5,7 +5,9 @@ from extensions.borders import Borders
 from extensions.fakeMonitors import FakeDisplays
 from extensions.mouse import Mouse
 from extensions.mouseFocus import MouseFocus
+from extensions.share import ShareClient, ShareServer
 from extensions.shortcuts import Shortcuts
+from extensions.tabs import Tabs
 from extensions.tiler import Tiler
 from extensions.wallpaper import Wallpaper
 from extensions.widget import Widget
@@ -13,20 +15,16 @@ from extensions.widgets.bar import Bar
 from extensions.widgets.clock import Clock
 from extensions.widgets.nowPlaying import NowPlaying
 from extensions.widgets.text import Text
-from extensions.workspaces import Workspaces
 from extensions.winfo import Winfo
-from extensions.share import ShareServer, ShareClient
-from extensions.tabs import Tabs
-
+from extensions.workspaces import Workspaces
 from lib._cfg import Cfg
 from lib.api.keys import Key, Mod
 from lib.debcfg import cfg as debcfg
-
 from utils.fns import spawn, stop, toCursor
 from utils.layout import Layout
+from utils.log import log, logTerm
 from utils.ratio import Ratio
 from utils.theme import Theme
-from utils.log import logTerm, log
 
 # debcfg['all'] = True
 

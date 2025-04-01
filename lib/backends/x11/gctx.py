@@ -1,14 +1,16 @@
-from ..generic import GCtx, applyPre
 from typing import TYPE_CHECKING
+
+import trio
+
 from .. import xcb
+from ..generic import GCtx, applyPre
+from .requests import RequestLoop
 from .types import charpC, uintarr
 from .window import Window
-from .requests import RequestLoop
-import trio
 
 if TYPE_CHECKING:
     from ...ctx import Ctx as Ctxt
-    from ..generic import GWindow, CData
+    from ..generic import CData, GWindow
     from .atoms import Atom
 
 

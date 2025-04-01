@@ -1,4 +1,4 @@
-from ..generic import GScreen, GDisplay
+from ..generic import GDisplay, GScreen
 
 # TODO: support xinerama as well (should not be difficult i hope)
 

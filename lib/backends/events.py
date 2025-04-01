@@ -1,10 +1,10 @@
 import traceback
+from logging import DEBUG, ERROR
 from types import NoneType, UnionType
 from typing import TYPE_CHECKING, Callable
 
 import trio
 
-from logging import ERROR, DEBUG
 from ..debcfg import log
 from .generic import GButton, GKey, GMod, GWindow
 

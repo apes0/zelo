@@ -1,5 +1,6 @@
-from _cffi_backend import _CDataBase
 from typing import Any
+
+from _cffi_backend import _CDataBase
 
 # TODO: move Ptr[], CPtr, void and enum to here
 

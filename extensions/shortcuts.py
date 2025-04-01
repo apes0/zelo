@@ -1,9 +1,10 @@
+from itertools import combinations
+from typing import TYPE_CHECKING, Callable
+
+from lib.api.keys import Mod
+from lib.backends.events import keyPress, keyRelease
 from lib.backends.generic import GWindow
 from lib.extension import Extension
-from typing import TYPE_CHECKING, Callable
-from itertools import combinations
-from lib.backends.events import keyPress, keyRelease
-from lib.api.keys import Mod
 
 if TYPE_CHECKING:
     from lib.backends.generic import GKey, GMod

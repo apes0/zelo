@@ -1,5 +1,6 @@
 from _cffi_backend import _CDataBase
-from wayland_cffi import lib, ffi
+from wayland_cffi import ffi, lib
+
 from .base import Base, parseArgs
 
 NULL = ffi.NULL

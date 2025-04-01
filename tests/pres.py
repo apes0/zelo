@@ -1,15 +1,18 @@
-from typing import Callable, Any
 import os
+import random
+from typing import Any, Callable
+
 import trio
+
+from lib._cfg import Cfg
+from lib.backends.ffi import load
+from lib.backends.x11.types import chararr
 from lib.ctx import Ctx
 from lib.lock import alock
-from .ctx import Ctx as TCtx
-from lib.backends.x11.types import chararr
-from lib.backends.ffi import load
 from utils.fns import stop
-from lib._cfg import Cfg
-import random
-from .utils import popen, pclose
+
+from .ctx import Ctx as TCtx
+from .utils import pclose, popen
 
 # these are all the prerequesites, they should only block until they can be used
 

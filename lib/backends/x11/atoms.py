@@ -1,8 +1,10 @@
-from lib.backends.x11 import requests
-from .types import charpC
-from typing import TYPE_CHECKING, Any
-from .. import xcb
 import math
+from typing import TYPE_CHECKING, Any
+
+from lib.backends.x11 import requests
+
+from .. import xcb
+from .types import charpC
 
 if TYPE_CHECKING:
     from lib.backends.x11.window import Window

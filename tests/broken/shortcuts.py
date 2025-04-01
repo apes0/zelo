@@ -1,19 +1,20 @@
-from ..tester import Shared, test
-from ..pres import startX, openWins, startWm
-from string import ascii_lowercase
 import random
-
-from lib.api.keys import Key, Mod
-from lib._cfg import Cfg
-from extensions.shortcuts import Shortcuts
-
+from string import ascii_lowercase
 from typing import TYPE_CHECKING
 
 import trio
 
+from extensions.shortcuts import Shortcuts
+from lib._cfg import Cfg
+from lib.api.keys import Key, Mod
+
+from ..pres import openWins, startWm, startX
+from ..tester import Shared, test
+
 if TYPE_CHECKING:
-    from ..tester import Test
     from lib.ctx import Ctx
+
+    from ..tester import Test
 
 cfg = Cfg()
 

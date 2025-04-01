@@ -2,13 +2,13 @@ import os
 import sys
 from functools import partial
 from importlib import import_module
+from logging import DEBUG
 from types import ModuleType
 from typing import Callable
-from logging import DEBUG
-
-from ..debcfg import log
 
 from cffi import FFI
+
+from ..debcfg import log
 
 # TODO: export this to a config thing, mostly for tests and stuff
 

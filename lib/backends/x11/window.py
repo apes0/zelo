@@ -1,17 +1,18 @@
 from functools import partial
+from typing import TYPE_CHECKING, Callable
+
 import numpy as np
+import trio
 
 from lib.backends.x11 import requests
 from lib.backends.x11.atoms import Atom
-
-from ..generic import GWindow, GKey, GButton, GMod, applyPre
-from .. import xcb
 from xcb_cffi import ffi
-import trio
-from .types import uintarr, maxUVal
-from typing import TYPE_CHECKING, Callable
+
 from ...lock import alock, calock
-from ..events import Event, focusChange, reparent, ignored
+from .. import xcb
+from ..events import Event, focusChange, ignored, reparent
+from ..generic import GButton, GKey, GMod, GWindow, applyPre
+from .types import maxUVal, uintarr
 
 if TYPE_CHECKING:
     from ...ctx import Ctx

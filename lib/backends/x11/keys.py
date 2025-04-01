@@ -1,7 +1,9 @@
-from lib.backends.generic import GKey, GMod, GWindow, applyPre
-from .keysyms import keys
 from typing import TYPE_CHECKING
+
+from lib.backends.generic import GKey, GMod, GWindow, applyPre
+
 from .. import xcb
+from .keysyms import keys
 
 if TYPE_CHECKING:
     from ...ctx import Ctx

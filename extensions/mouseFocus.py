@@ -1,12 +1,13 @@
-from lib.extension import Extension
 from typing import TYPE_CHECKING
-from lib.backends.events import buttonPress, mapNotify, focusChange
+
 from lib.api.keys import Mod
 from lib.api.mouse import Button
+from lib.backends.events import buttonPress, focusChange, mapNotify
+from lib.extension import Extension
 
 if TYPE_CHECKING:
+    from lib.backends.generic import GButton, GMod, GWindow
     from lib.ctx import Ctx
-    from lib.backends.generic import GButton, GWindow, GMod
 
 
 class MouseFocus(Extension):

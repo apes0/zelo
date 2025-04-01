@@ -1,11 +1,13 @@
-from lib.extension import Extension
 from typing import TYPE_CHECKING
-from lib.backends.events import mapNotify
+
 import trio
 
+from lib.backends.events import mapNotify
+from lib.extension import Extension
+
 if TYPE_CHECKING:
-    from lib.ctx import Ctx
     from lib.backends.generic import GWindow
+    from lib.ctx import Ctx
 
 
 class Animation(Extension):

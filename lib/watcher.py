@@ -1,6 +1,6 @@
 import select
+from logging import DEBUG, FATAL
 from typing import TYPE_CHECKING, Callable
-from logging import FATAL, DEBUG
 
 import trio
 

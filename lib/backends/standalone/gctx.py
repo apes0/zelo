@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 import pyglet
 
 from lib.backends.generic import GWindow
+
 from ..generic import GCtx, applyPre
 from .cfg import HEIGHT, ROOT
 

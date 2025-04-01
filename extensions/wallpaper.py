@@ -1,13 +1,15 @@
-from lib.extension import Extension
 from typing import TYPE_CHECKING
-from lib.backends.events import redraw
-from lib.api.drawer import Image
+
 import cv2
 import trio
 
+from lib.api.drawer import Image
+from lib.backends.events import redraw
+from lib.extension import Extension
+
 if TYPE_CHECKING:
-    from lib.ctx import Ctx
     from lib.backends.generic import GImage, GWindow
+    from lib.ctx import Ctx
 
 # TODO: support multiple wallpapers for each screen
 

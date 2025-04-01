@@ -1,11 +1,13 @@
-from lib.extension import Extension
 from typing import TYPE_CHECKING
-from .windowTracker import track
+
+from lib.extension import Extension
 from utils.fns import multiple
 
+from .windowTracker import track
+
 if TYPE_CHECKING:
+    from lib.backends.generic import GDisplay, GWindow
     from lib.ctx import Ctx
-    from lib.backends.generic import GWindow, GDisplay
 
 # tiles windows in the following way:
 #

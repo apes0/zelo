@@ -2,24 +2,18 @@
 # NOTE: i literally made this just because of the workspaces hah
 
 from logging import DEBUG
-from lib.debcfg import log
-from utils.fns import getDisplay
-from lib.extension import Extension
-from lib.backends.events import (
-    mapRequest,
-    destroyNotify,
-    focusChange,
-    unmapNotify,
-    mapNotify,
-    configureNotify,
-)
-
 from typing import TYPE_CHECKING, Callable, Coroutine
 
+from lib.backends.events import (configureNotify, destroyNotify, focusChange,
+                                 mapNotify, mapRequest, unmapNotify)
+from lib.debcfg import log
+from lib.extension import Extension
+from utils.fns import getDisplay
+
 if TYPE_CHECKING:
-    from lib.ctx import Ctx
-    from lib.backends.generic import GWindow, GDisplay
     from lib.backends.events import Event
+    from lib.backends.generic import GDisplay, GWindow
+    from lib.ctx import Ctx
 
 
 def track(updateFn: str, custom: list = []):

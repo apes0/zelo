@@ -1,11 +1,11 @@
-from lib.extension import Extension
 from typing import TYPE_CHECKING, Any
-from lib.api.drawer import Text
-from lib.backends.events import enterNotify, leaveNotify
+
 import trio
 
+from lib.api.drawer import Text
+from lib.backends.events import enterNotify, leaveNotify
+from lib.extension import Extension
 from utils.fns import getDisplay
-
 
 if TYPE_CHECKING:
     from lib.backends.generic import GWindow

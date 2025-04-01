@@ -1,10 +1,11 @@
-from lib.extension import Extension
 from typing import TYPE_CHECKING
+
 from lib.api.screen import Display
+from lib.extension import Extension
 
 if TYPE_CHECKING:
-    from lib.ctx import Ctx
     from lib.backends.generic import GDisplay
+    from lib.ctx import Ctx
 
 # fakes screens
 # TODO: vertical splitting

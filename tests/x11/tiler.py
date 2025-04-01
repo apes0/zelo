@@ -1,14 +1,15 @@
-from ..utils import checkWin, randFocus
-from ..tester import test
-from ..pres import startX, openWins, startWm
-
-from lib._cfg import Cfg
-from extensions.tiler import Tiler
-
 from typing import TYPE_CHECKING
+
+from extensions.tiler import Tiler
+from lib._cfg import Cfg
+
+from ..pres import openWins, startWm, startX
+from ..tester import test
+from ..utils import checkWin, randFocus
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx
+
     from ..ctx import Ctx as TCtx
 
 cfg = Cfg()

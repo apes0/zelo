@@ -1,7 +1,10 @@
-from _cffi_backend import _CDataBase
-from xcb_cffi import lib, ffi
 from typing import Any
-from .base import Base, parseArgs, Ptr, CPtr, void, enum
+
+from _cffi_backend import _CDataBase
+
+from xcb_cffi import ffi, lib
+
+from .base import Base, CPtr, Ptr, enum, parseArgs, void
 
 NULL = ffi.NULL
 

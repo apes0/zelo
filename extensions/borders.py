@@ -1,10 +1,11 @@
-from lib.extension import Extension
-from lib.backends.events import createNotify, focusChange
 from typing import TYPE_CHECKING
 
+from lib.backends.events import createNotify, focusChange
+from lib.extension import Extension
+
 if TYPE_CHECKING:
-    from lib.ctx import Ctx
     from lib.backends.generic import GWindow
+    from lib.ctx import Ctx
 
 # adds window borders
 

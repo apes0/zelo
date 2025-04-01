@@ -1,13 +1,15 @@
-from lib.api.keys import Key, Mod
-from lib.extension import Extension
-from lib.backends.events import enterNotify, leaveNotify
 from typing import TYPE_CHECKING
-from .shortcuts import Shortcuts, arun
+
+from lib.api.keys import Key, Mod
+from lib.backends.events import enterNotify, leaveNotify
+from lib.extension import Extension
 from utils.layout import Layout
 
+from .shortcuts import Shortcuts, arun
+
 if TYPE_CHECKING:
-    from lib.ctx import Ctx
     from lib.backends.generic import GWindow
+    from lib.ctx import Ctx
 
 
 # combine multiple windows into one with tabs:

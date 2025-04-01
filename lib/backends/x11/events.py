@@ -1,41 +1,28 @@
-from logging import ERROR, WARN, DEBUG
-from ...debcfg import log
-from .keys import Key, Mod
-from .mouse import Button
-from lib.extension import setupExtensions
-from .. import xcb
-from .types import (
-    PropertyNotifyTC,
-    intp,
-    uintarr,
-    charpp,
-    createNotifyTC,
-    mapRequestTC,
-    confRequestTC,
-    confNotifyTC,
-    destroyNotifyTC,
-    unmapNotifyTC,
-    motionNotifyTC,
-    genericErrorTC,
-    buttonPressTC,
-    keyPressTC,
-    enterNotifyTC,
-    mapNotifyTC,
-    randrNotifyTC,
-    ExposeTC,
-    xcbErrorContext,
-    ReparentNotifyTC,
-)
-from .connection import Connection
+from logging import DEBUG, ERROR, WARN
 from typing import TYPE_CHECKING
-from .. import events
-from .gctx import Ctx as GCtx
+
 import trio
 
+from lib.extension import setupExtensions
+
+from ...debcfg import log
+from .. import events, xcb
+from .connection import Connection
+from .gctx import Ctx as GCtx
+from .keys import Key, Mod
+from .mouse import Button
+from .types import (ExposeTC, PropertyNotifyTC, ReparentNotifyTC,
+                    buttonPressTC, charpp, confNotifyTC, confRequestTC,
+                    createNotifyTC, destroyNotifyTC, enterNotifyTC,
+                    genericErrorTC, intp, keyPressTC, mapNotifyTC,
+                    mapRequestTC, motionNotifyTC, randrNotifyTC, uintarr,
+                    unmapNotifyTC, xcbErrorContext)
+
 if TYPE_CHECKING:
-    from .atoms import Atom
-    from lib.ctx import Ctx
     from lib.backends.generic import GConnection, GWindow
+    from lib.ctx import Ctx
+
+    from .atoms import Atom
 
 # TODO: event handlers for extension events?
 # TODO: log on 'windows' log as well

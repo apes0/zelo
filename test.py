@@ -1,11 +1,12 @@
-from tests.tester import Test, tests, load
+import sys
+from logging import DEBUG
 
 import coverage
-from junit_xml import TestSuite, TestCase
-from lib.debcfg import cfg, logger
-from logging import DEBUG
 import trio
-import sys
+from junit_xml import TestCase, TestSuite
+
+from lib.debcfg import cfg, logger
+from tests.tester import Test, load, tests
 
 # for c in cfg:
 #    cfg[c] = False

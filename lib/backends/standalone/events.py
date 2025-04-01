@@ -1,8 +1,10 @@
 from typing import TYPE_CHECKING
+
+import pyglet
 import pyglet.event
 import trio
-import pyglet
-from .cfg import WIDTH, HEIGHT
+
+from .cfg import HEIGHT, WIDTH
 from .gctx import Ctx as GCtx
 
 if TYPE_CHECKING:

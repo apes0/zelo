@@ -1,6 +1,5 @@
-from ..generic import GScreen, GDisplay
-
-from .cfg import ROOT, WIDTH, HEIGHT
+from ..generic import GDisplay, GScreen
+from .cfg import HEIGHT, ROOT, WIDTH
 
 
 class Screen(GScreen):

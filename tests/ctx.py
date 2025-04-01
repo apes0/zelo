@@ -1,6 +1,7 @@
 import os
-import trio
 from typing import TYPE_CHECKING
+
+import trio
 
 if TYPE_CHECKING:
     from .pres import Pre

@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING
-import random
-import trio
 import os
+import random
+from typing import TYPE_CHECKING
+
+import trio
 
 if TYPE_CHECKING:
     from lib.backends.generic import GWindow

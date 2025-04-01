@@ -1,12 +1,12 @@
-from typing import TYPE_CHECKING, Any, Callable, Awaitable
+import traceback
+from typing import TYPE_CHECKING, Any, Awaitable, Callable
 
 import trio
 
 from lib.watcher import Watcher
-from .debcfg import log, ERROR
-import traceback
 
 from .api.window import Window
+from .debcfg import ERROR, log
 
 if TYPE_CHECKING:
     from ._cfg import Cfg

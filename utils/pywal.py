@@ -1,4 +1,5 @@
 import pywal
+
 from .theme import Theme
 
 

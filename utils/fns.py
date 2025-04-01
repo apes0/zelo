@@ -1,13 +1,14 @@
+import os
 import subprocess
 from typing import TYPE_CHECKING, Any
-import os
+
 import trio
 
-from .theme import Theme
 from .ratio import Ratio
+from .theme import Theme
 
 if TYPE_CHECKING:
-    from lib.backends.generic import GWindow, GDisplay
+    from lib.backends.generic import GDisplay, GWindow
     from lib.ctx import Ctx
     from lib.extension import Extension
 

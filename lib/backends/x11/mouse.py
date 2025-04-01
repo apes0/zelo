@@ -1,15 +1,15 @@
-from lib.backends.x11 import requests
-from .. import xcb
-from .types import chararr, uintarr
-from ..generic import GButton, GMouse, applyPre
-
-from .keys import Mod, Key
-
 from typing import TYPE_CHECKING
 
+from lib.backends.x11 import requests
+
+from .. import xcb
+from ..generic import GButton, GMouse, applyPre
+from .keys import Key, Mod
+from .types import chararr, uintarr
+
 if TYPE_CHECKING:
-    from ..generic import GWindow, GMod
     from ...ctx import Ctx
+    from ..generic import GMod, GWindow
     from .gctx import Ctx as GCtx
 
 cursors = {

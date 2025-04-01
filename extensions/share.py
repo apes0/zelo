@@ -1,24 +1,24 @@
-import traceback
-from lib.api.drawer import Image
-from lib.extension import Extension
-from lib.backends.events import mapNotify, unmapNotify
-from typing import TYPE_CHECKING
-import numpy as np
 import struct
-import trio
+import traceback
 import zlib
-from base64 import urlsafe_b64encode, urlsafe_b64decode
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
-from cryptography.hazmat.primitives.serialization import (
-    Encoding,
-    PublicFormat,
-    PrivateFormat,
-    load_pem_public_key,
-    load_pem_private_key,
-    NoEncryption,
-)
+from base64 import urlsafe_b64decode, urlsafe_b64encode
+from typing import TYPE_CHECKING
+
+import numpy as np
+import trio
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives.serialization import (Encoding,
+                                                          NoEncryption,
+                                                          PrivateFormat,
+                                                          PublicFormat,
+                                                          load_pem_private_key,
+                                                          load_pem_public_key)
+
+from lib.api.drawer import Image
+from lib.backends.events import mapNotify, unmapNotify
+from lib.extension import Extension
 
 # grr i hate this lol
 

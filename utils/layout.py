@@ -1,6 +1,5 @@
 from .ratio import Ratio
 
-
 # TODO: maybe directly add and subtract ratios
 
 

@@ -1,17 +1,18 @@
 # from .ewmh import AtomStore
-from . import requests
-from .mouse import Mouse
-from .. import xcb
-from typing import TYPE_CHECKING
-from ..generic import GConnection, applyPre
-from .window import Window
-from .types import intarr
-from .screen import Display, Screen
-from .keys import Mod
-from .types import chararr
-from ...debcfg import log
 from logging import DEBUG
+from typing import TYPE_CHECKING
+
 import trio
+
+from ...debcfg import log
+from .. import xcb
+from ..generic import GConnection, applyPre
+from . import requests
+from .keys import Mod
+from .mouse import Mouse
+from .screen import Display, Screen
+from .types import chararr, intarr
+from .window import Window
 
 if TYPE_CHECKING:
     from ...ctx import Ctx

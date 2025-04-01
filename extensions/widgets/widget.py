@@ -1,6 +1,7 @@
 # the base widget class
 
 from typing import TYPE_CHECKING
+
 from lib.extension import Extension
 
 if TYPE_CHECKING:

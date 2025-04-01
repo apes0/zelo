@@ -1,5 +1,7 @@
 from typing import Any
+
 from xcb_cffi import ffi
+
 from ..base import Base
 
 

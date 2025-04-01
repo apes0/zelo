@@ -1,6 +1,7 @@
 from lib.backends.generic import GWindow
 from lib.ctx import Ctx
-from ..generic import GMod, GKey, applyPre
+
+from ..generic import GKey, GMod, applyPre
 
 
 @applyPre
