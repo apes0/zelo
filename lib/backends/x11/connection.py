@@ -2,8 +2,6 @@
 from logging import DEBUG
 from typing import TYPE_CHECKING
 
-import trio
-
 from ...debcfg import log
 from .. import xcb
 from ..generic import GConnection, applyPre
@@ -13,6 +11,7 @@ from .mouse import Mouse
 from .screen import Display, Screen
 from .types import chararr, intarr
 from .window import Window
+from .atoms import atoms
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
@@ -219,3 +218,22 @@ async def shm(ctx: 'Ctx'):
     gctx.sharedPixmaps = bool(rep.sharedPixmaps)
 
     log('backend', DEBUG, f'shared pixmaps are {"not "*(not rep.sharedPixmaps)}present')
+
+
+@init
+async def loadAtoms(ctx: 'Ctx'):
+    for name, (id, type) in atoms.items():
+        if id is not None:
+            continue
+
+        rep = await requests.InternAtom(
+            ctx,
+            ctx._getGCtx().connection,
+            0,
+            len(name),
+            name.encode(),
+        ).reply()
+
+        log('backend', DEBUG, f'loaded atom {name} ({rep.atom})')
+
+        atoms[name] = (rep.atom, type)

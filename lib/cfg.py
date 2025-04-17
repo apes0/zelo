@@ -114,7 +114,7 @@ cfg.extensions = {
     Mouse: {},
     Tabs: {},
     Borders: {'width': 5, 'focused': theme.fore, 'unfocused': theme.back},
-    #    Winfo: {},
+    Winfo: {},
     #    ShareServer:{},
     #    ShareClient:{'addr': '0.0.0.0'},
     #    Animation: {},

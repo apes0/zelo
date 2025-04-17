@@ -1,3 +1,7 @@
+// clang-format off
+// formatting is very important here, so we wont let clang format our code
+// TODO: maybe figure out what config gives us exactly what we want
+
 /*
 i found most of these with these commands:
 ``
@@ -948,6 +952,30 @@ typedef struct xcb_property_notify_event_t
     unsigned char state;
     unsigned char pad1[3];
 } xcb_property_notify_event_t;
+typedef struct xcb_icccm_wm_hints_t
+{
+    int flags;
+    unsigned int input;
+    int initial_state;
+    xcb_pixmap_t icon_pixmap;
+    xcb_window_t icon_window;
+    int icon_x;
+    int icon_y;
+    xcb_pixmap_t icon_mask;
+    xcb_window_t window_group;
+} xcb_icccm_wm_hints_t;
+
+typedef enum xcb_icccm_wm_t
+{
+    XCB_ICCCM_WM_HINT_INPUT = (1L << 0),
+    XCB_ICCCM_WM_HINT_STATE = (1L << 1),
+    XCB_ICCCM_WM_HINT_ICON_PIXMAP = (1L << 2),
+    XCB_ICCCM_WM_HINT_ICON_WINDOW = (1L << 3),
+    XCB_ICCCM_WM_HINT_ICON_POSITION = (1L << 4),
+    XCB_ICCCM_WM_HINT_ICON_MASK = (1L << 5),
+    XCB_ICCCM_WM_HINT_WINDOW_GROUP = (1L << 6),
+    XCB_ICCCM_WM_HINT_X_URGENCY = (1L << 8)
+} xcb_icccm_wm_t;
 
 // custom from source:
 

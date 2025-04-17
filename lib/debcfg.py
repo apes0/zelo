@@ -23,10 +23,10 @@ cfg = {
     'buttons': False,  # button related logs
     'focus': False,  # focus changes
     'drawable': False,  # basically anything from api/drawable.py
-    'errors': True,  # backend errors
-    'backend': False,  # backend debug info
+    'errors': False,  # backend errors
+    'backend': True,  # backend debug info
     'windows': False,  # anything to do with windows
-    'extensions': True,  # extension logs
+    'extensions': False,  # extension logs
     'startSoon': True,  # stuff erroring in start soon calls
     'others': True,  # anything else that's logging
 }

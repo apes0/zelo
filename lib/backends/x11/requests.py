@@ -1,6 +1,5 @@
 from collections import deque
-from typing import (TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec,
-                    TypeVar)
+from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeVar
 
 import trio
 
@@ -84,3 +83,4 @@ ShmQueryVersion = _Request(xcb.xcbShmQueryVersion, xcb.xcbShmQueryVersionReply)
 QueryPointer = _Request(xcb.xcbQueryPointer, xcb.xcbQueryPointerReply)
 ShmGetImage = _Request(xcb.xcbShmGetImageUnchecked, xcb.xcbShmGetImageReply)
 GetImage = _Request(xcb.xcbGetImage, xcb.xcbGetImageReply)
+InternAtom = _Request(xcb.xcbInternAtom, xcb.xcbInternAtomReply)

@@ -63,3 +63,4 @@
 - add xrandr features
 - fix x image memory leak
 - use generic inits everywhere we can
+- stop using x.a = {**x.get("a"), ...} because its very slow

@@ -70,3 +70,5 @@ charpC = Caster('char*')
 keysymC = Caster('xcb_keysym_t*')
 # xrandr
 randrNotifyTC = Caster('xcb_randr_notify_event_t *')
+# icccm
+icccmWmHintsTC = Caster('xcb_icccm_wm_hints_t *')

@@ -2,8 +2,9 @@ from typing import TYPE_CHECKING, Any
 
 import trio
 
-from lib.api.drawer import Text
-from lib.backends.events import enterNotify, leaveNotify
+from lib.api.drawer import Image, Text
+from lib.backends.events import enterNotify
+from lib.backends.generic import GImage
 from lib.extension import Extension
 from utils.fns import getDisplay
 
@@ -23,6 +24,7 @@ class Winfo(Extension):
         self.xoff = 10
         self.yoff = 10
         self.text = Text(ctx, self.win, 0, 0, None, self.font, self.fore, self.back)
+        self.img: GImage | None = None
 
         # TODO: make these args
         # TODO: put this in the docs
@@ -30,7 +32,6 @@ class Winfo(Extension):
         super().__init__(ctx, cfg)
 
         self.addListener(enterNotify, self.enter)
-        self.addListener(leaveNotify, self.enter)
         self.addListener(self.win.redraw, self.redraw)
 
     async def enter(self, win: 'GWindow'):
@@ -46,6 +47,13 @@ title: {win.title}
 x: {win.x} y: {win.y} w: {win.width} h: {win.height}'''
         )
         self.text.draw()
+        if win.icon is not None:
+            w = h = self.text.width // 3
+            self.img = Image(self.ctx, self.win, win.icon, w, h, self.text.width - w, 0)
+            self.img.draw()
+        elif self.img:
+            self.img.destroy()
+            self.img = None
         await self.win.configure(newWidth=self.text.width, newHeight=self.text.height)
         await self.win.map()
         await self.win.toTop()
@@ -54,10 +62,8 @@ x: {win.x} y: {win.y} w: {win.width} h: {win.height}'''
 
     async def redraw(self):
         self.text.draw()
-
-    async def leave(self, _win: 'GWindow'):
-        self.following = False
-        await self.win.unmap()
+        if self.img:
+            self.img.draw()
 
     async def follow(self):
         while self.following:

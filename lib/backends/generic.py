@@ -25,7 +25,6 @@ CData = Any
 
 def pre(fn):
     def deco(fn2):
-        print('deco called')
         if hasattr(fn2, 'pres'):
             fn2.pres.insert(0, fn)
         else:
@@ -162,6 +161,8 @@ class GWindow:
         self.parent: GWindow | None
         self.mine: bool
         self.title: str | None = ''
+        self.iconTitle: str | None = ''
+        self.icon: np.array | None = None
 
         # events:
 
@@ -185,10 +186,12 @@ class GWindow:
         self.ignored = Event('ignored')  # when we are marked as ignored
 
         # events that a backend makes:
-        # NOTE: we can still put a default event but we are gonna destroy it immediately, so its a
-        # pointless thing to do
+        # TODO: this is a kinda shit solution
+        # i think we can fix it by making proxy events or something like that
 
         self.titleChanged: Event
+        self.iconTitleChanged: Event
+        self.iconChanged: Event
 
     def __repr__(self) -> str:
         return f'<Window {self.id}>'

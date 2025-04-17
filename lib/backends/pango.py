@@ -1,10 +1,7 @@
-from typing import Any
-
 from _cffi_backend import _CDataBase
-
-from pango_cffi import ffi, lib
-
-from .base import Base, CPtr, Ptr, enum, parseArgs, void
+from pango_cffi import lib, ffi
+from typing import Any
+from .base import Base, parseArgs, Ptr, CPtr, void, enum
 
 NULL = ffi.NULL
 

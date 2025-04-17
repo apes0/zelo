@@ -11,12 +11,28 @@ from .connection import Connection
 from .gctx import Ctx as GCtx
 from .keys import Key, Mod
 from .mouse import Button
-from .types import (ExposeTC, PropertyNotifyTC, ReparentNotifyTC,
-                    buttonPressTC, charpp, confNotifyTC, confRequestTC,
-                    createNotifyTC, destroyNotifyTC, enterNotifyTC,
-                    genericErrorTC, intp, keyPressTC, mapNotifyTC,
-                    mapRequestTC, motionNotifyTC, randrNotifyTC, uintarr,
-                    unmapNotifyTC, xcbErrorContext)
+from .types import (
+    ExposeTC,
+    PropertyNotifyTC,
+    ReparentNotifyTC,
+    buttonPressTC,
+    charpp,
+    confNotifyTC,
+    confRequestTC,
+    createNotifyTC,
+    destroyNotifyTC,
+    enterNotifyTC,
+    genericErrorTC,
+    intp,
+    keyPressTC,
+    mapNotifyTC,
+    mapRequestTC,
+    motionNotifyTC,
+    randrNotifyTC,
+    uintarr,
+    unmapNotifyTC,
+    xcbErrorContext,
+)
 
 if TYPE_CHECKING:
     from lib.backends.generic import GConnection, GWindow
@@ -405,6 +421,8 @@ async def expose(event, ctx: 'Ctx'):
 @handler(xcb.XCBPropertyNotify)
 async def propertyNotify(event, ctx: 'Ctx'):
     event = xcb.XcbPropertyNotifyEventT(PropertyNotifyTC(event))
+
+    log('backend', DEBUG, f'atom {event.atom} of win {event.window} changed')
 
     gctx: 'GCtx' = ctx._getGCtx()
 

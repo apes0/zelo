@@ -52,19 +52,42 @@ class Window(GWindow):
         self._ignore = True  # set by override redirect (also we assume the worst, so we set it to true)
         self.mine: bool = False
         self._title = Atom(ctx, self, 'WM_NAME')
+        self._iconTitle = Atom(ctx, self, 'WM_ICON_NAME')
+        self._icon = Atom(ctx, self, '_NET_WM_ICON')
+        self._hints = Atom(ctx, self, 'WM_HINTS')
 
         # custom events:
 
         self.titleChanged = self._title.changed
+        self.iconTitleChanged = self._iconTitle.changed
+        self.iconChanged = self._icon.changed
+
+    @property
+    def iconTitle(self):
+        return self._iconTitle.value or self._title.value
+
+    @property
+    def icon(self):
+        return self._icon.value or (self._hints.value and self._hints.value.icon)
 
     @property
     def title(self):
         return self._title.value
 
-    @title.setter
-    def title(self, _val):
+    # TODO: maybe change the atoms for the setters?
+    # TODO: fix mypy typing for the setters
+
+    @iconTitle.setter
+    def iconTitle(self, v):
         pass
-        # raise NotImplementedError()
+
+    @icon.setter
+    def icon(self, v):
+        pass
+
+    @title.setter
+    def title(self, v):
+        pass
 
     @property  # ? this is the only property, so should i add functions to ignore the win instead?
     def ignore(self):
@@ -300,7 +323,7 @@ class Window(GWindow):
                 width * height
             )  # TODO: same as above here
 
-            out = ffi.buffer(dat, width * height * depth)
+            out = ffi.buffer(dat.obj, width * height * depth)
 
         out: np.ndarray = np.frombuffer(out, np.uint8)
         if useShm:

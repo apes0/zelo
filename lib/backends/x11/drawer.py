@@ -80,6 +80,11 @@ class Image(GImage):
         if img is not None:
             self.set(img)
 
+    @classmethod
+    def _fromPixmap(cls):
+        self: Image = cls.__new__(cls)
+        return self
+
     def set(self, img):
         assert not self.ctx.closed, 'conn is closed'
 

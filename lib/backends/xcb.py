@@ -1,10 +1,7 @@
-from typing import Any
-
 from _cffi_backend import _CDataBase
-
-from xcb_cffi import ffi, lib
-
-from .base import Base, CPtr, Ptr, enum, parseArgs, void
+from xcb_cffi import lib, ffi
+from typing import Any
+from .base import Base, parseArgs, Ptr, CPtr, void, enum
 
 NULL = ffi.NULL
 
@@ -374,6 +371,23 @@ class XcbGetWindowAttributesReplyT(Base):
         self.winGravity: int = obj.win_gravity
         self.yourEventMask: int = obj.your_event_mask
 class XcbGxT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+class XcbIcccmWmHintsT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.flags: int = obj.flags
+        self.iconMask: int = obj.icon_mask
+        self.iconPixmap: int = obj.icon_pixmap
+        self.iconWindow: int = obj.icon_window
+        self.iconX: int = obj.icon_x
+        self.iconY: int = obj.icon_y
+        self.initialState: int = obj.initial_state
+        self.input: int = obj.input
+        self.windowGroup: int = obj.window_group
+class XcbIcccmWmT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
@@ -1040,6 +1054,14 @@ XCBGxOrInverted: int = lib.XCB_GX_OR_INVERTED
 XCBGxOrReverse: int = lib.XCB_GX_OR_REVERSE
 XCBGxSet: int = lib.XCB_GX_SET
 XCBGxXor: int = lib.XCB_GX_XOR
+XCBIcccmWmHintIconMask: int = lib.XCB_ICCCM_WM_HINT_ICON_MASK
+XCBIcccmWmHintIconPixmap: int = lib.XCB_ICCCM_WM_HINT_ICON_PIXMAP
+XCBIcccmWmHintIconPosition: int = lib.XCB_ICCCM_WM_HINT_ICON_POSITION
+XCBIcccmWmHintIconWindow: int = lib.XCB_ICCCM_WM_HINT_ICON_WINDOW
+XCBIcccmWmHintInput: int = lib.XCB_ICCCM_WM_HINT_INPUT
+XCBIcccmWmHintState: int = lib.XCB_ICCCM_WM_HINT_STATE
+XCBIcccmWmHintWindowGroup: int = lib.XCB_ICCCM_WM_HINT_WINDOW_GROUP
+XCBIcccmWmHintXUrgency: int = lib.XCB_ICCCM_WM_HINT_X_URGENCY
 XCBImageFormatXyBitmap: int = lib.XCB_IMAGE_FORMAT_XY_BITMAP
 XCBImageFormatXyPixmap: int = lib.XCB_IMAGE_FORMAT_XY_PIXMAP
 XCBImageFormatZPixmap: int = lib.XCB_IMAGE_FORMAT_Z_PIXMAP

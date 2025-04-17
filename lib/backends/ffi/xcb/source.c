@@ -1,24 +1,25 @@
-#include <xcb/xcb.h>
-#include <xcb/xproto.h>
-#include <xcb/xcb_util.h>
-#include <xcb/xcb_keysyms.h>
-#include <xcb/xcb_image.h>
 #include <xcb/randr.h>
-#include <xcb/xtest.h>
 #include <xcb/shm.h>
+#include <xcb/xcb.h>
+#include <xcb/xcb_icccm.h>
+#include <xcb/xcb_image.h>
+#include <xcb/xcb_keysyms.h>
+#include <xcb/xcb_util.h>
+#include <xcb/xproto.h>
+#include <xcb/xtest.h>
 
-#include <sys/shm.h>
 #include <sys/ipc.h>
+#include <sys/shm.h>
 
 #include "libxcb-errors/src/xcb_errors.h"
 
-// see this: https://stackoverflow.com/questions/27745131/how-to-use-shm-pixmap-with-xcb
+// see this:
+// https://stackoverflow.com/questions/27745131/how-to-use-shm-pixmap-with-xcb
 
 typedef struct xcb_shm {
     uint32_t id;
     void *addr;
 } xcb_shm;
-
 
 xcb_shm create_shm(xcb_connection_t *c, size_t size) {
     xcb_shm out;
