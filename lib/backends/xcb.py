@@ -1,7 +1,7 @@
 from _cffi_backend import _CDataBase
 from xcb_cffi import lib, ffi
-from typing import Any
-from .base import Base, parseArgs, Ptr, CPtr, void, enum
+from typing import Any, Literal
+from .base import Base, parseArgs, Ptr, CPtr, void
 
 NULL = ffi.NULL
 
@@ -14,15 +14,7 @@ class Xcbkeysymbols(Base):
 class ExtensionInfoT(Base):
     def __init__(self, obj):
         self.obj = obj
-class XcbAtomEnumT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbAtomT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
-class XcbButtonIndexT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
@@ -66,10 +58,6 @@ class XcbClientMessageEventT(Base):
         self.type: int = obj.type
         self.window: int = obj.window
 class XcbColormapT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
-class XcbConfigWindowT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
@@ -130,10 +118,6 @@ class XcbCursorT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
-class XcbCwT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbDestroyNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -169,10 +153,6 @@ class XcbEnterNotifyEventT(Base):
 class XcbErrorsContextT(Base):
     def __init__(self, obj):
         self.obj = obj
-class XcbEventMaskT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbExposeEventT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -202,10 +182,6 @@ class XcbFocusInEventT(Base):
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
 class XcbFontT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
-class XcbGcT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
@@ -338,10 +314,6 @@ class XcbGetPropertyReplyT(Base):
         self.sequence: int = obj.sequence
         self.type: int = obj.type
         self.valueLen: int = obj.value_len
-class XcbGetPropertyTypeT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbGetWindowAttributesCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -370,10 +342,6 @@ class XcbGetWindowAttributesReplyT(Base):
         self.visual: int = obj.visual
         self.winGravity: int = obj.win_gravity
         self.yourEventMask: int = obj.your_event_mask
-class XcbGxT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbIcccmWmHintsT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -387,18 +355,6 @@ class XcbIcccmWmHintsT(Base):
         self.initialState: int = obj.initial_state
         self.input: int = obj.input
         self.windowGroup: int = obj.window_group
-class XcbIcccmWmT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
-class XcbImageFormatT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
-class XcbImageOrderT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbImageT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -417,10 +373,6 @@ class XcbImageT(Base):
         self.stride: int = obj.stride
         self.unit: int = obj.unit
         self.width: int = obj.width
-class XcbInputFocusT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbInternAtomCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -465,10 +417,6 @@ class XcbKeysymT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
-class XcbLineStyleT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbMapNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -489,14 +437,6 @@ class XcbMapRequestEventT(Base):
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.window: int = obj.window
-class XcbMapStateT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
-class XcbModMaskT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbMotionNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -516,10 +456,6 @@ class XcbMotionNotifyEventT(Base):
         self.state: int = obj.state
         self.time: int = obj.time
 class XcbPixmapT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
-class XcbPropModeT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
@@ -670,14 +606,6 @@ class XcbRandrNotifyDataT(Base):
 class XcbRandrNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
-class XcbRandrNotifyMaskT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
-class XcbRandrNotifyT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 # skipping XcbRandrOutputChangeT, because its not fully defined
 class XcbRandrOutputChangeT(Base):
     def __init__(self, obj):
@@ -755,10 +683,6 @@ class XcbScreenT(Base):
         self.whitePixel: int = obj.white_pixel
         self.widthInMillimeters: int = obj.width_in_millimeters
         self.widthInPixels: int = obj.width_in_pixels
-class XcbSendEventDestT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbSetupT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -827,10 +751,6 @@ class XcbShmSegT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
-class XcbStackModeT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbTimestampT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -855,375 +775,389 @@ class XcbVoidCookieT(Base):
         self.obj = obj
         if obj == ffi.NULL:return
         self.sequence: int = obj.sequence
-class XcbWindowClassT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
-class XcbWindowEnumT(Base):
-    def __init__(self, obj):
-        self.obj = obj
-        if obj == ffi.NULL:return
 class XcbWindowT(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
 
 # funcs and vars
-XCBAtomAny: int = lib.XCB_ATOM_ANY
-XCBAtomArc: int = lib.XCB_ATOM_ARC
-XCBAtomAtom: int = lib.XCB_ATOM_ATOM
-XCBAtomBitmap: int = lib.XCB_ATOM_BITMAP
-XCBAtomCapHeight: int = lib.XCB_ATOM_CAP_HEIGHT
-XCBAtomCardinal: int = lib.XCB_ATOM_CARDINAL
-XCBAtomColormap: int = lib.XCB_ATOM_COLORMAP
-XCBAtomCopyright: int = lib.XCB_ATOM_COPYRIGHT
-XCBAtomCursor: int = lib.XCB_ATOM_CURSOR
-XCBAtomCutBuffer0: int = lib.XCB_ATOM_CUT_BUFFER0
-XCBAtomCutBuffer1: int = lib.XCB_ATOM_CUT_BUFFER1
-XCBAtomCutBuffer2: int = lib.XCB_ATOM_CUT_BUFFER2
-XCBAtomCutBuffer3: int = lib.XCB_ATOM_CUT_BUFFER3
-XCBAtomCutBuffer4: int = lib.XCB_ATOM_CUT_BUFFER4
-XCBAtomCutBuffer5: int = lib.XCB_ATOM_CUT_BUFFER5
-XCBAtomCutBuffer6: int = lib.XCB_ATOM_CUT_BUFFER6
-XCBAtomCutBuffer7: int = lib.XCB_ATOM_CUT_BUFFER7
-XCBAtomDrawable: int = lib.XCB_ATOM_DRAWABLE
-XCBAtomEndSpace: int = lib.XCB_ATOM_END_SPACE
-XCBAtomFamilyName: int = lib.XCB_ATOM_FAMILY_NAME
-XCBAtomFont: int = lib.XCB_ATOM_FONT
-XCBAtomFontName: int = lib.XCB_ATOM_FONT_NAME
-XCBAtomFullName: int = lib.XCB_ATOM_FULL_NAME
-XCBAtomInteger: int = lib.XCB_ATOM_INTEGER
-XCBAtomItalicAngle: int = lib.XCB_ATOM_ITALIC_ANGLE
-XCBAtomMaxSpace: int = lib.XCB_ATOM_MAX_SPACE
-XCBAtomMinSpace: int = lib.XCB_ATOM_MIN_SPACE
-XCBAtomNone: int = lib.XCB_ATOM_NONE
-XCBAtomNormSpace: int = lib.XCB_ATOM_NORM_SPACE
-XCBAtomNotice: int = lib.XCB_ATOM_NOTICE
-XCBAtomPixmap: int = lib.XCB_ATOM_PIXMAP
-XCBAtomPoint: int = lib.XCB_ATOM_POINT
-XCBAtomPointSize: int = lib.XCB_ATOM_POINT_SIZE
-XCBAtomPrimary: int = lib.XCB_ATOM_PRIMARY
-XCBAtomQuadWidth: int = lib.XCB_ATOM_QUAD_WIDTH
-XCBAtomRectangle: int = lib.XCB_ATOM_RECTANGLE
-XCBAtomResolution: int = lib.XCB_ATOM_RESOLUTION
-XCBAtomResourceManager: int = lib.XCB_ATOM_RESOURCE_MANAGER
-XCBAtomRgbBestMap: int = lib.XCB_ATOM_RGB_BEST_MAP
-XCBAtomRgbBlueMap: int = lib.XCB_ATOM_RGB_BLUE_MAP
-XCBAtomRgbColorMap: int = lib.XCB_ATOM_RGB_COLOR_MAP
-XCBAtomRgbDefaultMap: int = lib.XCB_ATOM_RGB_DEFAULT_MAP
-XCBAtomRgbGrayMap: int = lib.XCB_ATOM_RGB_GRAY_MAP
-XCBAtomRgbGreenMap: int = lib.XCB_ATOM_RGB_GREEN_MAP
-XCBAtomRgbRedMap: int = lib.XCB_ATOM_RGB_RED_MAP
-XCBAtomSecondary: int = lib.XCB_ATOM_SECONDARY
-XCBAtomStrikeoutAscent: int = lib.XCB_ATOM_STRIKEOUT_ASCENT
-XCBAtomStrikeoutDescent: int = lib.XCB_ATOM_STRIKEOUT_DESCENT
-XCBAtomString: int = lib.XCB_ATOM_STRING
-XCBAtomSubscriptX: int = lib.XCB_ATOM_SUBSCRIPT_X
-XCBAtomSubscriptY: int = lib.XCB_ATOM_SUBSCRIPT_Y
-XCBAtomSuperscriptX: int = lib.XCB_ATOM_SUPERSCRIPT_X
-XCBAtomSuperscriptY: int = lib.XCB_ATOM_SUPERSCRIPT_Y
-XCBAtomUnderlinePosition: int = lib.XCB_ATOM_UNDERLINE_POSITION
-XCBAtomUnderlineThickness: int = lib.XCB_ATOM_UNDERLINE_THICKNESS
-XCBAtomVisualid: int = lib.XCB_ATOM_VISUALID
-XCBAtomWeight: int = lib.XCB_ATOM_WEIGHT
-XCBAtomWindow: int = lib.XCB_ATOM_WINDOW
-XCBAtomWmClass: int = lib.XCB_ATOM_WM_CLASS
-XCBAtomWmClientMachine: int = lib.XCB_ATOM_WM_CLIENT_MACHINE
-XCBAtomWmCommand: int = lib.XCB_ATOM_WM_COMMAND
-XCBAtomWmHints: int = lib.XCB_ATOM_WM_HINTS
-XCBAtomWmIconName: int = lib.XCB_ATOM_WM_ICON_NAME
-XCBAtomWmIconSize: int = lib.XCB_ATOM_WM_ICON_SIZE
-XCBAtomWmName: int = lib.XCB_ATOM_WM_NAME
-XCBAtomWmNormalHints: int = lib.XCB_ATOM_WM_NORMAL_HINTS
-XCBAtomWmSizeHints: int = lib.XCB_ATOM_WM_SIZE_HINTS
-XCBAtomWmTransientFor: int = lib.XCB_ATOM_WM_TRANSIENT_FOR
-XCBAtomWmZoomHints: int = lib.XCB_ATOM_WM_ZOOM_HINTS
-XCBAtomXHeight: int = lib.XCB_ATOM_X_HEIGHT
-XCBButtonIndex1: int = lib.XCB_BUTTON_INDEX_1
-XCBButtonIndex2: int = lib.XCB_BUTTON_INDEX_2
-XCBButtonIndex3: int = lib.XCB_BUTTON_INDEX_3
-XCBButtonIndex4: int = lib.XCB_BUTTON_INDEX_4
-XCBButtonIndex5: int = lib.XCB_BUTTON_INDEX_5
-XCBButtonIndexAny: int = lib.XCB_BUTTON_INDEX_ANY
-XCBButtonPress: int = lib.XCB_BUTTON_PRESS
-XCBButtonRelease: int = lib.XCB_BUTTON_RELEASE
-XCBCirculateNotify: int = lib.XCB_CIRCULATE_NOTIFY
-XCBCirculateRequest: int = lib.XCB_CIRCULATE_REQUEST
-XCBClientMessage: int = lib.XCB_CLIENT_MESSAGE
-XCBColormapNotify: int = lib.XCB_COLORMAP_NOTIFY
-XCBConfigureNotify: int = lib.XCB_CONFIGURE_NOTIFY
-XCBConfigureRequest: int = lib.XCB_CONFIGURE_REQUEST
-XCBConfigWindowBorderWidth: int = lib.XCB_CONFIG_WINDOW_BORDER_WIDTH
-XCBConfigWindowHeight: int = lib.XCB_CONFIG_WINDOW_HEIGHT
-XCBConfigWindowSibling: int = lib.XCB_CONFIG_WINDOW_SIBLING
-XCBConfigWindowStackMode: int = lib.XCB_CONFIG_WINDOW_STACK_MODE
-XCBConfigWindowWidth: int = lib.XCB_CONFIG_WINDOW_WIDTH
-XCBConfigWindowX: int = lib.XCB_CONFIG_WINDOW_X
-XCBConfigWindowY: int = lib.XCB_CONFIG_WINDOW_Y
-XCBCopyFromParent: int = lib.XCB_COPY_FROM_PARENT
-XCBCreateNotify: int = lib.XCB_CREATE_NOTIFY
-XCBCurrentTime: int = lib.XCB_CURRENT_TIME
-XCBCwBackingPixel: int = lib.XCB_CW_BACKING_PIXEL
-XCBCwBackingPlanes: int = lib.XCB_CW_BACKING_PLANES
-XCBCwBackingStore: int = lib.XCB_CW_BACKING_STORE
-XCBCwBackPixel: int = lib.XCB_CW_BACK_PIXEL
-XCBCwBackPixmap: int = lib.XCB_CW_BACK_PIXMAP
-XCBCwBitGravity: int = lib.XCB_CW_BIT_GRAVITY
-XCBCwBorderPixel: int = lib.XCB_CW_BORDER_PIXEL
-XCBCwBorderPixmap: int = lib.XCB_CW_BORDER_PIXMAP
-XCBCwColormap: int = lib.XCB_CW_COLORMAP
-XCBCwCursor: int = lib.XCB_CW_CURSOR
-XCBCwDontPropagate: int = lib.XCB_CW_DONT_PROPAGATE
-XCBCwEventMask: int = lib.XCB_CW_EVENT_MASK
-XCBCwOverrideRedirect: int = lib.XCB_CW_OVERRIDE_REDIRECT
-XCBCwSaveUnder: int = lib.XCB_CW_SAVE_UNDER
-XCBCwWinGravity: int = lib.XCB_CW_WIN_GRAVITY
-XCBDestroyNotify: int = lib.XCB_DESTROY_NOTIFY
-XCBEnterNotify: int = lib.XCB_ENTER_NOTIFY
-XCBEventMaskButton1Motion: int = lib.XCB_EVENT_MASK_BUTTON_1_MOTION
-XCBEventMaskButton2Motion: int = lib.XCB_EVENT_MASK_BUTTON_2_MOTION
-XCBEventMaskButton3Motion: int = lib.XCB_EVENT_MASK_BUTTON_3_MOTION
-XCBEventMaskButton4Motion: int = lib.XCB_EVENT_MASK_BUTTON_4_MOTION
-XCBEventMaskButton5Motion: int = lib.XCB_EVENT_MASK_BUTTON_5_MOTION
-XCBEventMaskButtonMotion: int = lib.XCB_EVENT_MASK_BUTTON_MOTION
-XCBEventMaskButtonPress: int = lib.XCB_EVENT_MASK_BUTTON_PRESS
-XCBEventMaskButtonRelease: int = lib.XCB_EVENT_MASK_BUTTON_RELEASE
-XCBEventMaskColorMapChange: int = lib.XCB_EVENT_MASK_COLOR_MAP_CHANGE
-XCBEventMaskEnterWindow: int = lib.XCB_EVENT_MASK_ENTER_WINDOW
-XCBEventMaskExposure: int = lib.XCB_EVENT_MASK_EXPOSURE
-XCBEventMaskFocusChange: int = lib.XCB_EVENT_MASK_FOCUS_CHANGE
-XCBEventMaskKeymapState: int = lib.XCB_EVENT_MASK_KEYMAP_STATE
-XCBEventMaskKeyPress: int = lib.XCB_EVENT_MASK_KEY_PRESS
-XCBEventMaskKeyRelease: int = lib.XCB_EVENT_MASK_KEY_RELEASE
-XCBEventMaskLeaveWindow: int = lib.XCB_EVENT_MASK_LEAVE_WINDOW
-XCBEventMaskNoEvent: int = lib.XCB_EVENT_MASK_NO_EVENT
-XCBEventMaskOwnerGrabButton: int = lib.XCB_EVENT_MASK_OWNER_GRAB_BUTTON
-XCBEventMaskPointerMotion: int = lib.XCB_EVENT_MASK_POINTER_MOTION
-XCBEventMaskPointerMotionHint: int = lib.XCB_EVENT_MASK_POINTER_MOTION_HINT
-XCBEventMaskPropertyChange: int = lib.XCB_EVENT_MASK_PROPERTY_CHANGE
-XCBEventMaskResizeRedirect: int = lib.XCB_EVENT_MASK_RESIZE_REDIRECT
-XCBEventMaskStructureNotify: int = lib.XCB_EVENT_MASK_STRUCTURE_NOTIFY
-XCBEventMaskSubstructureNotify: int = lib.XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
-XCBEventMaskSubstructureRedirect: int = lib.XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT
-XCBEventMaskVisibilityChange: int = lib.XCB_EVENT_MASK_VISIBILITY_CHANGE
-XCBExpose: int = lib.XCB_EXPOSE
-XCBFocusIn: int = lib.XCB_FOCUS_IN
-XCBFocusOut: int = lib.XCB_FOCUS_OUT
-XCBGcArcMode: int = lib.XCB_GC_ARC_MODE
-XCBGcBackground: int = lib.XCB_GC_BACKGROUND
-XCBGcCapStyle: int = lib.XCB_GC_CAP_STYLE
-XCBGcClipMask: int = lib.XCB_GC_CLIP_MASK
-XCBGcClipOriginX: int = lib.XCB_GC_CLIP_ORIGIN_X
-XCBGcClipOriginY: int = lib.XCB_GC_CLIP_ORIGIN_Y
-XCBGcDashList: int = lib.XCB_GC_DASH_LIST
-XCBGcDashOffset: int = lib.XCB_GC_DASH_OFFSET
-XCBGcFillRule: int = lib.XCB_GC_FILL_RULE
-XCBGcFillStyle: int = lib.XCB_GC_FILL_STYLE
-XCBGcFont: int = lib.XCB_GC_FONT
-XCBGcForeground: int = lib.XCB_GC_FOREGROUND
-XCBGcFunction: int = lib.XCB_GC_FUNCTION
-XCBGcGraphicsExposures: int = lib.XCB_GC_GRAPHICS_EXPOSURES
-XCBGcJoinStyle: int = lib.XCB_GC_JOIN_STYLE
-XCBGcLineStyle: int = lib.XCB_GC_LINE_STYLE
-XCBGcLineWidth: int = lib.XCB_GC_LINE_WIDTH
-XCBGcPlaneMask: int = lib.XCB_GC_PLANE_MASK
-XCBGcStipple: int = lib.XCB_GC_STIPPLE
-XCBGcSubwindowMode: int = lib.XCB_GC_SUBWINDOW_MODE
-XCBGcTile: int = lib.XCB_GC_TILE
-XCBGcTileStippleOriginX: int = lib.XCB_GC_TILE_STIPPLE_ORIGIN_X
-XCBGcTileStippleOriginY: int = lib.XCB_GC_TILE_STIPPLE_ORIGIN_Y
-XCBGetPropertyTypeAny: int = lib.XCB_GET_PROPERTY_TYPE_ANY
-XCBGeGeneric: int = lib.XCB_GE_GENERIC
-XCBGrabAny: int = lib.XCB_GRAB_ANY
-XCBGrabModeAsync: int = lib.XCB_GRAB_MODE_ASYNC
-XCBGraphicsExposure: int = lib.XCB_GRAPHICS_EXPOSURE
-XCBGravityNotify: int = lib.XCB_GRAVITY_NOTIFY
-XCBGxAnd: int = lib.XCB_GX_AND
-XCBGxAndInverted: int = lib.XCB_GX_AND_INVERTED
-XCBGxAndReverse: int = lib.XCB_GX_AND_REVERSE
-XCBGxClear: int = lib.XCB_GX_CLEAR
-XCBGxCopy: int = lib.XCB_GX_COPY
-XCBGxCopyInverted: int = lib.XCB_GX_COPY_INVERTED
-XCBGxEquiv: int = lib.XCB_GX_EQUIV
-XCBGxInvert: int = lib.XCB_GX_INVERT
-XCBGxNand: int = lib.XCB_GX_NAND
-XCBGxNoop: int = lib.XCB_GX_NOOP
-XCBGxNor: int = lib.XCB_GX_NOR
-XCBGxOr: int = lib.XCB_GX_OR
-XCBGxOrInverted: int = lib.XCB_GX_OR_INVERTED
-XCBGxOrReverse: int = lib.XCB_GX_OR_REVERSE
-XCBGxSet: int = lib.XCB_GX_SET
-XCBGxXor: int = lib.XCB_GX_XOR
-XCBIcccmWmHintIconMask: int = lib.XCB_ICCCM_WM_HINT_ICON_MASK
-XCBIcccmWmHintIconPixmap: int = lib.XCB_ICCCM_WM_HINT_ICON_PIXMAP
-XCBIcccmWmHintIconPosition: int = lib.XCB_ICCCM_WM_HINT_ICON_POSITION
-XCBIcccmWmHintIconWindow: int = lib.XCB_ICCCM_WM_HINT_ICON_WINDOW
-XCBIcccmWmHintInput: int = lib.XCB_ICCCM_WM_HINT_INPUT
-XCBIcccmWmHintState: int = lib.XCB_ICCCM_WM_HINT_STATE
-XCBIcccmWmHintWindowGroup: int = lib.XCB_ICCCM_WM_HINT_WINDOW_GROUP
-XCBIcccmWmHintXUrgency: int = lib.XCB_ICCCM_WM_HINT_X_URGENCY
-XCBImageFormatXyBitmap: int = lib.XCB_IMAGE_FORMAT_XY_BITMAP
-XCBImageFormatXyPixmap: int = lib.XCB_IMAGE_FORMAT_XY_PIXMAP
-XCBImageFormatZPixmap: int = lib.XCB_IMAGE_FORMAT_Z_PIXMAP
-XCBImageOrderLsbFirst: int = lib.XCB_IMAGE_ORDER_LSB_FIRST
-XCBImageOrderMsbFirst: int = lib.XCB_IMAGE_ORDER_MSB_FIRST
-XCBInputFocusFollowKeyboard: int = lib.XCB_INPUT_FOCUS_FOLLOW_KEYBOARD
-XCBInputFocusNone: int = lib.XCB_INPUT_FOCUS_NONE
-XCBInputFocusParent: int = lib.XCB_INPUT_FOCUS_PARENT
-XCBInputFocusPointerRoot: int = lib.XCB_INPUT_FOCUS_POINTER_ROOT
-XCBKeymapNotify: int = lib.XCB_KEYMAP_NOTIFY
-XCBKeyPress: int = lib.XCB_KEY_PRESS
-XCBKeyRelease: int = lib.XCB_KEY_RELEASE
-XCBLeaveNotify: int = lib.XCB_LEAVE_NOTIFY
-XCBLineStyleDoubleDash: int = lib.XCB_LINE_STYLE_DOUBLE_DASH
-XCBLineStyleOnOffDash: int = lib.XCB_LINE_STYLE_ON_OFF_DASH
-XCBLineStyleSolid: int = lib.XCB_LINE_STYLE_SOLID
-XCBMappingNotify: int = lib.XCB_MAPPING_NOTIFY
-XCBMapNotify: int = lib.XCB_MAP_NOTIFY
-XCBMapRequest: int = lib.XCB_MAP_REQUEST
-XCBMapStateUnmapped: int = lib.XCB_MAP_STATE_UNMAPPED
-XCBMapStateUnviewable: int = lib.XCB_MAP_STATE_UNVIEWABLE
-XCBMapStateViewable: int = lib.XCB_MAP_STATE_VIEWABLE
-XCBModMask1: int = lib.XCB_MOD_MASK_1
-XCBModMask2: int = lib.XCB_MOD_MASK_2
-XCBModMask3: int = lib.XCB_MOD_MASK_3
-XCBModMask4: int = lib.XCB_MOD_MASK_4
-XCBModMask5: int = lib.XCB_MOD_MASK_5
-XCBModMaskAny: int = lib.XCB_MOD_MASK_ANY
-XCBModMaskControl: int = lib.XCB_MOD_MASK_CONTROL
-XCBModMaskLock: int = lib.XCB_MOD_MASK_LOCK
-XCBModMaskShift: int = lib.XCB_MOD_MASK_SHIFT
-XCBMotionNotify: int = lib.XCB_MOTION_NOTIFY
-XCBNone: int = lib.XCB_NONE
-XCBNoExposure: int = lib.XCB_NO_EXPOSURE
-XCBPropertyNotify: int = lib.XCB_PROPERTY_NOTIFY
-XCBPropModeAppend: int = lib.XCB_PROP_MODE_APPEND
-XCBPropModePrepend: int = lib.XCB_PROP_MODE_PREPEND
-XCBPropModeReplace: int = lib.XCB_PROP_MODE_REPLACE
-XCBRandrNotify: int = lib.XCB_RANDR_NOTIFY
-XCBRandrNotifyCrtcChange: int = lib.XCB_RANDR_NOTIFY_CRTC_CHANGE
-XCBRandrNotifyMaskCrtcChange: int = lib.XCB_RANDR_NOTIFY_MASK_CRTC_CHANGE
-XCBRandrNotifyMaskOutputChange: int = lib.XCB_RANDR_NOTIFY_MASK_OUTPUT_CHANGE
-XCBRandrNotifyMaskOutputProperty: int = lib.XCB_RANDR_NOTIFY_MASK_OUTPUT_PROPERTY
-XCBRandrNotifyMaskProviderChange: int = lib.XCB_RANDR_NOTIFY_MASK_PROVIDER_CHANGE
-XCBRandrNotifyMaskProviderProperty: int = lib.XCB_RANDR_NOTIFY_MASK_PROVIDER_PROPERTY
-XCBRandrNotifyMaskResourceChange: int = lib.XCB_RANDR_NOTIFY_MASK_RESOURCE_CHANGE
-XCBRandrNotifyMaskScreenChange: int = lib.XCB_RANDR_NOTIFY_MASK_SCREEN_CHANGE
-XCBRandrNotifyOutputChange: int = lib.XCB_RANDR_NOTIFY_OUTPUT_CHANGE
-XCBRandrNotifyOutputProperty: int = lib.XCB_RANDR_NOTIFY_OUTPUT_PROPERTY
-XCBRandrNotifyProviderChange: int = lib.XCB_RANDR_NOTIFY_PROVIDER_CHANGE
-XCBRandrNotifyProviderProperty: int = lib.XCB_RANDR_NOTIFY_PROVIDER_PROPERTY
-XCBRandrNotifyResourceChange: int = lib.XCB_RANDR_NOTIFY_RESOURCE_CHANGE
-XCBReparentNotify: int = lib.XCB_REPARENT_NOTIFY
-XCBResizeRequest: int = lib.XCB_RESIZE_REQUEST
-XCBSelectionClear: int = lib.XCB_SELECTION_CLEAR
-XCBSelectionNotify: int = lib.XCB_SELECTION_NOTIFY
-XCBSelectionRequest: int = lib.XCB_SELECTION_REQUEST
-XCBSendEventDestItemFocus: int = lib.XCB_SEND_EVENT_DEST_ITEM_FOCUS
-XCBSendEventDestPointerWindow: int = lib.XCB_SEND_EVENT_DEST_POINTER_WINDOW
-XCBStackModeAbove: int = lib.XCB_STACK_MODE_ABOVE
-XCBStackModeBelow: int = lib.XCB_STACK_MODE_BELOW
-XCBStackModeBottomIf: int = lib.XCB_STACK_MODE_BOTTOM_IF
-XCBStackModeOpposite: int = lib.XCB_STACK_MODE_OPPOSITE
-XCBStackModeTopIf: int = lib.XCB_STACK_MODE_TOP_IF
-XCBUnmapNotify: int = lib.XCB_UNMAP_NOTIFY
-XCBVisibilityNotify: int = lib.XCB_VISIBILITY_NOTIFY
-XCBWindowClassCopyFromParent: int = lib.XCB_WINDOW_CLASS_COPY_FROM_PARENT
-XCBWindowClassInputOnly: int = lib.XCB_WINDOW_CLASS_INPUT_ONLY
-XCBWindowClassInputOutput: int = lib.XCB_WINDOW_CLASS_INPUT_OUTPUT
-XCBWindowNone: int = lib.XCB_WINDOW_NONE
+XCBAtomAny: int = 0
+XCBAtomArc: int = 3
+XCBAtomAtom: int = 4
+XCBAtomBitmap: int = 5
+XCBAtomCapHeight: int = 66
+XCBAtomCardinal: int = 6
+XCBAtomColormap: int = 7
+XCBAtomCopyright: int = 61
+XCBAtomCursor: int = 8
+XCBAtomCutBuffer0: int = 9
+XCBAtomCutBuffer1: int = 10
+XCBAtomCutBuffer2: int = 11
+XCBAtomCutBuffer3: int = 12
+XCBAtomCutBuffer4: int = 13
+XCBAtomCutBuffer5: int = 14
+XCBAtomCutBuffer6: int = 15
+XCBAtomCutBuffer7: int = 16
+XCBAtomDrawable: int = 17
+XCBAtomEndSpace: int = 46
+XCBAtomFamilyName: int = 64
+XCBAtomFont: int = 18
+XCBAtomFontName: int = 63
+XCBAtomFullName: int = 65
+XCBAtomInteger: int = 19
+XCBAtomItalicAngle: int = 55
+XCBAtomMaxSpace: int = 45
+XCBAtomMinSpace: int = 43
+XCBAtomNone: int = 0
+XCBAtomNormSpace: int = 44
+XCBAtomNotice: int = 62
+XCBAtomPixmap: int = 20
+XCBAtomPoint: int = 21
+XCBAtomPointSize: int = 59
+XCBAtomPrimary: int = 1
+XCBAtomQuadWidth: int = 57
+XCBAtomRectangle: int = 22
+XCBAtomResolution: int = 60
+XCBAtomResourceManager: int = 23
+XCBAtomRgbBestMap: int = 25
+XCBAtomRgbBlueMap: int = 26
+XCBAtomRgbColorMap: int = 24
+XCBAtomRgbDefaultMap: int = 27
+XCBAtomRgbGrayMap: int = 28
+XCBAtomRgbGreenMap: int = 29
+XCBAtomRgbRedMap: int = 30
+XCBAtomSecondary: int = 2
+XCBAtomStrikeoutAscent: int = 53
+XCBAtomStrikeoutDescent: int = 54
+XCBAtomString: int = 31
+XCBAtomSubscriptX: int = 49
+XCBAtomSubscriptY: int = 50
+XCBAtomSuperscriptX: int = 47
+XCBAtomSuperscriptY: int = 48
+XCBAtomUnderlinePosition: int = 51
+XCBAtomUnderlineThickness: int = 52
+XCBAtomVisualid: int = 32
+XCBAtomWeight: int = 58
+XCBAtomWindow: int = 33
+XCBAtomWmClass: int = 67
+XCBAtomWmClientMachine: int = 36
+XCBAtomWmCommand: int = 34
+XCBAtomWmHints: int = 35
+XCBAtomWmIconName: int = 37
+XCBAtomWmIconSize: int = 38
+XCBAtomWmName: int = 39
+XCBAtomWmNormalHints: int = 40
+XCBAtomWmSizeHints: int = 41
+XCBAtomWmTransientFor: int = 68
+XCBAtomWmZoomHints: int = 42
+XCBAtomXHeight: int = 56
+XCBButtonIndex1: int = 1
+XCBButtonIndex2: int = 2
+XCBButtonIndex3: int = 3
+XCBButtonIndex4: int = 4
+XCBButtonIndex5: int = 5
+XCBButtonIndexAny: int = 0
+XCBButtonPress: int = 4
+XCBButtonRelease: int = 5
+XCBCirculateNotify: int = 26
+XCBCirculateRequest: int = 27
+XCBClientMessage: int = 33
+XCBColormapNotify: int = 32
+XCBConfigureNotify: int = 22
+XCBConfigureRequest: int = 23
+XCBConfigWindowBorderWidth: int = 16
+XCBConfigWindowHeight: int = 8
+XCBConfigWindowSibling: int = 32
+XCBConfigWindowStackMode: int = 64
+XCBConfigWindowWidth: int = 4
+XCBConfigWindowX: int = 1
+XCBConfigWindowY: int = 2
+XCBCopyFromParent: int = 0
+XCBCreateNotify: int = 16
+XCBCurrentTime: int = 0
+XCBCwBackingPixel: int = 256
+XCBCwBackingPlanes: int = 128
+XCBCwBackingStore: int = 64
+XCBCwBackPixel: int = 2
+XCBCwBackPixmap: int = 1
+XCBCwBitGravity: int = 16
+XCBCwBorderPixel: int = 8
+XCBCwBorderPixmap: int = 4
+XCBCwColormap: int = 8192
+XCBCwCursor: int = 16384
+XCBCwDontPropagate: int = 4096
+XCBCwEventMask: int = 2048
+XCBCwOverrideRedirect: int = 512
+XCBCwSaveUnder: int = 1024
+XCBCwWinGravity: int = 32
+XCBDestroyNotify: int = 17
+XCBEnterNotify: int = 7
+XCBEventMaskButton1Motion: int = 256
+XCBEventMaskButton2Motion: int = 512
+XCBEventMaskButton3Motion: int = 1024
+XCBEventMaskButton4Motion: int = 2048
+XCBEventMaskButton5Motion: int = 4096
+XCBEventMaskButtonMotion: int = 8192
+XCBEventMaskButtonPress: int = 4
+XCBEventMaskButtonRelease: int = 8
+XCBEventMaskColorMapChange: int = 8388608
+XCBEventMaskEnterWindow: int = 16
+XCBEventMaskExposure: int = 32768
+XCBEventMaskFocusChange: int = 2097152
+XCBEventMaskKeymapState: int = 16384
+XCBEventMaskKeyPress: int = 1
+XCBEventMaskKeyRelease: int = 2
+XCBEventMaskLeaveWindow: int = 32
+XCBEventMaskNoEvent: int = 0
+XCBEventMaskOwnerGrabButton: int = 16777216
+XCBEventMaskPointerMotion: int = 64
+XCBEventMaskPointerMotionHint: int = 128
+XCBEventMaskPropertyChange: int = 4194304
+XCBEventMaskResizeRedirect: int = 262144
+XCBEventMaskStructureNotify: int = 131072
+XCBEventMaskSubstructureNotify: int = 524288
+XCBEventMaskSubstructureRedirect: int = 1048576
+XCBEventMaskVisibilityChange: int = 65536
+XCBExpose: int = 12
+XCBFocusIn: int = 9
+XCBFocusOut: int = 10
+XCBGcArcMode: int = 4194304
+XCBGcBackground: int = 8
+XCBGcCapStyle: int = 64
+XCBGcClipMask: int = 524288
+XCBGcClipOriginX: int = 131072
+XCBGcClipOriginY: int = 262144
+XCBGcDashList: int = 2097152
+XCBGcDashOffset: int = 1048576
+XCBGcFillRule: int = 512
+XCBGcFillStyle: int = 256
+XCBGcFont: int = 16384
+XCBGcForeground: int = 4
+XCBGcFunction: int = 1
+XCBGcGraphicsExposures: int = 65536
+XCBGcJoinStyle: int = 128
+XCBGcLineStyle: int = 32
+XCBGcLineWidth: int = 16
+XCBGcPlaneMask: int = 2
+XCBGcStipple: int = 2048
+XCBGcSubwindowMode: int = 32768
+XCBGcTile: int = 1024
+XCBGcTileStippleOriginX: int = 4096
+XCBGcTileStippleOriginY: int = 8192
+XCBGetPropertyTypeAny: int = 0
+XCBGeGeneric: int = 35
+XCBGrabAny: int = 0
+XCBGrabModeAsync: int = 1
+XCBGraphicsExposure: int = 13
+XCBGravityNotify: int = 24
+XCBGxAnd: int = 1
+XCBGxAndInverted: int = 4
+XCBGxAndReverse: int = 2
+XCBGxClear: int = 0
+XCBGxCopy: int = 3
+XCBGxCopyInverted: int = 12
+XCBGxEquiv: int = 9
+XCBGxInvert: int = 10
+XCBGxNand: int = 14
+XCBGxNoop: int = 5
+XCBGxNor: int = 8
+XCBGxOr: int = 7
+XCBGxOrInverted: int = 13
+XCBGxOrReverse: int = 11
+XCBGxSet: int = 15
+XCBGxXor: int = 6
+XCBIcccmWmHintIconMask: int = 32
+XCBIcccmWmHintIconPixmap: int = 4
+XCBIcccmWmHintIconPosition: int = 16
+XCBIcccmWmHintIconWindow: int = 8
+XCBIcccmWmHintInput: int = 1
+XCBIcccmWmHintState: int = 2
+XCBIcccmWmHintWindowGroup: int = 64
+XCBIcccmWmHintXUrgency: int = 256
+XCBImageFormatXyBitmap: int = 0
+XCBImageFormatXyPixmap: int = 1
+XCBImageFormatZPixmap: int = 2
+XCBImageOrderLsbFirst: int = 0
+XCBImageOrderMsbFirst: int = 1
+XCBInputFocusFollowKeyboard: int = 3
+XCBInputFocusNone: int = 0
+XCBInputFocusParent: int = 2
+XCBInputFocusPointerRoot: int = 1
+XCBKeymapNotify: int = 11
+XCBKeyPress: int = 2
+XCBKeyRelease: int = 3
+XCBLeaveNotify: int = 8
+XCBLineStyleDoubleDash: int = 2
+XCBLineStyleOnOffDash: int = 1
+XCBLineStyleSolid: int = 0
+XCBMappingNotify: int = 34
+XCBMapNotify: int = 19
+XCBMapRequest: int = 20
+XCBMapStateUnmapped: int = 0
+XCBMapStateUnviewable: int = 1
+XCBMapStateViewable: int = 2
+XCBModMask1: int = 8
+XCBModMask2: int = 16
+XCBModMask3: int = 32
+XCBModMask4: int = 64
+XCBModMask5: int = 128
+XCBModMaskAny: int = 32768
+XCBModMaskControl: int = 4
+XCBModMaskLock: int = 2
+XCBModMaskShift: int = 1
+XCBMotionNotify: int = 6
+XCBNone: int = 0
+XCBNoExposure: int = 14
+XCBPropertyNotify: int = 28
+XCBPropModeAppend: int = 2
+XCBPropModePrepend: int = 1
+XCBPropModeReplace: int = 0
+XCBRandrNotify: int = 1
+XCBRandrNotifyCrtcChange: int = 0
+XCBRandrNotifyMaskCrtcChange: int = 2
+XCBRandrNotifyMaskOutputChange: int = 4
+XCBRandrNotifyMaskOutputProperty: int = 8
+XCBRandrNotifyMaskProviderChange: int = 16
+XCBRandrNotifyMaskProviderProperty: int = 32
+XCBRandrNotifyMaskResourceChange: int = 64
+XCBRandrNotifyMaskScreenChange: int = 1
+XCBRandrNotifyOutputChange: int = 1
+XCBRandrNotifyOutputProperty: int = 2
+XCBRandrNotifyProviderChange: int = 3
+XCBRandrNotifyProviderProperty: int = 4
+XCBRandrNotifyResourceChange: int = 5
+XCBReparentNotify: int = 21
+XCBResizeRequest: int = 25
+XCBSelectionClear: int = 29
+XCBSelectionNotify: int = 31
+XCBSelectionRequest: int = 30
+XCBSendEventDestItemFocus: int = 1
+XCBSendEventDestPointerWindow: int = 0
+XCBStackModeAbove: int = 0
+XCBStackModeBelow: int = 1
+XCBStackModeBottomIf: int = 3
+XCBStackModeOpposite: int = 4
+XCBStackModeTopIf: int = 2
+XCBUnmapNotify: int = 18
+XCBVisibilityNotify: int = 15
+XCBWindowClassCopyFromParent: int = 0
+XCBWindowClassInputOnly: int = 2
+XCBWindowClassInputOutput: int = 1
+XCBWindowNone: int = 0
 
-def createShm(conn: CPtr[XcbConnectionT], size: int, ) -> XcbShm:return XcbShm(lib.create_shm(*parseArgs(conn, size, )))
-def removeShm(conn: CPtr[XcbConnectionT], shm: XcbShm, ) -> void:return void(lib.remove_shm(*parseArgs(conn, shm, )))
-def xcbAuxGetScreen(conn: CPtr[XcbConnectionT], screen: int, ) -> CPtr[XcbScreenT]:return XcbScreenT(lib.xcb_aux_get_screen(*parseArgs(conn, screen, )))
-def xcbChangeProperty(conn: CPtr[XcbConnectionT], mode: int, window: int, property: int, type: int, format: int, dataLen: int, data: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_change_property(*parseArgs(conn, mode, window, property, type, format, dataLen, data, )))
-def xcbChangeWindowAttributesChecked(conn: CPtr[XcbConnectionT], window: int, valueMask: int, valueList: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_change_window_attributes_checked(*parseArgs(conn, window, valueMask, valueList, )))
-def xcbCloseFont(conn: CPtr[XcbConnectionT], font: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_close_font(*parseArgs(conn, font, )))
-def xcbConfigureWindow(conn: CPtr[XcbConnectionT], window: int, valueMask: int, valueList: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_configure_window(*parseArgs(conn, window, valueMask, valueList, )))
-def xcbConnect(displayname: Ptr[int], screenp: Ptr[int], ) -> CPtr[XcbConnectionT]:return XcbConnectionT(lib.xcb_connect(*parseArgs(displayname, screenp, )))
-def xcbConnectionHasError(conn: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_connection_has_error(*parseArgs(conn, )))
-def xcbCopyArea(conn: CPtr[XcbConnectionT], srcDrawable: int, dstDrawable: int, gc: int, srcX: int, srcY: int, dstX: int, dstY: int, width: int, height: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_copy_area(*parseArgs(conn, srcDrawable, dstDrawable, gc, srcX, srcY, dstX, dstY, width, height, )))
-def xcbCreateGc(conn: CPtr[XcbConnectionT], cid: int, drawable: int, valueMask: int, valueList: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_gc(*parseArgs(conn, cid, drawable, valueMask, valueList, )))
-def xcbCreateGlyphCursor(conn: CPtr[XcbConnectionT], cid: int, sourceFont: int, maskFont: int, sourceChar: int, maskChar: int, foreRed: int, foreGreen: int, foreBlue: int, backRed: int, backGreen: int, backBlue: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_glyph_cursor(*parseArgs(conn, cid, sourceFont, maskFont, sourceChar, maskChar, foreRed, foreGreen, foreBlue, backRed, backGreen, backBlue, )))
-def xcbCreatePixmap(conn: CPtr[XcbConnectionT], depth: int, pid: int, drawable: int, width: int, height: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_pixmap(*parseArgs(conn, depth, pid, drawable, width, height, )))
-def xcbCreateWindow(conn: CPtr[XcbConnectionT], depth: int, wid: int, parent: int, x: int, y: int, width: int, height: int, borderWidth: int, Class: int, visual: int, valueMask: int, valueList: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_window(*parseArgs(conn, depth, wid, parent, x, y, width, height, borderWidth, Class, visual, valueMask, valueList, )))
-def xcbDeleteProperty(conn: CPtr[XcbConnectionT], window: int, property: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_delete_property(*parseArgs(conn, window, property, )))
-def xcbDestroyWindow(conn: CPtr[XcbConnectionT], window: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_destroy_window(*parseArgs(conn, window, )))
-def xcbDisconnect(conn: CPtr[XcbConnectionT], ) -> void:return void(lib.xcb_disconnect(*parseArgs(conn, )))
-def xcbErrorsContextFree(ctx: CPtr[XcbErrorsContextT], ) -> void:return void(lib.xcb_errors_context_free(*parseArgs(ctx, )))
-def xcbErrorsContextNew(conn: CPtr[XcbConnectionT], c: CPtr[XcbErrorsContextT], ) -> int:return int(lib.xcb_errors_context_new(*parseArgs(conn, c, )))
-def xcbErrorsGetNameForError(ctx: CPtr[XcbErrorsContextT], errorCode: int, extension: Ptr[int], ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_error(*parseArgs(ctx, errorCode, extension, )))
-def xcbErrorsGetNameForMajorCode(ctx: CPtr[XcbErrorsContextT], majorCode: int, ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_major_code(*parseArgs(ctx, majorCode, )))
-def xcbErrorsGetNameForMinorCode(ctx: CPtr[XcbErrorsContextT], majorCode: int, minorCode: int, ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_minor_code(*parseArgs(ctx, majorCode, minorCode, )))
-def xcbFlush(conn: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_flush(*parseArgs(conn, )))
-def xcbFreeCursor(conn: CPtr[XcbConnectionT], cursor: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_free_cursor(*parseArgs(conn, cursor, )))
-def xcbFreePixmap(conn: CPtr[XcbConnectionT], pixmap: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_free_pixmap(*parseArgs(conn, pixmap, )))
-def xcbGenerateId(conn: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_generate_id(*parseArgs(conn, )))
-def xcbGetAtomName(conn: CPtr[XcbConnectionT], atom: int, ) -> XcbGetAtomNameCookieT:return XcbGetAtomNameCookieT(lib.xcb_get_atom_name(*parseArgs(conn, atom, )))
-def xcbGetAtomNameName(R: CPtr[XcbGetAtomNameReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_get_atom_name_name(*parseArgs(R, )))
-def xcbGetAtomNameReply(conn: CPtr[XcbConnectionT], cookie: XcbGetAtomNameCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetAtomNameReplyT]:return XcbGetAtomNameReplyT(lib.xcb_get_atom_name_reply(*parseArgs(conn, cookie, e, )))
-def xcbGetExtensionData(conn: CPtr[XcbConnectionT], ext: CPtr[XcbExtensionT], ) -> CPtr[XcbQueryExtensionReplyT]:return XcbQueryExtensionReplyT(lib.xcb_get_extension_data(*parseArgs(conn, ext, )))
-def xcbGetFileDescriptor(conn: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_get_file_descriptor(*parseArgs(conn, )))
-def xcbGetGeometry(conn: CPtr[XcbConnectionT], drawable: int, ) -> XcbGetGeometryCookieT:return XcbGetGeometryCookieT(lib.xcb_get_geometry(*parseArgs(conn, drawable, )))
-def xcbGetGeometryReply(conn: CPtr[XcbConnectionT], cookie: XcbGetGeometryCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetGeometryReplyT]:return XcbGetGeometryReplyT(lib.xcb_get_geometry_reply(*parseArgs(conn, cookie, e, )))
-def xcbGetImage(conn: CPtr[XcbConnectionT], format: int, drawable: int, x: int, y: int, width: int, height: int, planeMask: int, ) -> XcbGetImageCookieT:return XcbGetImageCookieT(lib.xcb_get_image(*parseArgs(conn, format, drawable, x, y, width, height, planeMask, )))
-def xcbGetImageData(R: CPtr[XcbGetImageReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_get_image_data(*parseArgs(R, )))
-def xcbGetImageDataLength(R: CPtr[XcbGetImageReplyT], ) -> int:return int(lib.xcb_get_image_data_length(*parseArgs(R, )))
-def xcbGetImageReply(conn: CPtr[XcbConnectionT], cookie: XcbGetImageCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetImageReplyT]:return XcbGetImageReplyT(lib.xcb_get_image_reply(*parseArgs(conn, cookie, e, )))
-def xcbGetKeyboardMapping(conn: CPtr[XcbConnectionT], cookie: int, e: int, ) -> XcbGetKeyboardMappingCookieT:return XcbGetKeyboardMappingCookieT(lib.xcb_get_keyboard_mapping(*parseArgs(conn, cookie, e, )))
-def xcbGetKeyboardMappingReply(conn: CPtr[XcbConnectionT], cookie: XcbGetKeyboardMappingCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetKeyboardMappingReplyT]:return XcbGetKeyboardMappingReplyT(lib.xcb_get_keyboard_mapping_reply(*parseArgs(conn, cookie, e, )))
-def xcbGetMaximumRequestLength(conn: CPtr[XcbConnectionT], ) -> int:return int(lib.xcb_get_maximum_request_length(*parseArgs(conn, )))
-def xcbGetModifierMappingKeycodes(R: CPtr[XcbGetModifierMappingReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_get_modifier_mapping_keycodes(*parseArgs(R, )))
-def xcbGetModifierMappingReply(conn: CPtr[XcbConnectionT], cookie: XcbGetModifierMappingCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetModifierMappingReplyT]:return XcbGetModifierMappingReplyT(lib.xcb_get_modifier_mapping_reply(*parseArgs(conn, cookie, e, )))
-def xcbGetModifierMappingUnchecked(conn: CPtr[XcbConnectionT], ) -> XcbGetModifierMappingCookieT:return XcbGetModifierMappingCookieT(lib.xcb_get_modifier_mapping_unchecked(*parseArgs(conn, )))
-def xcbGetProperty(conn: CPtr[XcbConnectionT], Delete: int, window: int, property: int, type: int, longOffset: int, longLength: int, ) -> XcbGetPropertyCookieT:return XcbGetPropertyCookieT(lib.xcb_get_property(*parseArgs(conn, Delete, window, property, type, longOffset, longLength, )))
-def xcbGetPropertyReply(conn: CPtr[XcbConnectionT], cookie: XcbGetPropertyCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetPropertyReplyT]:return XcbGetPropertyReplyT(lib.xcb_get_property_reply(*parseArgs(conn, cookie, e, )))
-def xcbGetPropertyValue(reply: CPtr[XcbGetPropertyReplyT], ) -> Ptr[void]:return Ptr(lib.xcb_get_property_value(*parseArgs(reply, )))
-def xcbGetPropertyValueLength(reply: CPtr[XcbGetPropertyReplyT], ) -> int:return int(lib.xcb_get_property_value_length(*parseArgs(reply, )))
-def xcbGetSetup(conn: CPtr[XcbConnectionT], ) -> CPtr[XcbSetupT]:return XcbSetupT(lib.xcb_get_setup(*parseArgs(conn, )))
-def xcbGetWindowAttributes(conn: CPtr[XcbConnectionT], window: int, ) -> XcbGetWindowAttributesCookieT:return XcbGetWindowAttributesCookieT(lib.xcb_get_window_attributes(*parseArgs(conn, window, )))
-def xcbGetWindowAttributesReply(conn: CPtr[XcbConnectionT], cookie: XcbGetWindowAttributesCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbGetWindowAttributesReplyT]:return XcbGetWindowAttributesReplyT(lib.xcb_get_window_attributes_reply(*parseArgs(conn, cookie, e, )))
-def xcbGrabButton(conn: CPtr[XcbConnectionT], ownerEvents: int, grabWindow: int, eventMask: int, pointerMode: int, keyboardMode: int, confineTo: int, cursor: int, button: int, modifiers: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_grab_button(*parseArgs(conn, ownerEvents, grabWindow, eventMask, pointerMode, keyboardMode, confineTo, cursor, button, modifiers, )))
-def xcbGrabKey(conn: CPtr[XcbConnectionT], ownerEvents: int, grabWindow: int, modifiers: int, key: int, pointerMode: int, keyboardMode: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_grab_key(*parseArgs(conn, ownerEvents, grabWindow, modifiers, key, pointerMode, keyboardMode, )))
-def xcbImageCreateNative(conn: CPtr[XcbConnectionT], width: int, height: int, format: XcbImageFormatT, depth: int, base: Ptr[void], bytes: int, data: Ptr[int], ) -> CPtr[XcbImageT]:return XcbImageT(lib.xcb_image_create_native(*parseArgs(conn, width, height, format, depth, base, bytes, data, )))
-def xcbImageDestroy(image: CPtr[XcbImageT], ) -> void:return void(lib.xcb_image_destroy(*parseArgs(image, )))
-def xcbImagePut(conn: CPtr[XcbConnectionT], draw: int, gc: int, image: CPtr[XcbImageT], x: int, y: int, leftPad: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_image_put(*parseArgs(conn, draw, gc, image, x, y, leftPad, )))
-def xcbImageText8(conn: CPtr[XcbConnectionT], stringLen: int, drawable: int, gc: int, x: int, y: int, string: Ptr[int], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_image_text_8(*parseArgs(conn, stringLen, drawable, gc, x, y, string, )))
-def xcbInternAtom(conn: CPtr[XcbConnectionT], onlyIfExists: int, nameLen: int, name: Ptr[int], ) -> XcbInternAtomCookieT:return XcbInternAtomCookieT(lib.xcb_intern_atom(*parseArgs(conn, onlyIfExists, nameLen, name, )))
-def xcbInternAtomReply(conn: CPtr[XcbConnectionT], cookie: XcbInternAtomCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbInternAtomReplyT]:return XcbInternAtomReplyT(lib.xcb_intern_atom_reply(*parseArgs(conn, cookie, e, )))
-def xcbKeySymbolsAlloc(conn: CPtr[XcbConnectionT], ) -> CPtr[Xcbkeysymbols]:return Xcbkeysymbols(lib.xcb_key_symbols_alloc(*parseArgs(conn, )))
-def xcbKeySymbolsFree(syms: CPtr[Xcbkeysymbols], ) -> void:return void(lib.xcb_key_symbols_free(*parseArgs(syms, )))
-def xcbKeySymbolsGetKeycode(syms: CPtr[Xcbkeysymbols], keysym: int, ) -> Ptr[int]:return Ptr(lib.xcb_key_symbols_get_keycode(*parseArgs(syms, keysym, )))
-def xcbKillClient(conn: CPtr[XcbConnectionT], resource: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_kill_client(*parseArgs(conn, resource, )))
-def xcbMapWindow(conn: CPtr[XcbConnectionT], window: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_map_window(*parseArgs(conn, window, )))
-def xcbOpenFont(conn: CPtr[XcbConnectionT], fid: int, nameLen: int, name: Ptr[int], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_open_font(*parseArgs(conn, fid, nameLen, name, )))
-def xcbPollForEvent(conn: CPtr[XcbConnectionT], ) -> CPtr[XcbGenericEventT]:return XcbGenericEventT(lib.xcb_poll_for_event(*parseArgs(conn, )))
-def xcbPolyFillRectangle(conn: CPtr[XcbConnectionT], drawable: int, gc: int, rectanglesLen: int, rectangles: CPtr[XcbRectangleT], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_poly_fill_rectangle(*parseArgs(conn, drawable, gc, rectanglesLen, rectangles, )))
-def xcbQueryExtensionReply(conn: CPtr[XcbConnectionT], cookie: XcbQueryExtensionCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbQueryExtensionReplyT]:return XcbQueryExtensionReplyT(lib.xcb_query_extension_reply(*parseArgs(conn, cookie, e, )))
-def xcbQueryExtensionUnchecked(conn: CPtr[XcbConnectionT], nameLen: int, name: Ptr[int], ) -> XcbQueryExtensionCookieT:return XcbQueryExtensionCookieT(lib.xcb_query_extension_unchecked(*parseArgs(conn, nameLen, name, )))
-def xcbQueryPointer(conn: CPtr[XcbConnectionT], window: int, ) -> XcbQueryPointerCookieT:return XcbQueryPointerCookieT(lib.xcb_query_pointer(*parseArgs(conn, window, )))
-def xcbQueryPointerReply(conn: CPtr[XcbConnectionT], cookie: XcbQueryPointerCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbQueryPointerReplyT]:return XcbQueryPointerReplyT(lib.xcb_query_pointer_reply(*parseArgs(conn, cookie, e, )))
-def xcbQueryTree(conn: CPtr[XcbConnectionT], window: int, ) -> XcbQueryTreeCookieT:return XcbQueryTreeCookieT(lib.xcb_query_tree(*parseArgs(conn, window, )))
-def xcbQueryTreeChildren(reply: CPtr[XcbQueryTreeReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_query_tree_children(*parseArgs(reply, )))
-def xcbQueryTreeReply(conn: CPtr[XcbConnectionT], cookie: XcbQueryTreeCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbQueryTreeReplyT]:return XcbQueryTreeReplyT(lib.xcb_query_tree_reply(*parseArgs(conn, cookie, e, )))
-def xcbRandrGetCrtcInfo(conn: CPtr[XcbConnectionT], cookie: int, e: int, ) -> XcbRandrGetCrtcInfoCookieT:return XcbRandrGetCrtcInfoCookieT(lib.xcb_randr_get_crtc_info(*parseArgs(conn, cookie, e, )))
-def xcbRandrGetCrtcInfoReply(conn: CPtr[XcbConnectionT], cookie: XcbRandrGetCrtcInfoCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbRandrGetCrtcInfoReplyT]:return XcbRandrGetCrtcInfoReplyT(lib.xcb_randr_get_crtc_info_reply(*parseArgs(conn, cookie, e, )))
-def xcbRandrGetScreenResources(conn: CPtr[XcbConnectionT], window: int, ) -> XcbRandrGetScreenResourcesCookieT:return XcbRandrGetScreenResourcesCookieT(lib.xcb_randr_get_screen_resources(*parseArgs(conn, window, )))
-def xcbRandrGetScreenResourcesCrtcs(R: CPtr[XcbRandrGetScreenResourcesReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_randr_get_screen_resources_crtcs(*parseArgs(R, )))
-def xcbRandrGetScreenResourcesCrtcsLength(R: CPtr[XcbRandrGetScreenResourcesReplyT], ) -> int:return int(lib.xcb_randr_get_screen_resources_crtcs_length(*parseArgs(R, )))
-def xcbRandrGetScreenResourcesReply(conn: CPtr[XcbConnectionT], cookie: XcbRandrGetScreenResourcesCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbRandrGetScreenResourcesReplyT]:return XcbRandrGetScreenResourcesReplyT(lib.xcb_randr_get_screen_resources_reply(*parseArgs(conn, cookie, e, )))
-def xcbRandrSelectInput(conn: CPtr[XcbConnectionT], window: int, enable: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_randr_select_input(*parseArgs(conn, window, enable, )))
-def xcbReparentWindow(conn: CPtr[XcbConnectionT], window: int, parent: int, x: int, y: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_reparent_window(*parseArgs(conn, window, parent, x, y, )))
-def xcbSendEvent(conn: CPtr[XcbConnectionT], propagate: bool, destination: int, eventMask: int, event: Ptr[int], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_send_event(*parseArgs(conn, propagate, destination, eventMask, event, )))
-def xcbSetInputFocus(conn: CPtr[XcbConnectionT], revertTo: int, focus: int, time: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_set_input_focus(*parseArgs(conn, revertTo, focus, time, )))
-def xcbShmCreatePixmap(conn: CPtr[XcbConnectionT], pid: int, drawable: int, width: int, height: int, depth: int, shmseg: int, offset: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_shm_create_pixmap(*parseArgs(conn, pid, drawable, width, height, depth, shmseg, offset, )))
-def xcbShmGetImageReply(conn: CPtr[XcbConnectionT], cookie: XcbShmGetImageCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbShmGetImageReplyT]:return XcbShmGetImageReplyT(lib.xcb_shm_get_image_reply(*parseArgs(conn, cookie, e, )))
-def xcbShmGetImageUnchecked(conn: CPtr[XcbConnectionT], drawable: int, x: int, y: int, width: int, height: int, planeMask: int, format: int, shmseg: int, offset: int, ) -> XcbShmGetImageCookieT:return XcbShmGetImageCookieT(lib.xcb_shm_get_image_unchecked(*parseArgs(conn, drawable, x, y, width, height, planeMask, format, shmseg, offset, )))
-def xcbShmPutImage(conn: CPtr[XcbConnectionT], drawable: int, gc: int, totalWidth: int, totalHeight: int, srcX: int, srcY: int, srcWidth: int, srcHeight: int, dstX: int, dstY: int, depth: int, format: int, sendEvent: int, shmseg: int, offset: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_shm_put_image(*parseArgs(conn, drawable, gc, totalWidth, totalHeight, srcX, srcY, srcWidth, srcHeight, dstX, dstY, depth, format, sendEvent, shmseg, offset, )))
-def xcbShmQueryVersion(conn: CPtr[XcbConnectionT], ) -> XcbShmQueryVersionCookieT:return XcbShmQueryVersionCookieT(lib.xcb_shm_query_version(*parseArgs(conn, )))
-def xcbShmQueryVersionReply(conn: CPtr[XcbConnectionT], cookie: XcbShmQueryVersionCookieT, e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbShmQueryVersionReplyT]:return XcbShmQueryVersionReplyT(lib.xcb_shm_query_version_reply(*parseArgs(conn, cookie, e, )))
-def xcbTestFakeInput(conn: CPtr[XcbConnectionT], type: int, detail: int, time: int, root: int, rootX: int, rootY: int, deviceid: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_test_fake_input(*parseArgs(conn, type, detail, time, root, rootX, rootY, deviceid, )))
-def xcbUngrabButton(conn: CPtr[XcbConnectionT], button: int, grabWindow: int, modifiers: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_ungrab_button(*parseArgs(conn, button, grabWindow, modifiers, )))
-def xcbUngrabKey(conn: CPtr[XcbConnectionT], key: int, grabWindow: int, modifiers: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_ungrab_key(*parseArgs(conn, key, grabWindow, modifiers, )))
-def xcbUnmapWindow(conn: CPtr[XcbConnectionT], window: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_unmap_window(*parseArgs(conn, window, )))
-def xcbWaitForEvent(conn: CPtr[XcbConnectionT], ) -> CPtr[XcbGenericEventT]:return XcbGenericEventT(lib.xcb_wait_for_event(*parseArgs(conn, )))
+def createShm(conn: 'CPtr[XcbConnectionT]', size: int, ) -> 'XcbShm':return XcbShm(lib.create_shm(*parseArgs(conn, size, )))
+def removeShm(conn: 'CPtr[XcbConnectionT]', shm: 'XcbShm', ) -> void:return void(lib.remove_shm(*parseArgs(conn, shm, )))
+def xcbAuxGetScreen(conn: 'CPtr[XcbConnectionT]', screen: int, ) -> CPtr[XcbScreenT]:return XcbScreenT(lib.xcb_aux_get_screen(*parseArgs(conn, screen, )))
+def xcbChangeProperty(conn: 'CPtr[XcbConnectionT]', mode: int, window: int, property: int, type: int, format: int, dataLen: int, data: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_change_property(*parseArgs(conn, mode, window, property, type, format, dataLen, data, )))
+def xcbChangeWindowAttributesChecked(conn: 'CPtr[XcbConnectionT]', window: int, valueMask: int, valueList: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_change_window_attributes_checked(*parseArgs(conn, window, valueMask, valueList, )))
+def xcbCloseFont(conn: 'CPtr[XcbConnectionT]', font: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_close_font(*parseArgs(conn, font, )))
+def xcbConfigureWindow(conn: 'CPtr[XcbConnectionT]', window: int, valueMask: int, valueList: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_configure_window(*parseArgs(conn, window, valueMask, valueList, )))
+def xcbConnect(displayname: Ptr[int], screenp: Ptr[int], ) -> 'CPtr[XcbConnectionT]':return XcbConnectionT(lib.xcb_connect(*parseArgs(displayname, screenp, )))
+def xcbConnectionHasError(conn: 'CPtr[XcbConnectionT]', ) -> int:return int(lib.xcb_connection_has_error(*parseArgs(conn, )))
+def xcbCopyArea(conn: 'CPtr[XcbConnectionT]', srcDrawable: int, dstDrawable: int, gc: int, srcX: int, srcY: int, dstX: int, dstY: int, width: int, height: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_copy_area(*parseArgs(conn, srcDrawable, dstDrawable, gc, srcX, srcY, dstX, dstY, width, height, )))
+def xcbCreateGc(conn: 'CPtr[XcbConnectionT]', cid: int, drawable: int, valueMask: int, valueList: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_gc(*parseArgs(conn, cid, drawable, valueMask, valueList, )))
+def xcbCreateGlyphCursor(conn: 'CPtr[XcbConnectionT]', cid: int, sourceFont: int, maskFont: int, sourceChar: int, maskChar: int, foreRed: int, foreGreen: int, foreBlue: int, backRed: int, backGreen: int, backBlue: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_glyph_cursor(*parseArgs(conn, cid, sourceFont, maskFont, sourceChar, maskChar, foreRed, foreGreen, foreBlue, backRed, backGreen, backBlue, )))
+def xcbCreatePixmap(conn: 'CPtr[XcbConnectionT]', depth: int, pid: int, drawable: int, width: int, height: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_pixmap(*parseArgs(conn, depth, pid, drawable, width, height, )))
+def xcbCreateWindow(conn: 'CPtr[XcbConnectionT]', depth: int, wid: int, parent: int, x: int, y: int, width: int, height: int, borderWidth: int, Class: int, visual: int, valueMask: int, valueList: Ptr[void], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_create_window(*parseArgs(conn, depth, wid, parent, x, y, width, height, borderWidth, Class, visual, valueMask, valueList, )))
+def xcbDeleteProperty(conn: 'CPtr[XcbConnectionT]', window: int, property: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_delete_property(*parseArgs(conn, window, property, )))
+def xcbDestroyWindow(conn: 'CPtr[XcbConnectionT]', window: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_destroy_window(*parseArgs(conn, window, )))
+def xcbDisconnect(conn: 'CPtr[XcbConnectionT]', ) -> void:return void(lib.xcb_disconnect(*parseArgs(conn, )))
+def xcbErrorsContextFree(ctx: 'CPtr[XcbErrorsContextT]', ) -> void:return void(lib.xcb_errors_context_free(*parseArgs(ctx, )))
+def xcbErrorsContextNew(conn: 'CPtr[XcbConnectionT]', c: 'CPtr[XcbErrorsContextT]', ) -> int:return int(lib.xcb_errors_context_new(*parseArgs(conn, c, )))
+def xcbErrorsGetNameForError(ctx: 'CPtr[XcbErrorsContextT]', errorCode: int, extension: Ptr[int], ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_error(*parseArgs(ctx, errorCode, extension, )))
+def xcbErrorsGetNameForMajorCode(ctx: 'CPtr[XcbErrorsContextT]', majorCode: int, ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_major_code(*parseArgs(ctx, majorCode, )))
+def xcbErrorsGetNameForMinorCode(ctx: 'CPtr[XcbErrorsContextT]', majorCode: int, minorCode: int, ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_minor_code(*parseArgs(ctx, majorCode, minorCode, )))
+def xcbFlush(conn: 'CPtr[XcbConnectionT]', ) -> int:return int(lib.xcb_flush(*parseArgs(conn, )))
+def xcbFreeCursor(conn: 'CPtr[XcbConnectionT]', cursor: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_free_cursor(*parseArgs(conn, cursor, )))
+def xcbFreePixmap(conn: 'CPtr[XcbConnectionT]', pixmap: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_free_pixmap(*parseArgs(conn, pixmap, )))
+def xcbGenerateId(conn: 'CPtr[XcbConnectionT]', ) -> int:return int(lib.xcb_generate_id(*parseArgs(conn, )))
+def xcbGetAtomName(conn: 'CPtr[XcbConnectionT]', atom: int, ) -> 'XcbGetAtomNameCookieT':return XcbGetAtomNameCookieT(lib.xcb_get_atom_name(*parseArgs(conn, atom, )))
+def xcbGetAtomNameName(R: 'CPtr[XcbGetAtomNameReplyT]', ) -> Ptr[int]:return Ptr(lib.xcb_get_atom_name_name(*parseArgs(R, )))
+def xcbGetAtomNameReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbGetAtomNameCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbGetAtomNameReplyT]':return XcbGetAtomNameReplyT(lib.xcb_get_atom_name_reply(*parseArgs(conn, cookie, e, )))
+def xcbGetExtensionData(conn: 'CPtr[XcbConnectionT]', ext: 'CPtr[XcbExtensionT]', ) -> 'CPtr[XcbQueryExtensionReplyT]':return XcbQueryExtensionReplyT(lib.xcb_get_extension_data(*parseArgs(conn, ext, )))
+def xcbGetFileDescriptor(conn: 'CPtr[XcbConnectionT]', ) -> int:return int(lib.xcb_get_file_descriptor(*parseArgs(conn, )))
+def xcbGetGeometry(conn: 'CPtr[XcbConnectionT]', drawable: int, ) -> 'XcbGetGeometryCookieT':return XcbGetGeometryCookieT(lib.xcb_get_geometry(*parseArgs(conn, drawable, )))
+def xcbGetGeometryReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbGetGeometryCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbGetGeometryReplyT]':return XcbGetGeometryReplyT(lib.xcb_get_geometry_reply(*parseArgs(conn, cookie, e, )))
+def xcbGetImage(conn: 'CPtr[XcbConnectionT]', format: int, drawable: int, x: int, y: int, width: int, height: int, planeMask: int, ) -> 'XcbGetImageCookieT':return XcbGetImageCookieT(lib.xcb_get_image(*parseArgs(conn, format, drawable, x, y, width, height, planeMask, )))
+def xcbGetImageData(R: 'CPtr[XcbGetImageReplyT]', ) -> Ptr[int]:return Ptr(lib.xcb_get_image_data(*parseArgs(R, )))
+def xcbGetImageDataLength(R: 'CPtr[XcbGetImageReplyT]', ) -> int:return int(lib.xcb_get_image_data_length(*parseArgs(R, )))
+def xcbGetImageReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbGetImageCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbGetImageReplyT]':return XcbGetImageReplyT(lib.xcb_get_image_reply(*parseArgs(conn, cookie, e, )))
+def xcbGetKeyboardMapping(conn: 'CPtr[XcbConnectionT]', cookie: int, e: int, ) -> 'XcbGetKeyboardMappingCookieT':return XcbGetKeyboardMappingCookieT(lib.xcb_get_keyboard_mapping(*parseArgs(conn, cookie, e, )))
+def xcbGetKeyboardMappingReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbGetKeyboardMappingCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbGetKeyboardMappingReplyT]':return XcbGetKeyboardMappingReplyT(lib.xcb_get_keyboard_mapping_reply(*parseArgs(conn, cookie, e, )))
+def xcbGetMaximumRequestLength(conn: 'CPtr[XcbConnectionT]', ) -> int:return int(lib.xcb_get_maximum_request_length(*parseArgs(conn, )))
+def xcbGetModifierMappingKeycodes(R: 'CPtr[XcbGetModifierMappingReplyT]', ) -> Ptr[int]:return Ptr(lib.xcb_get_modifier_mapping_keycodes(*parseArgs(R, )))
+def xcbGetModifierMappingReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbGetModifierMappingCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbGetModifierMappingReplyT]':return XcbGetModifierMappingReplyT(lib.xcb_get_modifier_mapping_reply(*parseArgs(conn, cookie, e, )))
+def xcbGetModifierMappingUnchecked(conn: 'CPtr[XcbConnectionT]', ) -> 'XcbGetModifierMappingCookieT':return XcbGetModifierMappingCookieT(lib.xcb_get_modifier_mapping_unchecked(*parseArgs(conn, )))
+def xcbGetProperty(conn: 'CPtr[XcbConnectionT]', Delete: int, window: int, property: int, type: int, longOffset: int, longLength: int, ) -> 'XcbGetPropertyCookieT':return XcbGetPropertyCookieT(lib.xcb_get_property(*parseArgs(conn, Delete, window, property, type, longOffset, longLength, )))
+def xcbGetPropertyReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbGetPropertyCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbGetPropertyReplyT]':return XcbGetPropertyReplyT(lib.xcb_get_property_reply(*parseArgs(conn, cookie, e, )))
+def xcbGetPropertyValue(reply: 'CPtr[XcbGetPropertyReplyT]', ) -> Ptr[void]:return Ptr(lib.xcb_get_property_value(*parseArgs(reply, )))
+def xcbGetPropertyValueLength(reply: 'CPtr[XcbGetPropertyReplyT]', ) -> int:return int(lib.xcb_get_property_value_length(*parseArgs(reply, )))
+def xcbGetSetup(conn: 'CPtr[XcbConnectionT]', ) -> 'CPtr[XcbSetupT]':return XcbSetupT(lib.xcb_get_setup(*parseArgs(conn, )))
+def xcbGetWindowAttributes(conn: 'CPtr[XcbConnectionT]', window: int, ) -> 'XcbGetWindowAttributesCookieT':return XcbGetWindowAttributesCookieT(lib.xcb_get_window_attributes(*parseArgs(conn, window, )))
+def xcbGetWindowAttributesReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbGetWindowAttributesCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbGetWindowAttributesReplyT]':return XcbGetWindowAttributesReplyT(lib.xcb_get_window_attributes_reply(*parseArgs(conn, cookie, e, )))
+def xcbGrabButton(conn: 'CPtr[XcbConnectionT]', ownerEvents: int, grabWindow: int, eventMask: int, pointerMode: int, keyboardMode: int, confineTo: int, cursor: int, button: int, modifiers: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_grab_button(*parseArgs(conn, ownerEvents, grabWindow, eventMask, pointerMode, keyboardMode, confineTo, cursor, button, modifiers, )))
+def xcbGrabKey(conn: 'CPtr[XcbConnectionT]', ownerEvents: int, grabWindow: int, modifiers: int, key: int, pointerMode: int, keyboardMode: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_grab_key(*parseArgs(conn, ownerEvents, grabWindow, modifiers, key, pointerMode, keyboardMode, )))
+def xcbImageCreateNative(conn: 'CPtr[XcbConnectionT]', width: int, height: int, format: 'XcbImageFormatT', depth: int, base: Ptr[void], bytes: int, data: Ptr[int], ) -> 'CPtr[XcbImageT]':return XcbImageT(lib.xcb_image_create_native(*parseArgs(conn, width, height, format, depth, base, bytes, data, )))
+def xcbImageDestroy(image: 'CPtr[XcbImageT]', ) -> void:return void(lib.xcb_image_destroy(*parseArgs(image, )))
+def xcbImagePut(conn: 'CPtr[XcbConnectionT]', draw: int, gc: int, image: 'CPtr[XcbImageT]', x: int, y: int, leftPad: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_image_put(*parseArgs(conn, draw, gc, image, x, y, leftPad, )))
+def xcbImageText8(conn: 'CPtr[XcbConnectionT]', stringLen: int, drawable: int, gc: int, x: int, y: int, string: Ptr[int], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_image_text_8(*parseArgs(conn, stringLen, drawable, gc, x, y, string, )))
+def xcbInternAtom(conn: 'CPtr[XcbConnectionT]', onlyIfExists: int, nameLen: int, name: Ptr[int], ) -> 'XcbInternAtomCookieT':return XcbInternAtomCookieT(lib.xcb_intern_atom(*parseArgs(conn, onlyIfExists, nameLen, name, )))
+def xcbInternAtomReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbInternAtomCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbInternAtomReplyT]':return XcbInternAtomReplyT(lib.xcb_intern_atom_reply(*parseArgs(conn, cookie, e, )))
+def xcbKeySymbolsAlloc(conn: 'CPtr[XcbConnectionT]', ) -> 'CPtr[Xcbkeysymbols]':return Xcbkeysymbols(lib.xcb_key_symbols_alloc(*parseArgs(conn, )))
+def xcbKeySymbolsFree(syms: 'CPtr[Xcbkeysymbols]', ) -> void:return void(lib.xcb_key_symbols_free(*parseArgs(syms, )))
+def xcbKeySymbolsGetKeycode(syms: 'CPtr[Xcbkeysymbols]', keysym: int, ) -> Ptr[int]:return Ptr(lib.xcb_key_symbols_get_keycode(*parseArgs(syms, keysym, )))
+def xcbKillClient(conn: 'CPtr[XcbConnectionT]', resource: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_kill_client(*parseArgs(conn, resource, )))
+def xcbMapWindow(conn: 'CPtr[XcbConnectionT]', window: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_map_window(*parseArgs(conn, window, )))
+def xcbOpenFont(conn: 'CPtr[XcbConnectionT]', fid: int, nameLen: int, name: Ptr[int], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_open_font(*parseArgs(conn, fid, nameLen, name, )))
+def xcbPollForEvent(conn: 'CPtr[XcbConnectionT]', ) -> CPtr[XcbGenericEventT]:return XcbGenericEventT(lib.xcb_poll_for_event(*parseArgs(conn, )))
+def xcbPolyFillRectangle(conn: 'CPtr[XcbConnectionT]', drawable: int, gc: int, rectanglesLen: int, rectangles: 'CPtr[XcbRectangleT]', ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_poly_fill_rectangle(*parseArgs(conn, drawable, gc, rectanglesLen, rectangles, )))
+def xcbQueryExtensionReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbQueryExtensionCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbQueryExtensionReplyT]':return XcbQueryExtensionReplyT(lib.xcb_query_extension_reply(*parseArgs(conn, cookie, e, )))
+def xcbQueryExtensionUnchecked(conn: 'CPtr[XcbConnectionT]', nameLen: int, name: Ptr[int], ) -> 'XcbQueryExtensionCookieT':return XcbQueryExtensionCookieT(lib.xcb_query_extension_unchecked(*parseArgs(conn, nameLen, name, )))
+def xcbQueryPointer(conn: 'CPtr[XcbConnectionT]', window: int, ) -> 'XcbQueryPointerCookieT':return XcbQueryPointerCookieT(lib.xcb_query_pointer(*parseArgs(conn, window, )))
+def xcbQueryPointerReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbQueryPointerCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbQueryPointerReplyT]':return XcbQueryPointerReplyT(lib.xcb_query_pointer_reply(*parseArgs(conn, cookie, e, )))
+def xcbQueryTree(conn: 'CPtr[XcbConnectionT]', window: int, ) -> 'XcbQueryTreeCookieT':return XcbQueryTreeCookieT(lib.xcb_query_tree(*parseArgs(conn, window, )))
+def xcbQueryTreeChildren(reply: 'CPtr[XcbQueryTreeReplyT]', ) -> Ptr[int]:return Ptr(lib.xcb_query_tree_children(*parseArgs(reply, )))
+def xcbQueryTreeReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbQueryTreeCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbQueryTreeReplyT]':return XcbQueryTreeReplyT(lib.xcb_query_tree_reply(*parseArgs(conn, cookie, e, )))
+def xcbRandrGetCrtcInfo(conn: 'CPtr[XcbConnectionT]', cookie: int, e: int, ) -> 'XcbRandrGetCrtcInfoCookieT':return XcbRandrGetCrtcInfoCookieT(lib.xcb_randr_get_crtc_info(*parseArgs(conn, cookie, e, )))
+def xcbRandrGetCrtcInfoReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbRandrGetCrtcInfoCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbRandrGetCrtcInfoReplyT]':return XcbRandrGetCrtcInfoReplyT(lib.xcb_randr_get_crtc_info_reply(*parseArgs(conn, cookie, e, )))
+def xcbRandrGetScreenResources(conn: 'CPtr[XcbConnectionT]', window: int, ) -> 'XcbRandrGetScreenResourcesCookieT':return XcbRandrGetScreenResourcesCookieT(lib.xcb_randr_get_screen_resources(*parseArgs(conn, window, )))
+def xcbRandrGetScreenResourcesCrtcs(R: 'CPtr[XcbRandrGetScreenResourcesReplyT]', ) -> Ptr[int]:return Ptr(lib.xcb_randr_get_screen_resources_crtcs(*parseArgs(R, )))
+def xcbRandrGetScreenResourcesCrtcsLength(R: 'CPtr[XcbRandrGetScreenResourcesReplyT]', ) -> int:return int(lib.xcb_randr_get_screen_resources_crtcs_length(*parseArgs(R, )))
+def xcbRandrGetScreenResourcesReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbRandrGetScreenResourcesCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbRandrGetScreenResourcesReplyT]':return XcbRandrGetScreenResourcesReplyT(lib.xcb_randr_get_screen_resources_reply(*parseArgs(conn, cookie, e, )))
+def xcbRandrSelectInput(conn: 'CPtr[XcbConnectionT]', window: int, enable: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_randr_select_input(*parseArgs(conn, window, enable, )))
+def xcbReparentWindow(conn: 'CPtr[XcbConnectionT]', window: int, parent: int, x: int, y: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_reparent_window(*parseArgs(conn, window, parent, x, y, )))
+def xcbSendEvent(conn: 'CPtr[XcbConnectionT]', propagate: bool, destination: int, eventMask: int, event: Ptr[int], ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_send_event(*parseArgs(conn, propagate, destination, eventMask, event, )))
+def xcbSetInputFocus(conn: 'CPtr[XcbConnectionT]', revertTo: int, focus: int, time: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_set_input_focus(*parseArgs(conn, revertTo, focus, time, )))
+def xcbShmCreatePixmap(conn: 'CPtr[XcbConnectionT]', pid: int, drawable: int, width: int, height: int, depth: int, shmseg: int, offset: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_shm_create_pixmap(*parseArgs(conn, pid, drawable, width, height, depth, shmseg, offset, )))
+def xcbShmGetImageReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbShmGetImageCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbShmGetImageReplyT]':return XcbShmGetImageReplyT(lib.xcb_shm_get_image_reply(*parseArgs(conn, cookie, e, )))
+def xcbShmGetImageUnchecked(conn: 'CPtr[XcbConnectionT]', drawable: int, x: int, y: int, width: int, height: int, planeMask: int, format: int, shmseg: int, offset: int, ) -> 'XcbShmGetImageCookieT':return XcbShmGetImageCookieT(lib.xcb_shm_get_image_unchecked(*parseArgs(conn, drawable, x, y, width, height, planeMask, format, shmseg, offset, )))
+def xcbShmPutImage(conn: 'CPtr[XcbConnectionT]', drawable: int, gc: int, totalWidth: int, totalHeight: int, srcX: int, srcY: int, srcWidth: int, srcHeight: int, dstX: int, dstY: int, depth: int, format: int, sendEvent: int, shmseg: int, offset: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_shm_put_image(*parseArgs(conn, drawable, gc, totalWidth, totalHeight, srcX, srcY, srcWidth, srcHeight, dstX, dstY, depth, format, sendEvent, shmseg, offset, )))
+def xcbShmQueryVersion(conn: 'CPtr[XcbConnectionT]', ) -> 'XcbShmQueryVersionCookieT':return XcbShmQueryVersionCookieT(lib.xcb_shm_query_version(*parseArgs(conn, )))
+def xcbShmQueryVersionReply(conn: 'CPtr[XcbConnectionT]', cookie: 'XcbShmQueryVersionCookieT', e: CPtr[XcbGenericErrorT], ) -> 'CPtr[XcbShmQueryVersionReplyT]':return XcbShmQueryVersionReplyT(lib.xcb_shm_query_version_reply(*parseArgs(conn, cookie, e, )))
+def xcbTestFakeInput(conn: 'CPtr[XcbConnectionT]', type: int, detail: int, time: int, root: int, rootX: int, rootY: int, deviceid: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_test_fake_input(*parseArgs(conn, type, detail, time, root, rootX, rootY, deviceid, )))
+def xcbUngrabButton(conn: 'CPtr[XcbConnectionT]', button: int, grabWindow: int, modifiers: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_ungrab_button(*parseArgs(conn, button, grabWindow, modifiers, )))
+def xcbUngrabKey(conn: 'CPtr[XcbConnectionT]', key: int, grabWindow: int, modifiers: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_ungrab_key(*parseArgs(conn, key, grabWindow, modifiers, )))
+def xcbUnmapWindow(conn: 'CPtr[XcbConnectionT]', window: int, ) -> XcbVoidCookieT:return XcbVoidCookieT(lib.xcb_unmap_window(*parseArgs(conn, window, )))
+def xcbWaitForEvent(conn: 'CPtr[XcbConnectionT]', ) -> CPtr[XcbGenericEventT]:return XcbGenericEventT(lib.xcb_wait_for_event(*parseArgs(conn, )))
+type XcbAtomEnumT = Literal['XCBAtomNone', 'XCBAtomAny', 'XCBAtomPrimary', 'XCBAtomSecondary', 'XCBAtomArc', 'XCBAtomAtom', 'XCBAtomBitmap', 'XCBAtomCardinal', 'XCBAtomColormap', 'XCBAtomCursor', 'XCBAtomCutBuffer0', 'XCBAtomCutBuffer1', 'XCBAtomCutBuffer2', 'XCBAtomCutBuffer3', 'XCBAtomCutBuffer4', 'XCBAtomCutBuffer5', 'XCBAtomCutBuffer6', 'XCBAtomCutBuffer7', 'XCBAtomDrawable', 'XCBAtomFont', 'XCBAtomInteger', 'XCBAtomPixmap', 'XCBAtomPoint', 'XCBAtomRectangle', 'XCBAtomResourceManager', 'XCBAtomRgbColorMap', 'XCBAtomRgbBestMap', 'XCBAtomRgbBlueMap', 'XCBAtomRgbDefaultMap', 'XCBAtomRgbGrayMap', 'XCBAtomRgbGreenMap', 'XCBAtomRgbRedMap', 'XCBAtomString', 'XCBAtomVisualid', 'XCBAtomWindow', 'XCBAtomWmCommand', 'XCBAtomWmHints', 'XCBAtomWmClientMachine', 'XCBAtomWmIconName', 'XCBAtomWmIconSize', 'XCBAtomWmName', 'XCBAtomWmNormalHints', 'XCBAtomWmSizeHints', 'XCBAtomWmZoomHints', 'XCBAtomMinSpace', 'XCBAtomNormSpace', 'XCBAtomMaxSpace', 'XCBAtomEndSpace', 'XCBAtomSuperscriptX', 'XCBAtomSuperscriptY', 'XCBAtomSubscriptX', 'XCBAtomSubscriptY', 'XCBAtomUnderlinePosition', 'XCBAtomUnderlineThickness', 'XCBAtomStrikeoutAscent', 'XCBAtomStrikeoutDescent', 'XCBAtomItalicAngle', 'XCBAtomXHeight', 'XCBAtomQuadWidth', 'XCBAtomWeight', 'XCBAtomPointSize', 'XCBAtomResolution', 'XCBAtomCopyright', 'XCBAtomNotice', 'XCBAtomFontName', 'XCBAtomFamilyName', 'XCBAtomFullName', 'XCBAtomCapHeight', 'XCBAtomWmClass', 'XCBAtomWmTransientFor']
+type XcbButtonIndexT = Literal['XCBButtonIndexAny', 'XCBButtonIndex1', 'XCBButtonIndex2', 'XCBButtonIndex3', 'XCBButtonIndex4', 'XCBButtonIndex5']
+type XcbConfigWindowT = Literal['XCBConfigWindowX', 'XCBConfigWindowY', 'XCBConfigWindowWidth', 'XCBConfigWindowHeight', 'XCBConfigWindowBorderWidth', 'XCBConfigWindowSibling', 'XCBConfigWindowStackMode']
+type XcbCwT = Literal['XCBCwBackPixmap', 'XCBCwBackPixel', 'XCBCwBorderPixmap', 'XCBCwBorderPixel', 'XCBCwBitGravity', 'XCBCwWinGravity', 'XCBCwBackingStore', 'XCBCwBackingPlanes', 'XCBCwBackingPixel', 'XCBCwOverrideRedirect', 'XCBCwSaveUnder', 'XCBCwEventMask', 'XCBCwDontPropagate', 'XCBCwColormap', 'XCBCwCursor']
+type XcbEventMaskT = Literal['XCBEventMaskNoEvent', 'XCBEventMaskKeyPress', 'XCBEventMaskKeyRelease', 'XCBEventMaskButtonPress', 'XCBEventMaskButtonRelease', 'XCBEventMaskEnterWindow', 'XCBEventMaskLeaveWindow', 'XCBEventMaskPointerMotion', 'XCBEventMaskPointerMotionHint', 'XCBEventMaskButton1Motion', 'XCBEventMaskButton2Motion', 'XCBEventMaskButton3Motion', 'XCBEventMaskButton4Motion', 'XCBEventMaskButton5Motion', 'XCBEventMaskButtonMotion', 'XCBEventMaskKeymapState', 'XCBEventMaskExposure', 'XCBEventMaskVisibilityChange', 'XCBEventMaskStructureNotify', 'XCBEventMaskResizeRedirect', 'XCBEventMaskSubstructureNotify', 'XCBEventMaskSubstructureRedirect', 'XCBEventMaskFocusChange', 'XCBEventMaskPropertyChange', 'XCBEventMaskColorMapChange', 'XCBEventMaskOwnerGrabButton']
+type XcbGcT = Literal['XCBGcFunction', 'XCBGcPlaneMask', 'XCBGcForeground', 'XCBGcBackground', 'XCBGcLineWidth', 'XCBGcLineStyle', 'XCBGcCapStyle', 'XCBGcJoinStyle', 'XCBGcFillStyle', 'XCBGcFillRule', 'XCBGcTile', 'XCBGcStipple', 'XCBGcTileStippleOriginX', 'XCBGcTileStippleOriginY', 'XCBGcFont', 'XCBGcSubwindowMode', 'XCBGcGraphicsExposures', 'XCBGcClipOriginX', 'XCBGcClipOriginY', 'XCBGcClipMask', 'XCBGcDashOffset', 'XCBGcDashList', 'XCBGcArcMode']
+type XcbGetPropertyTypeT = Literal['XCBGetPropertyTypeAny']
+type XcbGxT = Literal['XCBGxClear', 'XCBGxAnd', 'XCBGxAndReverse', 'XCBGxCopy', 'XCBGxAndInverted', 'XCBGxNoop', 'XCBGxXor', 'XCBGxOr', 'XCBGxNor', 'XCBGxEquiv', 'XCBGxInvert', 'XCBGxOrReverse', 'XCBGxCopyInverted', 'XCBGxOrInverted', 'XCBGxNand', 'XCBGxSet']
+type XcbIcccmWmT = Literal['XCBIcccmWmHintInput', 'XCBIcccmWmHintState', 'XCBIcccmWmHintIconPixmap', 'XCBIcccmWmHintIconWindow', 'XCBIcccmWmHintIconPosition', 'XCBIcccmWmHintIconMask', 'XCBIcccmWmHintWindowGroup', 'XCBIcccmWmHintXUrgency']
+type XcbImageFormatT = Literal['XCBImageFormatXyBitmap', 'XCBImageFormatXyPixmap', 'XCBImageFormatZPixmap']
+type XcbImageOrderT = Literal['XCBImageOrderLsbFirst', 'XCBImageOrderMsbFirst']
+type XcbInputFocusT = Literal['XCBInputFocusNone', 'XCBInputFocusPointerRoot', 'XCBInputFocusParent', 'XCBInputFocusFollowKeyboard']
+type XcbLineStyleT = Literal['XCBLineStyleSolid', 'XCBLineStyleOnOffDash', 'XCBLineStyleDoubleDash']
+type XcbMapStateT = Literal['XCBMapStateUnmapped', 'XCBMapStateUnviewable', 'XCBMapStateViewable']
+type XcbModMaskT = Literal['XCBModMaskShift', 'XCBModMaskLock', 'XCBModMaskControl', 'XCBModMask1', 'XCBModMask2', 'XCBModMask3', 'XCBModMask4', 'XCBModMask5', 'XCBModMaskAny']
+type XcbPropModeT = Literal['XCBPropModeReplace', 'XCBPropModePrepend', 'XCBPropModeAppend']
+type XcbRandrNotifyMaskT = Literal['XCBRandrNotifyMaskScreenChange', 'XCBRandrNotifyMaskCrtcChange', 'XCBRandrNotifyMaskOutputChange', 'XCBRandrNotifyMaskOutputProperty', 'XCBRandrNotifyMaskProviderChange', 'XCBRandrNotifyMaskProviderProperty', 'XCBRandrNotifyMaskResourceChange']
+type XcbRandrNotifyT = Literal['XCBRandrNotifyCrtcChange', 'XCBRandrNotifyOutputChange', 'XCBRandrNotifyOutputProperty', 'XCBRandrNotifyProviderChange', 'XCBRandrNotifyProviderProperty', 'XCBRandrNotifyResourceChange']
+type XcbSendEventDestT = Literal['XCBSendEventDestPointerWindow', 'XCBSendEventDestItemFocus']
+type XcbStackModeT = Literal['XCBStackModeAbove', 'XCBStackModeBelow', 'XCBStackModeTopIf', 'XCBStackModeBottomIf', 'XCBStackModeOpposite']
+type XcbWindowClassT = Literal['XCBWindowClassCopyFromParent', 'XCBWindowClassInputOutput', 'XCBWindowClassInputOnly']
+type XcbWindowEnumT = Literal['XCBWindowNone']

@@ -1,3 +1,4 @@
+import importlib
 import os
 import sys
 from itertools import chain
@@ -53,6 +54,7 @@ def parseType(t):
     # FIXME: this doesnt work with pointers to pointers
     # TODO: add variable names, instead of using a1, a2, etc..
 
+    deflater = False
     parts = t.split(' ')
     i = 0
 
@@ -63,6 +65,7 @@ def parseType(t):
 
     if parts[i] == 'struct' or parts[i] == 'enum':
         i += 1
+        deflater = True
         custom = True
 
     tname = parts[i]
@@ -77,7 +80,6 @@ def parseType(t):
             'long': 'int',
             'char': 'int',
             'void': 'void',
-            'enum': 'enum',
             '_Bool': 'bool',
         }.get(tname, None)
 
@@ -100,6 +102,8 @@ def parseType(t):
     if not custom and _ptr:
         cast = f'Ptr'
 
+    itype = f"'{itype}'" if deflater else itype
+
     return itype, cast
 
 
@@ -114,18 +118,44 @@ def generate(_name, lib, ffi) -> str:
     name = f'{_name}_cffi'
     defined = {}
 
+    defs = open(f'lib/backends/ffi/{_name}/definitions.h').read().splitlines()
+    # src = open(f'lib/backends/ffi/{_name}/source.c').read()
+
     text = ''
 
     text += f'''from _cffi_backend import _CDataBase
 from {name} import lib, ffi
-from typing import Any
-from .base import Base, parseArgs, Ptr, CPtr, void, enum
+from typing import Any, Literal
+from .base import Base, parseArgs, Ptr, CPtr, void
 
 NULL = ffi.NULL
 
 # types
 '''
+    enums = ''
     for _type in sorted(set(chain.from_iterable(ffi.list_types()))):
+        # check if _type is an enum
+        enum = False
+        for n, l in enumerate(defs):
+            if '//' in l:
+                l = l.split('//')[0].strip(' ')
+            if l == f'typedef enum {_type}':
+                enum = True
+                eitems = []
+                for l in defs[n + 2 :]:
+                    if '}' in l:
+                        break
+                    eitems.append(f"'{toCamelCase(l.split('=')[0].strip())}'")
+                enums += (
+                    f'type {toCamelCase(_type, True)} = Literal['
+                    + ', '.join(eitems)
+                    + ']\n'
+                )
+
+        if enum:
+            continue
+
+        # else we will type it as a class
         try:
             obj = ffi.new(f'{_type}*')
 
@@ -150,8 +180,6 @@ class {toCamelCase(_type, cls=True)}(Base):
     text += '''
 # funcs and vars
 '''
-    defs = open(f'lib/backends/ffi/{_name}/definitions.h').read().splitlines()
-    # src = open(f'lib/backends/ffi/{_name}/source.c').read()
 
     for name, val in lib.__dict__.items():
         if isinstance(val, Callable):
@@ -198,19 +226,22 @@ class {toCamelCase(_type, cls=True)}(Base):
                 callArgs += f'{toCamelCase(aname)}, '
             text += f'\ndef {toCamelCase(name)}({types}) -> {rtype}:{insert(name, n)}return {rcast}(lib.{name}(*parseArgs({callArgs})))'
         else:
-            text += f'{toCamelCase(name)}: {type(val).__name__} = lib.{name}\n'
+            text += (
+                f'{toCamelCase(name)}: {type(val).__name__} = {lib.__dict__[name]}\n'
+            )
 
-    return text
+    return text + '\n' + enums
 
 
-from xcb_cffi import ffi, lib
+def trybuild(libname, pyname):
+    try:
+        l = importlib.import_module(libname)
+    except:
+        print(f'couldn\'t generate {pyname}.py, compile {libname}')
+        return
+    open(f'./lib/backends/{pyname}.py', 'w').write(generate(pyname, l.lib, l.ffi))
 
-open('./lib/backends/xcb.py', 'w').write(generate('xcb', lib, ffi))
 
-# from wayland_cffi import lib, ffi
-
-# open('./lib/backends/waylandServer.py', 'w').write(generate('wayland', lib, ffi))
-
-from pango_cffi import ffi, lib
-
-open('./lib/backends/pango.py', 'w').write(generate('pango', lib, ffi))
+trybuild('xcb_cffi', 'xcb')
+trybuild('wayland_cffi', 'waylandServer')
+trybuild('pango_cffi', 'pango')
