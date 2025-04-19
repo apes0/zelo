@@ -1,11 +1,48 @@
 import logging
 from logging import CRITICAL, DEBUG, ERROR, FATAL, INFO, WARN, WARNING
 
+grey = ''
+white = ''
+yellow = ''
+red = ''
+bold = ''
+boldRed = ''
+reset = ''
+
+try:
+    import colorama
+
+    grey = colorama.Fore.LIGHTBLACK_EX
+    white = colorama.Fore.WHITE
+    yellow = colorama.Fore.YELLOW
+    red = colorama.Fore.RED
+    bold = colorama.Style.BRIGHT
+    boldRed = bold + red
+    reset = colorama.Fore.RESET + colorama.Style.RESET_ALL
+except:
+    print()
+    pass
+
+fmt = '{col}%(levelname)-8s{reset} %(message)s'
+
+
+class Formatter(logging.Formatter):
+    def format(self, record: logging.LogRecord):
+        log_fmt = {
+            logging.DEBUG: fmt.format(col=grey, reset=reset),
+            logging.INFO: fmt.format(col=white, reset=reset),
+            logging.WARNING: fmt.format(col=yellow, reset=reset),
+            logging.ERROR: fmt.format(col=red, reset=reset),
+            logging.CRITICAL: fmt.format(col=boldRed, reset=reset + bold),
+        }.get(record.levelno)
+        formatter = logging.Formatter(log_fmt)
+        return formatter.format(record)
+
+
 logger = logging.getLogger('zelo')
-formatter = logging.Formatter('%(levelname)-8s %(message)s')
 streamHandler = logging.StreamHandler()
 logger.addHandler(streamHandler)
-streamHandler.setFormatter(formatter)
+streamHandler.setFormatter(Formatter())
 
 logger.setLevel(logging.ERROR)
 
@@ -15,7 +52,7 @@ logger.setLevel(logging.ERROR)
 # ? why do i keep these in a dict lol?
 cfg = {
     'all': False,  # if we should log everything
-    'events': False,  # event triggerings
+    'events': True,  # event triggerings
     'evErrors': True,  # event errors
     'grab': False,  # and ungrab
     'press': False,  # and release
@@ -23,10 +60,10 @@ cfg = {
     'buttons': False,  # button related logs
     'focus': False,  # focus changes
     'drawable': False,  # basically anything from api/drawable.py
-    'errors': False,  # backend errors
+    'errors': True,  # backend errors
     'backend': True,  # backend debug info
     'windows': False,  # anything to do with windows
-    'extensions': False,  # extension logs
+    'extensions': True,  # extension logs
     'startSoon': True,  # stuff erroring in start soon calls
     'others': True,  # anything else that's logging
 }
