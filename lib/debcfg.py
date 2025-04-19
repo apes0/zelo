@@ -52,7 +52,7 @@ logger.setLevel(logging.ERROR)
 # ? why do i keep these in a dict lol?
 cfg = {
     'all': False,  # if we should log everything
-    'events': True,  # event triggerings
+    'events': False,  # event triggerings
     'evErrors': True,  # event errors
     'grab': False,  # and ungrab
     'press': False,  # and release
@@ -60,10 +60,10 @@ cfg = {
     'buttons': False,  # button related logs
     'focus': False,  # focus changes
     'drawable': False,  # basically anything from api/drawable.py
-    'errors': True,  # backend errors
+    'errors': False,  # backend errors
     'backend': True,  # backend debug info
     'windows': False,  # anything to do with windows
-    'extensions': True,  # extension logs
+    'extensions': False,  # extension logs
     'startSoon': True,  # stuff erroring in start soon calls
     'others': True,  # anything else that's logging
 }
