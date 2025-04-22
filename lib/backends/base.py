@@ -52,4 +52,3 @@ class Ptr[T](Base):
 type CPtr[T] = T
 
 void = Ptr
-enum = Ptr

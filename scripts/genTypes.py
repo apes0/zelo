@@ -78,7 +78,7 @@ def parseType(t):
             'short': 'int',
             'float': 'int',
             'long': 'int',
-            'char': 'int',
+            'char': 'int',  # TODO: make this | bytes, so that strings work better
             'void': 'void',
             '_Bool': 'bool',
         }.get(tname, None)
@@ -94,6 +94,7 @@ def parseType(t):
     ptr = ('C' if custom else '') + 'Ptr[{t}]'
     itype = type
 
+    itype = f"'{itype}'" if deflater else itype
     _ptr = len(parts) > i and parts[i] == '*'
     if _ptr:
         itype = ptr.format(t=type)
@@ -102,8 +103,6 @@ def parseType(t):
     if not custom and _ptr:
         cast = f'Ptr'
 
-    itype = f"'{itype}'" if deflater else itype
-
     return itype, cast
 
 
@@ -111,6 +110,49 @@ def insert(fn, an):
     # NOTE: this is a debugging thingie
     #    return f'print(f"calling {fn}({",".join(f"{{a{n}}}" for n in range(an))})");'
     return ''
+
+
+def uncomment(l: str) -> str:
+    return l.split('//')[0].strip(' ')
+
+
+def block(defs: list[str], startparts: list[str]):
+    # NOTE: we should be able to export a lot of stuff from here, so that it can be run only once, but i
+    # dont really care abt the speed currently
+    out: list[str] = []
+
+    for n, l in enumerate(defs):
+        l = uncomment(l)
+
+        matches = True
+
+        for p in startparts:
+            try:
+                i = l.index(p)
+                off = i + len(p)
+                if off < len(l):
+                    assert l[off] in ' ;'
+            except:
+                matches = False
+                break
+
+        if not matches:
+            continue
+
+        # print(f'{l} matched for {startparts}')
+
+        if l.endswith(';'):
+            return l
+
+        for l in defs[n + 2 :]:
+            l = uncomment(l)
+
+            if '}' in l:
+                break
+
+            out.append(l)
+
+        return out
 
 
 def generate(_name, lib, ffi) -> str:
@@ -136,21 +178,14 @@ NULL = ffi.NULL
     for _type in sorted(set(chain.from_iterable(ffi.list_types()))):
         # check if _type is an enum
         enum = False
-        for n, l in enumerate(defs):
-            if '//' in l:
-                l = l.split('//')[0].strip(' ')
-            if l == f'typedef enum {_type}':
-                enum = True
-                eitems = []
-                for l in defs[n + 2 :]:
-                    if '}' in l:
-                        break
-                    eitems.append(f"'{toCamelCase(l.split('=')[0].strip())}'")
-                enums += (
-                    f'type {toCamelCase(_type, True)} = Literal['
-                    + ', '.join(eitems)
-                    + ']\n'
-                )
+        if eitems := block(defs, [f'typedef enum {_type}']):
+            enum = True
+            eitems = [f"'{toCamelCase(l.split('=')[0].strip())}'" for l in eitems]
+            enums += (
+                f'type {toCamelCase(_type, True)} = Literal['
+                + ', '.join(eitems)
+                + ']\n'
+            )
 
         if enum:
             continue
@@ -159,17 +194,29 @@ NULL = ffi.NULL
         try:
             obj = ffi.new(f'{_type}*')
 
-            text += f'''class {toCamelCase(_type, cls=True)}(Base):
+            o = block(defs, ['typedef', _type])
+            if isinstance(o, str):
+                _t, _ = parseType(' '.join(o.split(' ')[1:-1]))
+                text += f'{toCamelCase(_type, cls=True)} = {_t}\n'
+            else:
+                text += f'''class {toCamelCase(_type, cls=True)}(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
 '''
-            for attr in dir(obj):
-                tp = type(getattr(obj, attr))
-                text += (
-                    f'        self.{toCamelCase(attr)}: {tp.__name__} = obj.{attr}\n'
-                )
-            defined[_type] = toCamelCase(_type, cls=True)
+                for attr in dir(obj):
+                    tp = None
+                    for l in o:
+                        if attr in l:
+                            p = l.split(' ')[-1]
+                            tp, _ = parseType(
+                                ' '.join(l.split(' ')[:-1]) + ' *' * p.count('*')
+                            )
+                            break
+                    if not tp:
+                        tp = type(getattr(obj, attr)).__name__
+                    text += f'        self.{toCamelCase(attr)}: {tp} = obj.{attr}\n'
+                defined[_type] = toCamelCase(_type, cls=True)
         except:
             text += f'''# skipping {toCamelCase(_type, cls=True)}, because its not fully defined
 class {toCamelCase(_type, cls=True)}(Base):

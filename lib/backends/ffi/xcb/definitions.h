@@ -26,7 +26,7 @@ typedef struct xcb_connection_t xcb_connection_t;
 typedef unsigned int xcb_window_t;
 typedef unsigned int xcb_visualid_t;
 typedef unsigned int xcb_colormap_t;
-typedef struct
+typedef struct xcb_screen_t
 {
     xcb_window_t root;
     xcb_colormap_t default_colormap;
@@ -45,13 +45,13 @@ typedef struct
     unsigned char root_depth;
     unsigned char allowed_depths_len;
 } xcb_screen_t;
-typedef struct
+typedef struct xcb_void_cookie_t
 {
     unsigned int sequence;
 } xcb_void_cookie_t;
 typedef unsigned int xcb_cursor_t;
 typedef unsigned char xcb_keycode_t;
-typedef struct
+typedef struct xcb_generic_event_t
 {
     unsigned char response_type;
     unsigned char pad0;
@@ -299,7 +299,7 @@ typedef struct xcb_intern_atom_cookie_t
 {
     unsigned int sequence;
 } xcb_intern_atom_cookie_t;
-typedef struct
+typedef struct xcb_generic_error_t
 {
     unsigned char response_type;
     unsigned char error_code;

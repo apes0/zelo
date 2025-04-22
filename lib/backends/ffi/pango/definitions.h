@@ -1,4 +1,5 @@
-typedef struct
+// clang-format off
+typedef struct FT_Bitmap
 {
     unsigned int rows;
     unsigned int width;

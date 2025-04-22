@@ -10,9 +10,9 @@ class FtBitmap(Base):
     def __init__(self, obj):
         self.obj = obj
         if obj == ffi.NULL:return
-        self.buffer: _CDataBase = obj.buffer
+        self.buffer: Ptr[int] = obj.buffer
         self.numGrays: int = obj.num_grays
-        self.palette: _CDataBase = obj.palette
+        self.palette: int = obj.palette
         self.paletteMode: int = obj.palette_mode
         self.pitch: int = obj.pitch
         self.pixelMode: int = obj.pixel_mode
