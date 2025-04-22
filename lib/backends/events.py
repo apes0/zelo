@@ -1,8 +1,7 @@
 import traceback
 from logging import DEBUG, ERROR
 from types import NoneType, UnionType
-from typing import TYPE_CHECKING, Callable
-
+from typing import TYPE_CHECKING, Callable, Iterable
 import trio
 
 from ..debcfg import log
@@ -30,13 +29,26 @@ async def caller(fn, *args, task_status=trio.TASK_STATUS_IGNORED):
         )
 
 
+type trans = Callable[..., Iterable]
+
+
 class Event:
     def __init__(self, name: str, *types: type | UnionType) -> None:
         self.listeners: dict['Ctx', list[Callable]] = {}
+        self.proxies: dict['Ctx', dict[Event, trans | None]] = {}
         self.name = name
         self.types = types
         self.block = False
         # NOTE: i dont like this that much, but it makes the api more reasonable to use
+
+    def addProxy(self, ctx: 'Ctx', event: 'Event', trans: trans | None = None):
+        # make this event a proxy to another
+        if ctx not in self.proxies:
+            self.proxies[ctx] = {}
+        self.proxies[ctx][event] = trans
+
+    def removeProxy(self, ctx: 'Ctx', event: 'Event'):
+        del self.proxies[ctx][event]
 
     def addListener(self, ctx: 'Ctx', fn: Callable):
         self.listeners[ctx] = [*self.listeners.get(ctx, []), fn]
@@ -65,6 +77,9 @@ class Event:
 
         for fn in self.listeners.get(ctx, []):
             await ctx.nurs.start(caller, fn, *args)
+
+        for ev, trans in self.proxies.get(ctx, {}).items():
+            await ev.trigger(ctx, *(args if not trans else trans(*args)))
 
 
 # you might be able to tell that all of these appear to be the same as the x11 events, you would be
