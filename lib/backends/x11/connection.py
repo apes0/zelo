@@ -1,4 +1,3 @@
-# from .ewmh import AtomStore
 from logging import DEBUG
 from typing import TYPE_CHECKING
 
@@ -9,9 +8,9 @@ from . import requests
 from .keys import Mod
 from .mouse import Mouse
 from .screen import Display, Screen
-from .types import chararr, intarr
+from .types import chararr, intp, intarr
 from .window import Window
-from .atoms import atoms
+from .atoms import Atom, atoms
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
@@ -70,6 +69,25 @@ async def initScreens(ctx: 'Ctx'):
         ctx.screen.displays.append(Display(crtc.x, crtc.y, crtc.width, crtc.height))
 
     xcb.xcbRandrSelectInput(conn, ctx._root, xcb.XCBRandrNotifyMaskScreenChange)
+
+
+@init
+async def loadAtoms(ctx: 'Ctx'):
+    for name, (id, type, fmt) in atoms.items():
+        if id is not None:
+            continue
+
+        rep = await requests.InternAtom(
+            ctx,
+            ctx._getGCtx().connection,
+            0,
+            len(name),
+            name.encode(),
+        ).reply()
+
+        log('backend', DEBUG, f'loaded atom {name} ({rep.atom})')
+
+        atoms[name] = (rep.atom, type, fmt)
 
 
 @init
@@ -221,19 +239,10 @@ async def shm(ctx: 'Ctx'):
 
 
 @init
-async def loadAtoms(ctx: 'Ctx'):
-    for name, (id, type) in atoms.items():
-        if id is not None:
-            continue
+async def supportingWmCheck(ctx: 'Ctx'):
+    w = ctx.createWindow(1, 1, 1, 1, 1)
 
-        rep = await requests.InternAtom(
-            ctx,
-            ctx._getGCtx().connection,
-            0,
-            len(name),
-            name.encode(),
-        ).reply()
-
-        log('backend', DEBUG, f'loaded atom {name} ({rep.atom})')
-
-        atoms[name] = (rep.atom, type)
+    await Atom(ctx, ctx.root, '_NET_SUPPORTING_WM_CHECK').set(intp(w.id), 4)
+    await Atom(ctx, w, '_NET_SUPPORTING_WM_CHECK').set(intp(w.id), 4)
+    await Atom(ctx, w, 'WM_NAME').set(chararr('Zelo'.encode()), 4)
+    await Atom(ctx, w, '_NET_WM_NAME').set(chararr('Zelo'.encode()), 4)

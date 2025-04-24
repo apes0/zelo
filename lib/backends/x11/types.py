@@ -66,6 +66,7 @@ PropertyNotifyTC = Caster('xcb_property_notify_event_t *')
 atomNameRequestTC = Caster('xcb_get_atom_name_request_t *')
 genericErrorTC = Caster('xcb_generic_error_t*')
 # others
+voidpC = Caster('void*')
 charpC = Caster('char*')
 keysymC = Caster('xcb_keysym_t*')
 # xrandr

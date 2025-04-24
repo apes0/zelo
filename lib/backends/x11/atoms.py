@@ -4,19 +4,22 @@ from typing import TYPE_CHECKING, Any, Callable
 import numpy as np
 
 from lib.backends.x11 import requests
+from lib.debcfg import log, DEBUG
 
 from .. import xcb
-from .types import charpC, maxUVal, icccmWmHintsTC
+from .types import charpC, maxUVal, icccmWmHintsTC, voidpC
 
 if TYPE_CHECKING:
-    from lib.backends.x11.window import Window
+    from lib.backends.generic import GWindow
     from lib.ctx import Ctx
 
-atoms = {
-    'WM_NAME': (xcb.XCBAtomWmName, xcb.XCBAtomString),
-    'WM_ICON_NAME': (xcb.XCBAtomWmIconName, xcb.XCBAtomString),
-    '_NET_WM_ICON': (None, xcb.XCBAtomCardinal),
-    'WM_HINTS': (xcb.XCBAtomWmHints, xcb.XCBAtomWmHints),
+atoms: dict[str, tuple[int | None, int, int]] = {
+    'WM_NAME': (xcb.XCBAtomWmName, xcb.XCBAtomString, 8),
+    '_NET_WM_NAME': (None, xcb.XCBAtomString, 8),
+    'WM_ICON_NAME': (xcb.XCBAtomWmIconName, xcb.XCBAtomString, 0),
+    '_NET_WM_ICON': (None, xcb.XCBAtomCardinal, 0),
+    '_NET_SUPPORTING_WM_CHECK': (None, xcb.XCBAtomWindow, 32),
+    'WM_HINTS': (xcb.XCBAtomWmHints, xcb.XCBAtomWmHints, 0),
 }
 
 readers: dict[str, Callable[['Atom'], Any]] = {}
@@ -30,27 +33,34 @@ def reader(t: str):
 
 
 class Atom:
-    def __init__(self, ctx: 'Ctx', win: 'Window', name: str) -> None:
-        self.ctx = ctx
-        self.win = win
-        self.name = name
+    def __init__(self, ctx: 'Ctx', win: 'GWindow', name: str) -> None:
+        self.ctx: requests.Ctx = ctx
+        self.win: 'GWindow' = win
+        self.name: str = name
         self.value: Any = None
 
         from ..events import Event
 
         self.changed = Event('atomChanged')
 
-        atom = atoms[name]
-
-        self.id = atom[0]
-        self.type = atom[1]
+        id, self.type, self.fmt = atoms[name]
+        assert id != None, f'atom {name} missing id'
+        self.id: int = id
 
         gctx = self.ctx._getGCtx()
         gctx.atoms[self.win.id] = {**gctx.atoms.get(self.win.id, {}), self.id: self}
 
     async def read(self):
-        self.value = await readers[self.name](self)
-        await self.changed.trigger(self.ctx)
+        f = readers.get(self.name)
+
+        if not f:
+            return
+
+        v = await f(self)
+
+        if self.value != v:
+            self.value = v
+            await self.changed.trigger(self.ctx)
         # print(f'read {self.value}')
 
     async def _read(self, off: int = 0, buf: int = maxUVal('int')):
@@ -65,6 +75,24 @@ class Atom:
             return 0, xcb.NULL
 
         return resp.valueLen, xcb.xcbGetPropertyValue(resp)
+
+    async def set(self, data, size: int):
+        log(
+            'backend',
+            DEBUG,
+            f'setting {self.name} of {self.win.id} to {data} (size: {size})',
+        )
+        xcb.xcbChangeProperty(
+            self.ctx._getGCtx().connection,
+            xcb.XCBPropModeReplace,
+            self.win.id,
+            self.id,
+            self.type,
+            self.fmt,
+            (size * 8) // self.fmt,
+            voidpC(data),
+        )
+        await self.changed.trigger(self.ctx)
 
 
 async def readString(atom: Atom):
