@@ -282,7 +282,7 @@ class {toCamelCase(_type, cls=True)}(Base):
 
 def trybuild(libname, pyname):
     try:
-        l = importlib.import_module(libname)
+        l = importlib.import_module(f'lib.backends.build.{libname}')
     except:
         print(f'couldn\'t generate {pyname}.py, compile {libname}')
         return

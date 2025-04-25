@@ -15,6 +15,8 @@ from ..debcfg import log
 # NOTE: personally, i would name it 'xcbcffi' (or 'xcbCffi'), but there is already a module with that name and i
 # don't want to use camel case for modules..., so ye, its gonna be in snake case
 
+prefix = 'lib.backends.build'
+
 xcb = 'xcb_cffi'
 wayland = 'wayland_cffi'
 pango = 'pango_cffi'
@@ -27,8 +29,10 @@ wrappers = {
 }
 
 
+buildloc = os.path.abspath(os.path.join(__file__, '..', 'build'))
+
+
 def build(name, libraries, out):
-    # TODO: how to compile this elsewhere
     ffibuilder = FFI()
 
     ffibuilder.set_source_pkgconfig(
@@ -52,7 +56,7 @@ def build(name, libraries, out):
         ).read(),
     )
 
-    ffibuilder.compile(verbose=True, target='*')
+    ffibuilder.compile(verbose=True, target=os.path.join(buildloc, f'{out}.*'))
 
 
 buildX = partial(
@@ -82,7 +86,7 @@ builds = {wayland: buildWayland, pango: buildpango, xcb: buildX, standalone: lam
 def assertModule(imp, build):
     try:
         # TODO: can we do this better?
-        _lib = import_module(imp)
+        _lib = import_module(f'{prefix}.{imp}')
     except ModuleNotFoundError:
         build()
 

@@ -21,4 +21,4 @@ class FtBitmap(Base):
 
 # funcs and vars
 
-def render(text: Ptr[int], font: Ptr[int], back: int, fore: int, ) -> FtBitmap:return FtBitmap(lib.render(*parseArgs(text, font, back, fore, )))
+def render(text: Ptr[int], font: Ptr[int], back: int, fore: int, ) -> 'FtBitmap':return FtBitmap(lib.render(*parseArgs(text, font, back, fore, )))
