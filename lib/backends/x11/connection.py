@@ -148,6 +148,11 @@ async def initWindows(ctx: 'Ctx'):
 
 
 @init
+async def createClientsAtom(ctx: 'Ctx'):
+    ctx.gctx.clients = Atom(ctx, ctx.root, '_NET_CLIENT_LIST')  # type: ignore
+
+
+@init
 async def initMouse(ctx: 'Ctx'):
     ctx.mouse = Mouse(ctx)
 

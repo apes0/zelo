@@ -20,6 +20,7 @@ atoms: dict[str, tuple[int | None, int, int]] = {
     '_NET_WM_ICON': (None, xcb.XCBAtomCardinal, 0),
     '_NET_SUPPORTING_WM_CHECK': (None, xcb.XCBAtomWindow, 32),
     'WM_HINTS': (xcb.XCBAtomWmHints, xcb.XCBAtomWmHints, 0),
+    '_NET_CLIENT_LIST': (None, xcb.XCBAtomWindow, 32),
 }
 
 readers: dict[str, Callable[['Atom'], Any]] = {}
@@ -76,7 +77,7 @@ class Atom:
 
         return resp.valueLen, xcb.xcbGetPropertyValue(resp)
 
-    async def set(self, data, size: int):
+    async def set(self, data, size: int, mode=xcb.XCBPropModeReplace):
         log(
             'backend',
             DEBUG,
@@ -84,15 +85,21 @@ class Atom:
         )
         xcb.xcbChangeProperty(
             self.ctx._getGCtx().connection,
-            xcb.XCBPropModeReplace,
+            mode,
             self.win.id,
             self.id,
             self.type,
             self.fmt,
-            (size * 8) // self.fmt,
+            size,
             voidpC(data),
         )
         await self.changed.trigger(self.ctx)
+
+    async def append(self, data, size: int):
+        await self.set(data, size, xcb.XCBPropModeAppend)
+
+    async def prepend(self, data, size: int):
+        await self.set(data, size, xcb.XCBPropModePrepend)
 
 
 async def readString(atom: Atom):

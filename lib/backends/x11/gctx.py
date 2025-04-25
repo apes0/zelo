@@ -4,7 +4,7 @@ import trio
 
 from .. import xcb
 from ..generic import GCtx, applyPre
-from .requests import RequestLoop
+from .requests import RequestLoop, QueryTree
 from .types import charpC, uintarr
 from .window import Window
 
@@ -23,6 +23,7 @@ class Ctx(GCtx):
         self.screenp: CData
         self.values: CData
         self.extResps = {}
+        self.clients: 'Atom'
         self.sharedPixmaps: bool = False
         self.atoms: dict['GWindow', dict[int, 'Atom']] = {}
         self.requestLoop = RequestLoop(ctx)
@@ -83,3 +84,9 @@ class Ctx(GCtx):
 
         xcb.xcbDisconnect(self.connection)
         self.connection = xcb.NULL
+
+    async def updateClientsList(self):
+        tree = await QueryTree(self.ctx, self.connection, self.ctx.root.id).reply()
+        wins = xcb.xcbQueryTreeChildren(tree)
+        print(wins)
+        await self.clients.set(wins, tree.childrenLen)

@@ -78,6 +78,8 @@ async def createNotify(event, ctx: 'Ctx'):
     await window.createNotify.trigger(ctx)
     await events.createNotify.trigger(ctx, window)
 
+    await gctx.updateClientsList()
+
 
 @handler(xcb.XCBMapRequest)
 async def mapRequest(event, ctx: 'Ctx'):
@@ -210,6 +212,8 @@ async def destroyNotify(event, ctx: 'Ctx'):
 
     await win.destroyNotify.trigger(ctx)
     await events.destroyNotify.trigger(ctx, win)
+
+    await gctx.updateClientsList()
 
 
 @handler(xcb.XCBMapNotify)
