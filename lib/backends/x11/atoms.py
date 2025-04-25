@@ -126,7 +126,6 @@ readers['WM_ICON_NAME'] = readString
 @reader('_NET_WM_ICON')
 async def readIcon(atom: Atom):
     # TODO: look for the biggest icon rather than just picking the 1st one
-    print('reading icon!!!')
     read, data = await atom._read()
     data = charpC(data.obj)
 
@@ -136,12 +135,8 @@ async def readIcon(atom: Atom):
     w = struct.unpack('!I', data[0:4])[0]
     h = struct.unpack('!I', data[4:8])[0]
 
-    print(w, h)
-
     img = np.frombuffer(data[8 : 8 + w * h * 4], dtype=np.uint8)
     img.shape = (h, w, 4)
-
-    print(img)
 
     return img
 

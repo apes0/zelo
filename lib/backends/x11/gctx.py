@@ -88,5 +88,4 @@ class Ctx(GCtx):
     async def updateClientsList(self):
         tree = await QueryTree(self.ctx, self.connection, self.ctx.root.id).reply()
         wins = xcb.xcbQueryTreeChildren(tree)
-        print(wins)
         await self.clients.set(wins, tree.childrenLen)

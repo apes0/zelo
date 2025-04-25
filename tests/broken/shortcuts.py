@@ -81,7 +81,6 @@ async def shortcutMods(test: 'Test'):
 
     cuts.shortcuts = {((key,), _mod): lambda ctx: ev.set()}  # reset it
     cuts.register()
-    print(cuts.shortcuts)
 
     key.press(ctx, ctx.root, _mod)
 

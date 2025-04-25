@@ -20,7 +20,6 @@ try:
     boldRed = bold + red
     reset = colorama.Fore.RESET + colorama.Style.RESET_ALL
 except:
-    print()
     pass
 
 fmt = '{col}%(levelname)-8s{reset} %(message)s'

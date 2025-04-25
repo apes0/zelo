@@ -21,7 +21,7 @@ class Layout:
     def hsplit(self, y: float, topspacing: float = -1, bottomspacing: float = -1):
         topspacing = max(topspacing, 0)
         bottomspacing = bottomspacing if bottomspacing > 0 else topspacing
-        print(topspacing, bottomspacing)
+
         return Layout(
             self.x + topspacing,
             self.y + topspacing,
@@ -37,7 +37,7 @@ class Layout:
     def vsplit(self, x: float, leftspacing: float = -1, rightspacing: float = -1):
         leftspacing = max(leftspacing, 0)
         rightspacing = rightspacing if rightspacing > 0 else leftspacing
-        print(leftspacing, rightspacing)
+
         return Layout(
             self.x + leftspacing,
             self.y + leftspacing,
