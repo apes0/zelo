@@ -43,13 +43,16 @@ destroyed: {win.destroyed}
 mapped: {win.mapped}
 mine: {win.mine}
 parent: {win.parent}
-title: {win.title}
+title: {await win.title()}
+icon title: {await win.iconTitle()}
 x: {win.x} y: {win.y} w: {win.width} h: {win.height}'''
         )
         self.text.draw()
         if win.icon is not None:
             w = h = self.text.width // 3
-            self.img = Image(self.ctx, self.win, win.icon, w, h, self.text.width - w, 0)
+            self.img = Image(
+                self.ctx, self.win, await win.icon(), w, h, self.text.width - w, 0
+            )
             self.img.draw()
         elif self.img:
             self.img.destroy()

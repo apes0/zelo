@@ -55,6 +55,7 @@ class Window(GWindow):
         self._iconTitle = Atom(ctx, self, 'WM_ICON_NAME')
         self._icon = Atom(ctx, self, '_NET_WM_ICON')
         self._hints = Atom(ctx, self, 'WM_HINTS')
+        # TODO: export hints somewhere
 
         # custom events:
 
@@ -62,32 +63,21 @@ class Window(GWindow):
         self.iconTitleChanged = self._iconTitle.changed
         self.iconChanged = self._icon.changed
 
-    @property
-    def iconTitle(self):
-        return self._iconTitle.value or self._title.value
+    async def title(self):
+        return await self._title.get()
 
-    @property
-    def icon(self):
-        return self._icon.value or (self._hints.value and self._hints.value.icon)
+    async def iconTitle(self):
+        return await self._iconTitle.get()
 
-    @property
-    def title(self):
-        return self._title.value
+    async def icon(self):
+        # ? should we prefer the hints icon or the _NET_WM_ICON icon?
+        h = await self._hints.get()
+        if h and h.icon.any():
+            return h.icon
+        return await self._icon.get()
 
-    # TODO: maybe change the atoms for the setters?
-    # TODO: fix mypy typing for the setters
-
-    @iconTitle.setter
-    def iconTitle(self, v):
-        pass
-
-    @icon.setter
-    def icon(self, v):
-        pass
-
-    @title.setter
-    def title(self, v):
-        pass
+    async def state(self):
+        return await self._state.get()
 
     @property  # ? this is the only property, so should i add functions to ignore the win instead?
     def ignore(self):

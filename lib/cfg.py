@@ -26,7 +26,7 @@ from utils.log import log, logTerm
 from utils.ratio import Ratio
 from utils.theme import Theme
 
-debcfg['all'] = True
+# debcfg['all'] = True
 
 logTerm()
 # ('log')

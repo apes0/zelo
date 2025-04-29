@@ -160,9 +160,6 @@ class GWindow:
         self.destroyed: bool
         self.parent: GWindow | None
         self.mine: bool
-        self.title: str | None = ''
-        self.iconTitle: str | None = ''
-        self.icon: np.array | None = None
 
         # events:
 
@@ -195,6 +192,15 @@ class GWindow:
 
     def __repr__(self) -> str:
         return f'<Window {self.id}>'
+
+    async def title(self) -> str | None:
+        raise NotImplementedError
+
+    async def iconTitle(self) -> str | None:
+        raise NotImplementedError
+
+    async def icon(self) -> np.ndarray | None:
+        raise NotImplementedError
 
     @logCall('windows', DEBUG)
     async def toTop(self):

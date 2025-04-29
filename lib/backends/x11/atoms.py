@@ -7,12 +7,13 @@ from lib.backends.x11 import requests
 from lib.debcfg import log, DEBUG
 
 from .. import xcb
-from .types import charpC, maxUVal, icccmWmHintsTC, voidpC
+from .types import charpC, maxUVal, icccmWmHintsTC, voidpC, intpC
 
 if TYPE_CHECKING:
     from lib.backends.generic import GWindow
     from lib.ctx import Ctx
 
+# atom name: id or None, type, atom format
 atoms: dict[str, tuple[int | None, int, int]] = {
     'WM_NAME': (xcb.XCBAtomWmName, xcb.XCBAtomString, 8),
     '_NET_WM_NAME': (None, xcb.XCBAtomString, 8),
@@ -21,6 +22,8 @@ atoms: dict[str, tuple[int | None, int, int]] = {
     '_NET_SUPPORTING_WM_CHECK': (None, xcb.XCBAtomWindow, 32),
     'WM_HINTS': (xcb.XCBAtomWmHints, xcb.XCBAtomWmHints, 0),
     '_NET_CLIENT_LIST': (None, xcb.XCBAtomWindow, 32),
+    '_NET_WM_STATE': (None, xcb.XCBAtomAtom, 0),
+    '_NET_WM_STATE_FULLSCREEN': (None, xcb.XCBAtomAtom, 0),
 }
 
 readers: dict[str, Callable[['Atom'], Any]] = {}
@@ -39,6 +42,7 @@ class Atom:
         self.win: 'GWindow' = win
         self.name: str = name
         self.value: Any = None
+        self._set = False
 
         from ..events import Event
 
@@ -59,9 +63,12 @@ class Atom:
 
         v = await f(self)
 
-        if self.value != v:
-            self.value = v
-            await self.changed.trigger(self.ctx)
+        # if self.value == v:
+        #   return
+        # TODO: numpy hates this and i hate it
+
+        self.value = v
+        await self.changed.trigger(self.ctx)
         # print(f'read {self.value}')
 
     async def _read(self, off: int = 0, buf: int = maxUVal('int')):
@@ -69,7 +76,7 @@ class Atom:
         conn = self.ctx._getGCtx().connection
 
         resp = await requests.GetProperty(
-            self.ctx, conn, 0, self.win.id, self.id, self.type, 0, buf
+            self.ctx, conn, 0, self.win.id, self.id, self.type, off, buf
         ).reply()
 
         if resp == xcb.NULL:
@@ -101,6 +108,13 @@ class Atom:
     async def prepend(self, data, size: int):
         await self.set(data, size, xcb.XCBPropModePrepend)
 
+    async def get(self):
+        if not self._set:
+            await self.read()
+            self._set = True
+
+        return self.value
+
 
 async def readString(atom: Atom):
     out = b''
@@ -122,23 +136,29 @@ readers['WM_NAME'] = readString
 readers['WM_ICON_NAME'] = readString
 
 
-# ?: does anybody set this or do they use the icon pixmap from the wm hints?
 @reader('_NET_WM_ICON')
 async def readIcon(atom: Atom):
     # TODO: look for the biggest icon rather than just picking the 1st one
+    # if you are debugging this: use firefox as a test app
+    # i got the idea from
+    # https://utcc.utoronto.ca/~cks/space/blog/unix/ModernXAppIcons
+
     read, data = await atom._read()
     data = charpC(data.obj)
 
     if not read:
         return None
 
-    w = struct.unpack('!I', data[0:4])[0]
-    h = struct.unpack('!I', data[4:8])[0]
+    data = np.frombuffer(xcb.ffi.buffer(data, read * 4), dtype=np.uint8)
 
-    img = np.frombuffer(data[8 : 8 + w * h * 4], dtype=np.uint8)
+    w = struct.unpack('<I', data[0:4])[0]
+    h = struct.unpack('<I', data[4:8])[0]
+
+    img = data[8 : w * h * 4 + 8]
+
     img.shape = (h, w, 4)
 
-    return img
+    return np.roll(img, 4, axis=2) if img.size > 0 else None
 
 
 class Hints:
