@@ -122,7 +122,7 @@ class Key(GKey):
         xcb.xcbUngrabKey(gctx.connection, self.key, window.id, mod)
         xcb.xcbFlush(gctx.connection)
 
-    def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod, flush: bool = True):
+    def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod):
         assert not ctx.closed, 'conn is closed'
 
         gctx = ctx._getGCtx()
@@ -130,14 +130,7 @@ class Key(GKey):
         if self.key is None:
             self.load(ctx)
 
-        for mod in modifiers:
-            i = 1
-            while mod.mod:  # break down the summed modifier to the basic modifiers
-                if mod.mod % 2:
-                    Key(code=Mod.mappings[i][0]).press(ctx, window, flush=False)
-                mod.mod = mod.mod >> 1
-                i = i << 1
-
+        # TODO: handle mods properly
         xcb.xcbTestFakeInput(
             gctx.connection,
             xcb.XCBKeyPress,
@@ -148,28 +141,6 @@ class Key(GKey):
             0,
             0,
         )
-
-        if flush:
-            xcb.xcbFlush(gctx.connection)
-
-    def release(
-        self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod, flush: bool = True
-    ):
-        assert not ctx.closed, 'conn is closed'
-
-        gctx = ctx._getGCtx()
-
-        if self.key is None:
-            self.load(ctx)
-
-        for mod in modifiers:
-            i = 1
-            while mod.mod:  # break down the summed modifier to the basic modifiers
-                if mod.mod % 2:
-                    Key(code=Mod.mappings[i][0]).release(ctx, window, flush=False)
-                mod.mod = mod.mod >> 1
-                i = i << 1
-
         xcb.xcbTestFakeInput(
             gctx.connection,
             xcb.XCBKeyRelease,
@@ -180,9 +151,6 @@ class Key(GKey):
             0,
             0,
         )
-
-        if flush:
-            xcb.xcbFlush(gctx.connection)
 
     def __hash__(self) -> int:
         return hash(self.lable)

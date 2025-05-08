@@ -293,10 +293,6 @@ class GKey:
     def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: GMod):
         raise NotImplementedError
 
-    @logCall(['keys', 'press'], DEBUG)
-    def release(self, ctx: 'Ctx', window: 'GWindow', *modifiers: GMod):
-        raise NotImplementedError
-
 
 # mouse
 class GButton:

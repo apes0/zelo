@@ -87,9 +87,8 @@ class Shortcuts(Extension):
             fn(self.ctx)
             self.keys = []
 
-    #        else:
-    #            originalKey.press(self.ctx, win, mod)
-    #            originalKey.release(self.ctx, win, mod)
+        # else:
+        # originalKey.press(self.ctx, win, mod)
 
     async def keyRelease(self, key: 'GKey', _mod: 'GMod', _win: 'GWindow'):
         key = key.key  # type: ignore
