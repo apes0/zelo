@@ -38,8 +38,7 @@ class Event:
         self.proxies: dict['Ctx', dict[Event, trans | None]] = {}
         self.name = name
         self.types = types
-        self.block = False
-        # NOTE: i dont like this that much, but it makes the api more reasonable to use
+        self.filters: dict['Ctx', list[Callable]] = {}
 
     def addProxy(self, ctx: 'Ctx', event: 'Event', trans: trans | None = None):
         # make this event a proxy to another
@@ -50,6 +49,15 @@ class Event:
     def removeProxy(self, ctx: 'Ctx', event: 'Event'):
         del self.proxies[ctx][event]
 
+    async def addFilter(self, ctx: 'Ctx', filter: Callable):
+        if ctx not in self.filters:
+            self.filters[ctx] = []
+
+        self.filters[ctx].append(filter)
+
+    async def removeFilter(self, ctx: 'Ctx', filter: Callable):
+        self.filters[ctx].remove(filter)
+
     def addListener(self, ctx: 'Ctx', fn: Callable):
         self.listeners[ctx] = [*self.listeners.get(ctx, []), fn]
 
@@ -58,12 +66,6 @@ class Event:
         # TODO: make this faster (prolly will have to use a dictionary)
 
     async def trigger(self, ctx: 'Ctx', *args):
-        if self.block:
-            log('events', DEBUG, f'skipping {self.name} with {args} because of block')
-            return
-
-        log('events', DEBUG, f'triggering {self.name} with {args}')
-
         # check types
 
         assert len(self.types) == len(
@@ -74,6 +76,17 @@ class Event:
             assert issubclass(
                 args[n].__class__, _type
             ), f'argument #{n} must be of type {_type}, instead of {type(args[n])} for event {self.name}'
+
+        for filter in self.filters:
+            if not filter(*args):
+                log(
+                    'events',
+                    DEBUG,
+                    f'filter {filter} of {self.name} blocked {args}',
+                )
+                return
+
+        log('events', DEBUG, f'triggering {self.name} with {args}')
 
         for fn in self.listeners.get(ctx, []):
             await ctx.nurs.start(caller, fn, *args)

@@ -24,9 +24,13 @@ class Animation(Extension):
         width = win.width
         height = win.height
         time = trio.current_time()
-        mapNotify.block = True
 
         _rat = 0
+
+        def filter(w, *_):
+            return w == win
+
+        mapNotify.addFilter(self.ctx, filter)
 
         while i:
             win.ignore = True
@@ -40,5 +44,6 @@ class Animation(Extension):
 
             await trio.sleep_until(time := time + self.rate)
             i -= 1
-        mapNotify.block = False
         win.ignore = False
+
+        mapNotify.addFilter(self.ctx, filter)
