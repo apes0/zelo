@@ -4,13 +4,10 @@ from typing import TYPE_CHECKING, Callable, Iterable, Coroutine
 import trio
 
 from ..debcfg import log
-from .generic import GButton, GKey, GMod, GWindow
+from collections import deque
 
 if TYPE_CHECKING:
     from ..ctx import Ctx
-
-# these are the generic events, which we export, these should be used instead of directly using the
-# backend's event, both wayland and x11 should support all of these
 
 
 async def caller(fn, *args, task_status=trio.TASK_STATUS_IGNORED):
@@ -28,16 +25,51 @@ async def caller(fn, *args, task_status=trio.TASK_STATUS_IGNORED):
         )
 
 
+# this class is just a list with append and pop, however it keeps indecies constant
+# NOTE: while this preserves the index, it does not prevserve the order
+class ReuseList[T]:
+    def __init__(self):
+        self.stuff: list[T | None] = []
+        self.empty: deque[int] = deque()
+
+    def append(self, v: T) -> int:
+        if self.empty:
+            n = self.empty.pop()
+            self.stuff[n] = v
+            return n
+
+        self.stuff.append(v)
+        return len(self.stuff) - 1
+
+    def pop(self, n: int) -> None:
+        # o = self.stuff[n]
+        self.stuff[n] = None
+        self.empty.append(n)
+        # return o
+
+    def __iter__(self):
+        for v in self.stuff:
+            if not v:
+                continue
+            yield v
+
+    # def __getitem__(self, n) -> T:
+    #     return self.stuff[n]
+
+    # def __setitem__(self, n, v):
+    #     self.stuff[n] = v
+
+
 type trans = Callable[..., Iterable]
 
 
 class Event[*T]:
     def __init__(self, ctx: 'Ctx', name: str) -> None:
-        self.listeners: list[Callable[[*T], Coroutine]] = []
+        self.listeners: ReuseList[Callable[[*T], Coroutine]] = ReuseList()
         self.proxies: dict[Event, trans | None] = {}
         self.name = name
         self.ctx = ctx
-        self.filters: list[Callable] = []
+        self.filters: ReuseList[Callable] = ReuseList()
 
     def addProxy(self, event: 'Event', trans: trans | None = None):
         # make this event a proxy to another
@@ -46,17 +78,17 @@ class Event[*T]:
     def removeProxy(self, event: 'Event'):
         del self.proxies[event]
 
-    def addFilter(self, filter: Callable):
-        self.filters.append(filter)
+    def addFilter(self, filter: Callable[[*T], bool]):
+        return self.filters.append(filter)
 
-    def removeFilter(self, filter: Callable):
-        self.filters.remove(filter)
+    def removeFilter(self, n: int):
+        self.filters.pop(n)
 
     def addListener(self, fn: Callable[[*T], Coroutine]):
-        self.listeners.append(fn)
+        return self.listeners.append(fn)
 
-    def removeListener(self, fn: Callable[[*T], Coroutine]):
-        self.listeners.remove(fn)
+    def removeListener(self, n: int):
+        self.listeners.pop(n)
 
     async def trigger(self, *args: *T):
         for filter in self.filters:

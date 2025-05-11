@@ -83,11 +83,11 @@ class Ctx:
             ev.set()
             args.extend(_args)
 
-        event.addListener(finish)
+        n = event.addListener(finish)
 
         await ev.wait()
 
-        event.removeListener(finish)
+        event.removeListener(n)
 
         return args
 

@@ -21,12 +21,13 @@ if TYPE_CHECKING:
 
 async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
     ev = trio.Event()
+    l = []
 
     async def wait(*args):
         ev.set()
 
     for event in events:
-        event.addListener(wait)
+        l.append(event.addListener(wait))
 
     fn()
     gctx: GCtx = ctx._getGCtx()
@@ -34,8 +35,8 @@ async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
 
     await ev.wait()
 
-    for event in events:
-        event.removeListener(wait)
+    for n in l:
+        event.removeListener(n)
 
 
 @applyPre

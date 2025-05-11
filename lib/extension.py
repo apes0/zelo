@@ -49,8 +49,8 @@ class Extension:
                 self.__dict__[lable] = get(obj, self, lable, _type)
 
     def addListener(self, event: Event, fn: Callable):
-        event.addListener(fn)
-        self.listeners.append((event, fn))
+        n = event.addListener(fn)
+        self.listeners.append((event, n))
 
     def unload(self):  # ? should this be async?
         if self.unloaded:
@@ -58,8 +58,8 @@ class Extension:
 
         self.unloaded = True
         event: Event
-        for event, fn in self.listeners:
-            event.removeListener(fn)
+        for event, n in self.listeners:
+            event.removeListener(n)
 
         self.unloader()
         # ? anything else here?
