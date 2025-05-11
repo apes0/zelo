@@ -68,7 +68,7 @@ class Atom:
         # TODO: numpy hates this and i hate it
 
         self.value = v
-        await self.changed.trigger(self.ctx)
+        await self.changed.trigger()
         # print(f'read {self.value}')
 
     async def _read(self, off: int = 0, buf: int = maxUVal('int')):
@@ -100,7 +100,7 @@ class Atom:
             size,
             voidpC(data),
         )
-        await self.changed.trigger(self.ctx)
+        await self.changed.trigger()
 
     async def append(self, data, size: int):
         await self.set(data, size, xcb.XCBPropModeAppend)

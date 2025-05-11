@@ -59,7 +59,7 @@ class Extension:
         self.unloaded = True
         event: Event
         for event, fn in self.listeners:
-            event.removeListener(self.ctx, fn)
+            event.removeListener(fn)
 
         self.unloader()
         # ? anything else here?
