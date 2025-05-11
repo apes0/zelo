@@ -1,7 +1,6 @@
 import traceback
 from logging import DEBUG, ERROR
-from types import NoneType, UnionType
-from typing import TYPE_CHECKING, Callable, Iterable
+from typing import TYPE_CHECKING, Callable, Iterable, Coroutine
 import trio
 
 from ..debcfg import log
@@ -32,12 +31,11 @@ async def caller(fn, *args, task_status=trio.TASK_STATUS_IGNORED):
 type trans = Callable[..., Iterable]
 
 
-class Event:
-    def __init__(self, name: str, *types: type | UnionType) -> None:
-        self.listeners: dict['Ctx', list[Callable]] = {}
+class Event[*T]:
+    def __init__(self, name: str) -> None:
+        self.listeners: dict['Ctx', list[Callable[[*T], Coroutine]]] = {}
         self.proxies: dict['Ctx', dict[Event, trans | None]] = {}
         self.name = name
-        self.types = types
         self.filters: dict['Ctx', list[Callable]] = {}
 
     def addProxy(self, ctx: 'Ctx', event: 'Event', trans: trans | None = None):
@@ -58,26 +56,15 @@ class Event:
     async def removeFilter(self, ctx: 'Ctx', filter: Callable):
         self.filters[ctx].remove(filter)
 
-    def addListener(self, ctx: 'Ctx', fn: Callable):
+    def addListener(self, ctx: 'Ctx', fn: Callable[[*T], Coroutine]):
         self.listeners[ctx] = [*self.listeners.get(ctx, []), fn]
 
-    def removeListener(self, ctx: 'Ctx', fn: Callable):
+    def removeListener(self, ctx: 'Ctx', fn: Callable[[*T], Coroutine]):
         self.listeners[ctx].remove(fn)
         # TODO: make this faster (prolly will have to use a dictionary)
 
-    async def trigger(self, ctx: 'Ctx', *args):
-        # check types
-
-        assert len(self.types) == len(
-            args
-        ), f'There need to be exactly {len(self.types)} arguments for event {self.name}, instead of {len(args)}.'
-
-        for n, _type in enumerate(self.types):
-            assert issubclass(
-                args[n].__class__, _type
-            ), f'argument #{n} must be of type {_type}, instead of {type(args[n])} for event {self.name}'
-
-        for filter in self.filters:
+    async def trigger(self, ctx: 'Ctx', *args: *T):
+        for filter in self.filters.get(ctx, []):
             if not filter(*args):
                 log(
                     'events',
@@ -98,21 +85,21 @@ class Event:
 # you might be able to tell that all of these appear to be the same as the x11 events, you would be
 # right, the original code was xcb only, so, because i dont wanna change anything, i did this
 
-keyPress = Event('keyPress', GKey, GMod, GWindow)
-keyRelease = Event('keyRelease', GKey, GMod, GWindow)
+keyPress = Event[GKey, GMod, GWindow]('keyPress')
+keyRelease = Event[GKey, GMod, GWindow]('keyRelease')
 # ? maybe include the x and y coordinates, but idk
-buttonPress = Event('buttonPress', GButton, GMod, GWindow)
-buttonRelease = Event('buttonRelease', GButton, GMod, GWindow)
-mapRequest = Event('mapRequest', GWindow)
-mapNotify = Event('mapNotify', GWindow)
-unmapNotify = Event('unmapNotify', GWindow)
-destroyNotify = Event('destroyNotify', GWindow)
-createNotify = Event('createNotify', GWindow)
-configureNotify = Event('configureNotify', GWindow)
-configureRequest = Event('configureRequest', GWindow)
-enterNotify = Event('enterNotify', GWindow)
-leaveNotify = Event('leaveNotify', GWindow)
-focusChange = Event('focusChange', GWindow | NoneType, GWindow | NoneType)  # old, new
-redraw = Event('redraw', GWindow)  # exposure notify for x
-reparent = Event('reparent', GWindow, GWindow)  # window and its parent
-ignored = Event('ignored', GWindow)  # when a window is marked as ignored
+buttonPress = Event[GButton, GMod, GWindow]('buttonPress')
+buttonRelease = Event[GButton, GMod, GWindow]('buttonRelease')
+mapRequest = Event[GWindow]('mapRequest')
+mapNotify = Event[GWindow]('mapNotify')
+unmapNotify = Event[GWindow]('unmapNotify')
+destroyNotify = Event[GWindow]('destroyNotify')
+createNotify = Event[GWindow]('createNotify')
+configureNotify = Event[GWindow]('configureNotify')
+configureRequest = Event[GWindow]('configureRequest')
+enterNotify = Event[GWindow]('enterNotify')
+leaveNotify = Event[GWindow]('leaveNotify')
+focusChange = Event[GWindow | None, GWindow | None]('focusChange')  # old, new
+redraw = Event[GWindow]('redraw')  # exposure notify for x
+reparent = Event[GWindow, GWindow]('reparent')  # window and its parent
+ignored = Event[GWindow]('ignored')  # when a window is marked as ignored

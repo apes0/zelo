@@ -165,22 +165,22 @@ class GWindow:
 
         from .events import Event
 
-        self.keyPress = Event('keyPress', GKey, GMod)
-        self.keyRelease = Event('keyRelease', GKey, GMod)
-        self.buttonPress = Event('buttonPress', GButton, GMod)
-        self.buttonRelease = Event('buttonRelease', GButton, GMod)
-        self.mapRequest = Event('mapRequest')
-        self.mapNotify = Event('mapNotify')
-        self.unmapNotify = Event('unmapNotify')
-        self.destroyNotify = Event('destroyNotify')
-        self.createNotify = Event('createNotify')
-        self.configureNotify = Event('configureNotify')
-        self.configureRequest = Event('configureRequest')
-        self.enterNotify = Event('enterNotify')
-        self.leaveNotify = Event('leaveNotify')
-        self.redraw = Event('redraw')  # exposure notify for x
-        self.reparented = Event('reparented', GWindow)  # my parent
-        self.ignored = Event('ignored')  # when we are marked as ignored
+        self.keyPress = Event[GKey, GMod]('keyPress')
+        self.keyRelease = Event[GKey, GMod]('keyRelease')
+        self.buttonPress = Event[GButton, GMod]('buttonPress')
+        self.buttonRelease = Event[GButton, GMod]('buttonRelease')
+        self.mapRequest = Event[()]('mapRequest')
+        self.mapNotify = Event[()]('mapNotify')
+        self.unmapNotify = Event[()]('unmapNotify')
+        self.destroyNotify = Event[()]('destroyNotify')
+        self.createNotify = Event[()]('createNotify')
+        self.configureNotify = Event[()]('configureNotify')
+        self.configureRequest = Event[()]('configureRequest')
+        self.enterNotify = Event[()]('enterNotify')
+        self.leaveNotify = Event[()]('leaveNotify')
+        self.redraw = Event[()]('redraw')  # exposure notify for x
+        self.reparented = Event[GWindow]('reparented')  # my parent
+        self.ignored = Event[()]('ignored')  # when we are marked as ignored
 
         # events that a backend makes:
         # TODO: this is a kinda shit solution
