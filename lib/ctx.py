@@ -7,11 +7,11 @@ from lib.watcher import Watcher
 
 from .api.window import Window
 from .debcfg import ERROR, log
+from .backends.events import Event
 
 if TYPE_CHECKING:
     from ._cfg import Cfg
-    from .backends.events import Event
-    from .backends.generic import GCtx, GMouse, GScreen, GWindow
+    from .backends.generic import GCtx, GMouse, GScreen, GWindow, GKey, GMod, GButton
     from .extension import Extension
 
 
@@ -38,6 +38,32 @@ class Ctx:
         self.cfg: 'Cfg'
         self.gctxConf = {}
 
+        # events:
+        self.keyPress = Event['GKey', 'GMod', 'GWindow'](self, 'keyPress')
+        self.keyRelease = Event['GKey', 'GMod', 'GWindow'](self, 'keyRelease')
+        # ? maybe include the x and y coordinates, but idk
+        self.buttonPress = Event['GButton', 'GMod', 'GWindow'](self, 'buttonPress')
+        self.buttonRelease = Event['GButton', 'GMod', 'GWindow'](self, 'buttonRelease')
+        self.mapRequest = Event['GWindow'](self, 'mapRequest')
+        self.mapNotify = Event['GWindow'](self, 'mapNotify')
+        self.unmapNotify = Event['GWindow'](self, 'unmapNotify')
+        self.destroyNotify = Event['GWindow'](self, 'destroyNotify')
+        self.createNotify = Event['GWindow'](self, 'createNotify')
+        self.configureNotify = Event['GWindow'](self, 'configureNotify')
+        self.configureRequest = Event['GWindow'](self, 'configureRequest')
+        self.enterNotify = Event['GWindow'](self, 'enterNotify')
+        self.leaveNotify = Event['GWindow'](self, 'leaveNotify')
+        self.focusChange = Event['GWindow | None', 'GWindow | None'](
+            self, 'focusChange'
+        )  # old, new
+        self.redraw = Event['GWindow'](self, 'redraw')  # exposure notify for x
+        self.reparent = Event['GWindow', 'GWindow'](
+            self, 'reparent'
+        )  # window and its parent
+        self.ignored = Event['GWindow'](
+            self, 'ignored'
+        )  # when a window is marked as ignored
+
     def getWindow(self, _id: int) -> 'GWindow':
         if _id == self._root:
             return self.root
@@ -57,11 +83,11 @@ class Ctx:
             ev.set()
             args.extend(_args)
 
-        event.addListener(self, finish)
+        event.addListener(finish)
 
         await ev.wait()
 
-        event.removeListener(self, finish)
+        event.removeListener(finish)
 
         return args
 

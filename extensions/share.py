@@ -9,15 +9,16 @@ import trio
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
-from cryptography.hazmat.primitives.serialization import (Encoding,
-                                                          NoEncryption,
-                                                          PrivateFormat,
-                                                          PublicFormat,
-                                                          load_pem_private_key,
-                                                          load_pem_public_key)
+from cryptography.hazmat.primitives.serialization import (
+    Encoding,
+    NoEncryption,
+    PrivateFormat,
+    PublicFormat,
+    load_pem_private_key,
+    load_pem_public_key,
+)
 
 from lib.api.drawer import Image
-from lib.backends.events import mapNotify, unmapNotify
 from lib.extension import Extension
 
 # grr i hate this lol
@@ -176,8 +177,8 @@ class ShareServer(Extension):
 
         super().__init__(ctx, cfg)
 
-        self.addListener(mapNotify, self.map)
-        self.addListener(unmapNotify, self.unmap)
+        self.addListener(ctx.mapNotify, self.map)
+        self.addListener(ctx.unmapNotify, self.unmap)
         ctx.startSoon(self.serve)
 
     async def serve(self):

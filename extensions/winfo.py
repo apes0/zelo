@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any
 import trio
 
 from lib.api.drawer import Image, Text
-from lib.backends.events import enterNotify
 from lib.backends.generic import GImage
 from lib.extension import Extension
 from utils.fns import getDisplay
@@ -31,7 +30,7 @@ class Winfo(Extension):
 
         super().__init__(ctx, cfg)
 
-        self.addListener(enterNotify, self.enter)
+        self.addListener(ctx.enterNotify, self.enter)
         self.addListener(self.win.redraw, self.redraw)
 
     async def enter(self, win: 'GWindow'):

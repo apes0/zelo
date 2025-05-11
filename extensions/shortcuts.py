@@ -2,7 +2,6 @@ from itertools import combinations
 from typing import TYPE_CHECKING, Callable
 
 from lib.api.keys import Mod
-from lib.backends.events import keyPress, keyRelease
 from lib.backends.generic import GWindow
 from lib.extension import Extension
 
@@ -42,8 +41,8 @@ class Shortcuts(Extension):
         for l in range(2, len(baseIgnore) + 1):
             self.ignore += [Mod(*mod) for mod in combinations(baseIgnore, l)]
 
-        self.addListener(keyPress, self.keyPress)
-        self.addListener(keyRelease, self.keyRelease)
+        self.addListener(ctx.keyPress, self.keyPress)
+        self.addListener(ctx.keyRelease, self.keyRelease)
 
         self.register()
 

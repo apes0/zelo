@@ -75,8 +75,8 @@ async def createNotify(event, ctx: 'Ctx'):
             newBorderWidth=event.borderWidth,
         )
 
-    await window.createNotify.trigger(ctx)
-    await events.createNotify.trigger(ctx, window)
+    await window.createNotify.trigger()
+    await ctx.createNotify.trigger(window)
 
     await gctx.updateClientsList()
 
@@ -101,8 +101,8 @@ async def mapRequest(event, ctx: 'Ctx'):
         gctx.connection, _id, xcb.XCBCwEventMask, gctx.values
     )
 
-    await window.mapRequest.trigger(ctx)
-    await events.mapRequest.trigger(ctx, window)
+    await window.mapRequest.trigger()
+    await ctx.mapRequest.trigger(window)
 
 
 @handler(xcb.XCBConfigureRequest)
@@ -140,8 +140,8 @@ async def confRequest(event, ctx: 'Ctx'):
 
     xcb.xcbFlush(gctx.connection)
 
-    await window.configureRequest.trigger(ctx)
-    await events.configureRequest.trigger(ctx, window)
+    await window.configureRequest.trigger()
+    await ctx.configureRequest.trigger(window)
 
 
 @handler(xcb.XCBConfigureNotify)
@@ -164,8 +164,8 @@ async def confNotify(event, ctx: 'Ctx'):
     for val, lable in change.items():
         window.__dict__[lable] = val
 
-    await window.configureNotify.trigger(ctx)
-    await events.configureNotify.trigger(ctx, window)
+    await window.configureNotify.trigger()
+    await ctx.configureNotify.trigger(window)
 
 
 # @handler(xcb.XCBClientMessage)
@@ -210,8 +210,8 @@ async def destroyNotify(event, ctx: 'Ctx'):
         del ctx.windows[window]
     # NOTE: not our job to select another window to focus to
 
-    await win.destroyNotify.trigger(ctx)
-    await events.destroyNotify.trigger(ctx, win)
+    await win.destroyNotify.trigger()
+    await ctx.destroyNotify.trigger(win)
 
     await gctx.updateClientsList()
 
@@ -227,8 +227,8 @@ async def mapNotify(event, ctx: 'Ctx'):
     ignore = event.overrideRedirect
     win.ignore = bool(ignore)
 
-    await win.mapNotify.trigger(ctx)
-    await events.mapNotify.trigger(ctx, win)
+    await win.mapNotify.trigger()
+    await ctx.mapNotify.trigger(win)
 
 
 @handler(xcb.XCBUnmapNotify)
@@ -253,8 +253,8 @@ async def unmapNotify(event, ctx: 'Ctx'):
         win.focused = False
     #        del ctx.windows[_id]
 
-    await win.unmapNotify.trigger(ctx)
-    await events.unmapNotify.trigger(ctx, win)
+    await win.unmapNotify.trigger()
+    await ctx.unmapNotify.trigger(win)
 
 
 @handler(xcb.XCBMotionNotify)
@@ -321,8 +321,8 @@ async def keyPress(event, ctx: 'Ctx'):
 
     log(['backend', 'keys'], DEBUG, f'{key} with {mod} pressed on {window}')
 
-    await window.keyPress.trigger(ctx, key, mod)
-    await events.keyPress.trigger(ctx, key, mod, window)
+    await window.keyPress.trigger(key, mod)
+    await ctx.keyPress.trigger(key, mod, window)
 
 
 @handler(xcb.XCBKeyRelease)
@@ -334,8 +334,8 @@ async def keyRelease(event, ctx: 'Ctx'):
 
     log(['backend', 'keys'], DEBUG, f'{key} with {mod} released on {window}')
 
-    await window.keyRelease.trigger(ctx, key, mod)
-    await events.keyRelease.trigger(ctx, key, mod, window)
+    await window.keyRelease.trigger(key, mod)
+    await ctx.keyRelease.trigger(key, mod, window)
 
 
 @handler(xcb.XCBButtonPress)
@@ -347,8 +347,8 @@ async def buttonPress(event, ctx: 'Ctx'):
 
     log(['backend', 'buttons'], DEBUG, f'{button} with {mod} pressed on {window}')
 
-    await window.buttonPress.trigger(ctx, button, mod)
-    await events.buttonPress.trigger(ctx, button, mod, window)
+    await window.buttonPress.trigger(button, mod)
+    await ctx.buttonPress.trigger(button, mod, window)
 
 
 @handler(xcb.XCBButtonRelease)
@@ -360,8 +360,8 @@ async def buttonRelease(event, ctx: 'Ctx'):
 
     log(['backend', 'buttons'], DEBUG, f'{button} with {mod} released on {window}')
 
-    await window.buttonRelease.trigger(ctx, button, mod)
-    await events.buttonRelease.trigger(ctx, button, mod, window)
+    await window.buttonRelease.trigger(button, mod)
+    await ctx.buttonRelease.trigger(button, mod, window)
 
 
 @handler(xcb.XCBEnterNotify)
@@ -371,8 +371,8 @@ async def enterNotify(event, ctx: 'Ctx'):
 
     log('backend', DEBUG, f'mouse entered {window}')
 
-    await window.enterNotify.trigger(ctx)
-    await events.enterNotify.trigger(ctx, window)
+    await window.enterNotify.trigger()
+    await ctx.enterNotify.trigger(window)
 
 
 @handler(xcb.XCBLeaveNotify)
@@ -382,8 +382,8 @@ async def leaveNotify(event, ctx: 'Ctx'):
 
     log('backend', DEBUG, f'mouse left {window}')
 
-    await window.leaveNotify.trigger(ctx)
-    await events.leaveNotify.trigger(ctx, window)
+    await window.leaveNotify.trigger()
+    await ctx.leaveNotify.trigger(window)
 
 
 @handler(xcb.XCBRandrNotify)
@@ -402,8 +402,8 @@ async def reparentNotify(event, ctx: 'Ctx'):
     win = ctx.getWindow(ev.window)
     parent = ctx.getWindow(ev.parent)
 
-    await win.reparented.trigger(ctx, parent)
-    await events.reparent.trigger(ctx, win, parent)
+    await win.reparented.trigger(parent)
+    await ctx.reparent.trigger(win, parent)
 
 
 @handler(xcb.XCBExpose)
@@ -418,8 +418,8 @@ async def expose(event, ctx: 'Ctx'):
 
     log('backend', DEBUG, f'{window} needs to be redrawn')
 
-    await window.redraw.trigger(ctx)
-    await events.redraw.trigger(ctx, window)
+    await window.redraw.trigger()
+    await ctx.redraw.trigger(window)
 
 
 @handler(xcb.XCBPropertyNotify)
@@ -430,7 +430,7 @@ async def propertyNotify(event, ctx: 'Ctx'):
 
     gctx: 'GCtx' = ctx._getGCtx()
 
-    winatoms: dict[int, 'Atom'] = gctx.atoms.get(event.window)
+    winatoms: dict[int, 'Atom'] | None = gctx.atoms.get(event.window)
     if not winatoms:
         return
 

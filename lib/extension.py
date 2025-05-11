@@ -49,7 +49,7 @@ class Extension:
                 self.__dict__[lable] = get(obj, self, lable, _type)
 
     def addListener(self, event: Event, fn: Callable):
-        event.addListener(self.ctx, fn)
+        event.addListener(fn)
         self.listeners.append((event, fn))
 
     def unload(self):  # ? should this be async?

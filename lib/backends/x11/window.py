@@ -10,7 +10,6 @@ from xcb_cffi import ffi
 
 from ...lock import alock, calock
 from .. import xcb
-from ..events import Event, focusChange, ignored, reparent
 from ..generic import GButton, GKey, GMod, GWindow, applyPre
 from .types import maxUVal, uintarr
 
@@ -27,7 +26,7 @@ async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
         ev.set()
 
     for event in events:
-        event.addListener(ctx, wait)
+        event.addListener(wait)
 
     fn()
     gctx: GCtx = ctx._getGCtx()
@@ -36,7 +35,7 @@ async def runAndWait(ctx: 'Ctx', events: list['Event'], fn: Callable):
     await ev.wait()
 
     for event in events:
-        event.removeListener(ctx, wait)
+        event.removeListener(wait)
 
 
 @applyPre
@@ -87,8 +86,8 @@ class Window(GWindow):
     def ignore(self, val):
         self._ignore = val
         # ? can i perhaps do an async setter?
-        self.ctx.nurs.start_soon(ignored.trigger, self.ctx, self)
-        self.ctx.nurs.start_soon(self.ignored.trigger, self.ctx)
+        self.ctx.nurs.start_soon(self.ctx.ignored.trigger, self)
+        self.ctx.nurs.start_soon(self.ignored.trigger)
 
     async def map(self):
         assert not self.ctx.closed, 'conn is closed'
@@ -131,12 +130,12 @@ class Window(GWindow):
 
             self.ctx.focused = self
 
-            await focusChange.trigger(self.ctx, old, self)
+            await self.ctx.focusChange.trigger(old, self)
         else:
             # if the id of the focused is our id, and only then, we need to unfocus the window,
             # otherwise, if the ids arent the same, then we are already unfocused
             if self.ctx.focused and self.ctx.focused.id == self.id:
-                await focusChange.trigger(self.ctx, self, None)
+                await self.ctx.focusChange.trigger(self, None)
                 self.ctx.focused = None
                 wid = self.ctx._root
 
@@ -331,7 +330,7 @@ class Window(GWindow):
 
         fn = partial(xcb.xcbReparentWindow, gctx.connection, self.id, parent.id, x, y)
 
-        await runAndWait(self.ctx, [reparent], fn)
+        await runAndWait(self.ctx, [self.ctx.reparent], fn)
 
     async def kill(self):
         assert not self.ctx.closed, 'conn is closed'

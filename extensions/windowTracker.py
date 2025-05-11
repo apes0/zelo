@@ -4,8 +4,6 @@
 from logging import DEBUG
 from typing import TYPE_CHECKING, Callable, Coroutine
 
-from lib.backends.events import (configureNotify, destroyNotify, focusChange,
-                                 mapNotify, mapRequest, unmapNotify)
 from lib.debcfg import log
 from lib.extension import Extension
 from utils.fns import getDisplay
@@ -72,12 +70,12 @@ class Tracker:
             win for win in ctx.windows.values() if ctx.editable(win)
         ]
 
-        ext.addListener(mapRequest, self.mapWindow)
-        ext.addListener(destroyNotify, self.destroyNotify)
-        ext.addListener(focusChange, self.focusChange)
-        ext.addListener(unmapNotify, self.unmapWindow)
-        ext.addListener(mapNotify, self.mapNotify)
-        ext.addListener(configureNotify, self.confNotify)
+        ext.addListener(ctx.mapRequest, self.mapWindow)
+        ext.addListener(ctx.destroyNotify, self.destroyNotify)
+        ext.addListener(ctx.focusChange, self.focusChange)
+        ext.addListener(ctx.unmapNotify, self.unmapWindow)
+        ext.addListener(ctx.mapNotify, self.mapNotify)
+        ext.addListener(ctx.configureNotify, self.confNotify)
 
         for event in customEvents:
             ext.addListener(event, lambda *a: self.update())

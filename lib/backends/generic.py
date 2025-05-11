@@ -165,22 +165,22 @@ class GWindow:
 
         from .events import Event
 
-        self.keyPress = Event[GKey, GMod]('keyPress')
-        self.keyRelease = Event[GKey, GMod]('keyRelease')
-        self.buttonPress = Event[GButton, GMod]('buttonPress')
-        self.buttonRelease = Event[GButton, GMod]('buttonRelease')
-        self.mapRequest = Event[()]('mapRequest')
-        self.mapNotify = Event[()]('mapNotify')
-        self.unmapNotify = Event[()]('unmapNotify')
-        self.destroyNotify = Event[()]('destroyNotify')
-        self.createNotify = Event[()]('createNotify')
-        self.configureNotify = Event[()]('configureNotify')
-        self.configureRequest = Event[()]('configureRequest')
-        self.enterNotify = Event[()]('enterNotify')
-        self.leaveNotify = Event[()]('leaveNotify')
-        self.redraw = Event[()]('redraw')  # exposure notify for x
-        self.reparented = Event[GWindow]('reparented')  # my parent
-        self.ignored = Event[()]('ignored')  # when we are marked as ignored
+        self.keyPress = Event[GKey, GMod](ctx, 'keyPress')
+        self.keyRelease = Event[GKey, GMod](ctx, 'keyRelease')
+        self.buttonPress = Event[GButton, GMod](ctx, 'buttonPress')
+        self.buttonRelease = Event[GButton, GMod](ctx, 'buttonRelease')
+        self.mapRequest = Event[()](ctx, 'mapRequest')
+        self.mapNotify = Event[()](ctx, 'mapNotify')
+        self.unmapNotify = Event[()](ctx, 'unmapNotify')
+        self.destroyNotify = Event[()](ctx, 'destroyNotify')
+        self.createNotify = Event[()](ctx, 'createNotify')
+        self.configureNotify = Event[()](ctx, 'configureNotify')
+        self.configureRequest = Event[()](ctx, 'configureRequest')
+        self.enterNotify = Event[()](ctx, 'enterNotify')
+        self.leaveNotify = Event[()](ctx, 'leaveNotify')
+        self.redraw = Event[()](ctx, 'redraw')  # exposure notify for x
+        self.reparented = Event[GWindow](ctx, 'reparented')  # my parent
+        self.ignored = Event[()](ctx, 'ignored')  # when we are marked as ignored
 
         # events that a backend makes:
         # TODO: this is a kinda shit solution

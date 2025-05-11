@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING
 
 from lib.api.keys import Key, Mod
-from lib.backends.events import enterNotify, leaveNotify
 from lib.extension import Extension
 from utils.layout import Layout
 
@@ -75,8 +74,8 @@ class Tabs(Extension):
 
         shortcuts.register()
 
-        self.addListener(enterNotify, self.enterNotify)
-        self.addListener(leaveNotify, self.leaveNotify)
+        self.addListener(ctx.enterNotify, self.enterNotify)
+        self.addListener(ctx.leaveNotify, self.leaveNotify)
 
     async def createTab(self, ctx: 'Ctx'):
         if not self.win:

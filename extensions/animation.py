@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING
 
 import trio
 
-from lib.backends.events import mapNotify
 from lib.extension import Extension
 
 if TYPE_CHECKING:
@@ -17,7 +16,7 @@ class Animation(Extension):
         self.fn = lambda x: x**2 * (3 - 2 * x)
         super().__init__(ctx, cfg)
 
-        self.addListener(mapNotify, self.anim)
+        self.addListener(ctx.mapNotify, self.anim)
 
     async def anim(self, win: 'GWindow'):
         i = self.frames
@@ -30,7 +29,7 @@ class Animation(Extension):
         def filter(w, *_):
             return w == win
 
-        mapNotify.addFilter(self.ctx, filter)
+        self.ctx.mapNotify.addFilter(filter)
 
         while i:
             win.ignore = True
@@ -46,4 +45,4 @@ class Animation(Extension):
             i -= 1
         win.ignore = False
 
-        mapNotify.addFilter(self.ctx, filter)
+        self.ctx.mapNotify.addFilter(filter)

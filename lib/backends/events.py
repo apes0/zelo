@@ -32,39 +32,34 @@ type trans = Callable[..., Iterable]
 
 
 class Event[*T]:
-    def __init__(self, name: str) -> None:
-        self.listeners: dict['Ctx', list[Callable[[*T], Coroutine]]] = {}
-        self.proxies: dict['Ctx', dict[Event, trans | None]] = {}
+    def __init__(self, ctx: 'Ctx', name: str) -> None:
+        self.listeners: list[Callable[[*T], Coroutine]] = []
+        self.proxies: dict[Event, trans | None] = {}
         self.name = name
-        self.filters: dict['Ctx', list[Callable]] = {}
+        self.ctx = ctx
+        self.filters: list[Callable] = []
 
-    def addProxy(self, ctx: 'Ctx', event: 'Event', trans: trans | None = None):
+    def addProxy(self, event: 'Event', trans: trans | None = None):
         # make this event a proxy to another
-        if ctx not in self.proxies:
-            self.proxies[ctx] = {}
-        self.proxies[ctx][event] = trans
+        self.proxies[event] = trans
 
-    def removeProxy(self, ctx: 'Ctx', event: 'Event'):
-        del self.proxies[ctx][event]
+    def removeProxy(self, event: 'Event'):
+        del self.proxies[event]
 
-    async def addFilter(self, ctx: 'Ctx', filter: Callable):
-        if ctx not in self.filters:
-            self.filters[ctx] = []
+    def addFilter(self, filter: Callable):
+        self.filters.append(filter)
 
-        self.filters[ctx].append(filter)
+    def removeFilter(self, filter: Callable):
+        self.filters.remove(filter)
 
-    async def removeFilter(self, ctx: 'Ctx', filter: Callable):
-        self.filters[ctx].remove(filter)
+    def addListener(self, fn: Callable[[*T], Coroutine]):
+        self.listeners.append(fn)
 
-    def addListener(self, ctx: 'Ctx', fn: Callable[[*T], Coroutine]):
-        self.listeners[ctx] = [*self.listeners.get(ctx, []), fn]
+    def removeListener(self, fn: Callable[[*T], Coroutine]):
+        self.listeners.remove(fn)
 
-    def removeListener(self, ctx: 'Ctx', fn: Callable[[*T], Coroutine]):
-        self.listeners[ctx].remove(fn)
-        # TODO: make this faster (prolly will have to use a dictionary)
-
-    async def trigger(self, ctx: 'Ctx', *args: *T):
-        for filter in self.filters.get(ctx, []):
+    async def trigger(self, *args: *T):
+        for filter in self.filters:
             if not filter(*args):
                 log(
                     'events',
@@ -75,31 +70,8 @@ class Event[*T]:
 
         log('events', DEBUG, f'triggering {self.name} with {args}')
 
-        for fn in self.listeners.get(ctx, []):
-            await ctx.nurs.start(caller, fn, *args)
+        for fn in self.listeners:
+            await self.ctx.nurs.start(caller, fn, *args)
 
-        for ev, trans in self.proxies.get(ctx, {}).items():
-            await ev.trigger(ctx, *(args if not trans else trans(*args)))
-
-
-# you might be able to tell that all of these appear to be the same as the x11 events, you would be
-# right, the original code was xcb only, so, because i dont wanna change anything, i did this
-
-keyPress = Event[GKey, GMod, GWindow]('keyPress')
-keyRelease = Event[GKey, GMod, GWindow]('keyRelease')
-# ? maybe include the x and y coordinates, but idk
-buttonPress = Event[GButton, GMod, GWindow]('buttonPress')
-buttonRelease = Event[GButton, GMod, GWindow]('buttonRelease')
-mapRequest = Event[GWindow]('mapRequest')
-mapNotify = Event[GWindow]('mapNotify')
-unmapNotify = Event[GWindow]('unmapNotify')
-destroyNotify = Event[GWindow]('destroyNotify')
-createNotify = Event[GWindow]('createNotify')
-configureNotify = Event[GWindow]('configureNotify')
-configureRequest = Event[GWindow]('configureRequest')
-enterNotify = Event[GWindow]('enterNotify')
-leaveNotify = Event[GWindow]('leaveNotify')
-focusChange = Event[GWindow | None, GWindow | None]('focusChange')  # old, new
-redraw = Event[GWindow]('redraw')  # exposure notify for x
-reparent = Event[GWindow, GWindow]('reparent')  # window and its parent
-ignored = Event[GWindow]('ignored')  # when a window is marked as ignored
+        for ev, trans in self.proxies.items():
+            await ev.trigger(*(args if not trans else trans(*args)))

@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-from lib.backends.events import createNotify
 from lib.extension import Extension
 
 if TYPE_CHECKING:
@@ -17,7 +16,7 @@ class Mouse(Extension):
 
         super().__init__(ctx, cfg)
 
-        self.addListener(createNotify, self.set)
+        self.addListener(ctx.createNotify, self.set)
 
         ctx.mouse.setCursor(
             ctx.root,

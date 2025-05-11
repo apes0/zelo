@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING
 
 from lib.api.keys import Mod
 from lib.api.mouse import Button
-from lib.backends.events import buttonPress, focusChange, mapNotify
 from lib.extension import Extension
 
 if TYPE_CHECKING:
@@ -29,9 +28,9 @@ class MouseFocus(Extension):
             for button in self.buttons:
                 button.grab(ctx, win, self.mod)
 
-        self.addListener(buttonPress, self.buttonPress)
-        self.addListener(mapNotify, self.mapNotify)
-        self.addListener(focusChange, self.focusChange)
+        self.addListener(ctx.buttonPress, self.buttonPress)
+        self.addListener(ctx.mapNotify, self.mapNotify)
+        self.addListener(ctx.focusChange, self.focusChange)
 
     async def mapNotify(self, win: 'GWindow'):
         if win.ignore or win.focused:

@@ -46,7 +46,7 @@ class Atom:
 
         from ..events import Event
 
-        self.changed = Event[()]('atomChanged')
+        self.changed = Event[()](ctx, 'atomChanged')
 
         id, self.type, self.fmt = atoms[name]
         assert id != None, f'atom {name} missing id'

@@ -4,7 +4,6 @@ import cv2
 import trio
 
 from lib.api.drawer import Image
-from lib.backends.events import redraw
 from lib.extension import Extension
 
 if TYPE_CHECKING:
@@ -45,7 +44,7 @@ class Wallpaper(Extension):
 
             ctx.startSoon(self.drawVideo)
 
-        self.addListener(redraw, self.drawImg)
+        self.addListener(ctx.redraw, self.drawImg)
 
     async def drawImg(self, win: 'GWindow'):
         if win.id != self.ctx._root:

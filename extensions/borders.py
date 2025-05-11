@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-from lib.backends.events import createNotify, focusChange
 from lib.extension import Extension
 
 if TYPE_CHECKING:
@@ -18,8 +17,8 @@ class Borders(Extension):
 
         super().__init__(ctx, cfg)  # TODO: resolve stuff here
 
-        self.addListener(createNotify, self.createNotify)
-        self.addListener(focusChange, self.focusChange)
+        self.addListener(ctx.createNotify, self.createNotify)
+        self.addListener(ctx.focusChange, self.focusChange)
 
     async def createNotify(self, win: 'GWindow'):
         await win.configure(newBorderWidth=self.width)
