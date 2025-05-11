@@ -22,8 +22,6 @@ class Widget(Extension):
             self.x, self.y, 1, 1, 0, parent=self.win, ignore=True
         )
         # the window to draw in
-        self.ctx.startSoon(self.win.map)
-        self.addListener(self.win.redraw, self.draw)
 
     async def draw(self):
         raise NotImplementedError
@@ -33,3 +31,7 @@ class Widget(Extension):
         await self.win.configure(newWidth=width, newHeight=height)
 
         self._size = (width, height)
+
+    def ready(self):
+        self.addListener(self.win.redraw, self.draw)
+        self.ctx.startSoon(self.win.map)

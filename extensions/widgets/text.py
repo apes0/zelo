@@ -31,6 +31,7 @@ class Text(Widget):
             self.back,
         )
 
+        self.ready()
         await self.setSize(self._text.width, self._text.height)
 
     async def draw(self):

@@ -41,6 +41,8 @@ class Bar(Widget):
             self.ctx, self.win, 0, 0, self.width, self.height, self.back
         )
 
+        self.ready()
+
     async def draw(self):
         await self.setSize(self.width, self.height)
         self.rect.draw()
