@@ -165,22 +165,37 @@ class GWindow:
 
         from .events import Event
 
-        self.keyPress = Event[GKey, GMod](ctx, 'keyPress')
-        self.keyRelease = Event[GKey, GMod](ctx, 'keyRelease')
-        self.buttonPress = Event[GButton, GMod](ctx, 'buttonPress')
-        self.buttonRelease = Event[GButton, GMod](ctx, 'buttonRelease')
-        self.mapRequest = Event[()](ctx, 'mapRequest')
-        self.mapNotify = Event[()](ctx, 'mapNotify')
-        self.unmapNotify = Event[()](ctx, 'unmapNotify')
-        self.destroyNotify = Event[()](ctx, 'destroyNotify')
-        self.createNotify = Event[()](ctx, 'createNotify')
-        self.configureNotify = Event[()](ctx, 'configureNotify')
-        self.configureRequest = Event[()](ctx, 'configureRequest')
-        self.enterNotify = Event[()](ctx, 'enterNotify')
-        self.leaveNotify = Event[()](ctx, 'leaveNotify')
-        self.redraw = Event[()](ctx, 'redraw')  # exposure notify for x
-        self.reparented = Event[GWindow](ctx, 'reparented')  # my parent
-        self.ignored = Event[()](ctx, 'ignored')  # when we are marked as ignored
+        trans = lambda *a: (*a, self)
+        self.keyPress = Event[GKey, GMod](ctx, 'keyPress', {ctx.keyPress: trans})
+        self.keyRelease = Event[GKey, GMod](ctx, 'keyRelease', {ctx.keyRelease: trans})
+        self.buttonPress = Event[GButton, GMod](
+            ctx, 'buttonPress', {ctx.buttonPress: trans}
+        )
+        self.buttonRelease = Event[GButton, GMod](
+            ctx, 'buttonRelease', {ctx.buttonRelease: trans}
+        )
+        self.mapRequest = Event[()](ctx, 'mapRequest', {ctx.mapRequest: trans})
+        self.mapNotify = Event[()](ctx, 'mapNotify', {ctx.mapNotify: trans})
+        self.unmapNotify = Event[()](ctx, 'unmapNotify', {ctx.unmapNotify: trans})
+        self.destroyNotify = Event[()](ctx, 'destroyNotify', {ctx.destroyNotify: trans})
+        self.createNotify = Event[()](ctx, 'createNotify', {ctx.createNotify: trans})
+        self.configureNotify = Event[()](
+            ctx, 'configureNotify', {ctx.configureNotify: trans}
+        )
+        self.configureRequest = Event[()](
+            ctx, 'configureRequest', {ctx.configureRequest: trans}
+        )
+        self.enterNotify = Event[()](ctx, 'enterNotify', {ctx.enterNotify: trans})
+        self.leaveNotify = Event[()](ctx, 'leaveNotify', {ctx.leaveNotify: trans})
+        self.redraw = Event[()](
+            ctx, 'redraw', {ctx.redraw: trans}
+        )  # exposure notify for x
+        self.reparent = Event[GWindow](
+            ctx, 'reparent', {ctx.reparent: trans}
+        )  # my parent
+        self.ignored = Event[()](
+            ctx, 'ignored', {ctx.ignored: trans}
+        )  # when we are marked as ignored
 
         # events that a backend makes:
         # TODO: this is a kinda shit solution

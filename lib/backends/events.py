@@ -64,9 +64,12 @@ type trans = Callable[..., Iterable]
 
 
 class Event[*T]:
-    def __init__(self, ctx: 'Ctx', name: str) -> None:
+
+    def __init__(
+        self, ctx: 'Ctx', name: str, proxies: dict['Event', trans | None] | None = None
+    ) -> None:
         self.listeners: ReuseList[Callable[[*T], Coroutine]] = ReuseList()
-        self.proxies: dict[Event, trans | None] = {}
+        self.proxies: dict[Event, trans | None] = proxies or {}
         self.name = name
         self.ctx = ctx
         self.filters: ReuseList[Callable] = ReuseList()
