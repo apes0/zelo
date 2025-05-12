@@ -42,14 +42,13 @@ class Wallpaper(Extension):
             self.cap = cv2.VideoCapture(self.wall)
             self.fps = self.cap.get(cv2.CAP_PROP_FPS)
 
-            ctx.startSoon(self.drawVideo)
+        self.addListener(ctx.root.redraw, self.drawImg)
 
-        self.addListener(ctx.redraw, self.drawImg)
+    async def __ainit__(self):
+        if self.video:
+            await self.drawVideo()
 
-    async def drawImg(self, win: 'GWindow'):
-        if win.id != self.ctx._root:
-            return
-
+    async def drawImg(self):
         for img in self.imgs:
             img.draw()
 
