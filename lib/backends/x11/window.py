@@ -96,7 +96,7 @@ class Window(GWindow):
         gctx: GCtx = self.ctx._getGCtx()
 
         fn = partial(xcb.xcbMapWindow, gctx.connection, self.id)
-        await runAndWait(self.ctx, [self.mapNotify, self.enterNotify, self.redraw], fn)
+        await runAndWait(self.ctx, [self.mapNotify], fn)
 
         self.mapped = True
 
@@ -106,9 +106,7 @@ class Window(GWindow):
         gctx: GCtx = self.ctx._getGCtx()
 
         fn = partial(xcb.xcbUnmapWindow, gctx.connection, self.id)
-        await runAndWait(
-            self.ctx, [self.unmapNotify, self.destroyNotify, self.leaveNotify], fn
-        )
+        await runAndWait(self.ctx, [self.unmapNotify], fn)
 
         self.mapped = False
 
@@ -208,8 +206,8 @@ class Window(GWindow):
         fn()
         xcb.xcbFlush(gctx.connection)
 
-    # TODO: what are we missing here
-    #        await runAndWait(self.ctx, [self.configureNotify], fn)
+        # TODO: what are we missing here
+        # await runAndWait(self.ctx, [self.configureNotify], fn)
 
     async def setBorderColor(self, color: int):
         assert not self.ctx.closed, 'conn is closed'

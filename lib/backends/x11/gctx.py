@@ -69,7 +69,15 @@ class Ctx(GCtx):
             xcb.XCBWindowClassInputOutput,
             self.ctx.screen.screen.rootVisual,
             xcb.XCBCwOverrideRedirect | xcb.XCBCwEventMask,  # TODO: maybe set masks idk
-            uintarr([ignore, xcb.XCBEventMaskExposure]),
+            uintarr(
+                [
+                    ignore,
+                    xcb.XCBEventMaskExposure
+                    | xcb.XCBEventMaskStructureNotify
+                    | xcb.XCBEventMaskExposure
+                    | xcb.XCBEventMaskPropertyChange,
+                ]
+            ),
         )
 
         win = Window(height, width, borderWidth, window, self.ctx)
