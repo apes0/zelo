@@ -63,10 +63,19 @@ async def initScreens(ctx: 'Ctx'):
 
     crtcs: list[xcb.XcbRandrGetCrtcInfoReplyT] = [await req.reply() for req in reqs]
 
-    for crtc in crtcs:
+    for n, crtc in enumerate(crtcs):
         if crtc == xcb.NULL or (crtc.width + crtc.height) == 0:
             continue
-        ctx.screen.displays.append(Display(crtc.x, crtc.y, crtc.width, crtc.height))
+
+        d = Display(ctx, crtc.x, crtc.y, crtc.width, crtc.height)
+
+        d._crtc = first[n]
+        d._mode = crtc.mode
+        d._rotation = crtc.rotation
+        d._numOutputs = crtc.numOutputs
+        d._outputs = xcb.xcbRandrGetCrtcInfoOutputs(crtc)
+
+        ctx.screen.displays.append(d)
 
     xcb.xcbRandrSelectInput(conn, ctx._root, xcb.XCBRandrNotifyMaskScreenChange)
 

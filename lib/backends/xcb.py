@@ -541,6 +541,28 @@ class XcbRandrGetCrtcInfoReplyT(Base):
         self.width: int = obj.width
         self.x: XcbTimestampT = obj.x
         self.y: int = obj.y
+class XcbRandrGetCrtcTransformCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.sequence: int = obj.sequence
+class XcbRandrGetCrtcTransformReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.currentLen: int = obj.current_len
+        self.currentNparams: int = obj.current_nparams
+        self.currentTransform: XcbRenderTransformT = obj.current_transform
+        self.hasTransforms: int = obj.has_transforms
+        self.length: int = obj.length
+        self.pad0: int = obj.pad0
+        self.pad1: int = obj.pad1
+        self.pad2: int = obj.pad2
+        self.pendingLen: int = obj.pending_len
+        self.pendingNparams: int = obj.pending_nparams
+        self.pendingTransform: XcbRenderTransformT = obj.pending_transform
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
 class XcbRandrGetScreenResourcesCookieT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -599,6 +621,21 @@ class XcbRandrResourceChangeT(Base):
         self.pad0: int = obj.pad0
         self.timestamp: XcbTimestampT = obj.timestamp
         self.window: XcbWindowT = obj.window
+class XcbRandrSetCrtcConfigCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.sequence: int = obj.sequence
+class XcbRandrSetCrtcConfigReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.length: int = obj.length
+        self.pad0: int = obj.pad0
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.status: int = obj.status
+        self.timestamp: XcbTimestampT = obj.timestamp
 class XcbRectangleT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -607,6 +644,20 @@ class XcbRectangleT(Base):
         self.width: int = obj.width
         self.x: int = obj.x
         self.y: int = obj.y
+XcbRenderFixedT = int
+class XcbRenderTransformT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        if obj == ffi.NULL:return
+        self.matrix11: XcbRenderFixedT = obj.matrix11
+        self.matrix12: XcbRenderFixedT = obj.matrix12
+        self.matrix13: XcbRenderFixedT = obj.matrix13
+        self.matrix21: XcbRenderFixedT = obj.matrix21
+        self.matrix22: XcbRenderFixedT = obj.matrix22
+        self.matrix23: XcbRenderFixedT = obj.matrix23
+        self.matrix31: XcbRenderFixedT = obj.matrix31
+        self.matrix32: XcbRenderFixedT = obj.matrix32
+        self.matrix33: XcbRenderFixedT = obj.matrix33
 class XcbReparentNotifyEventT(Base):
     def __init__(self, obj):
         self.obj = obj
@@ -992,6 +1043,7 @@ XCBWindowClassInputOutput: int = 1
 XCBWindowNone: int = 0
 
 def createShm(conn: CPtr[XcbConnectionT], size: int, ) -> 'XcbShm':return XcbShm(lib.create_shm(*parseArgs(conn, size, )))
+def doubleToFixed(n: float, ) -> int:return int(lib.double_to_fixed(*parseArgs(n, )))
 def removeShm(conn: CPtr[XcbConnectionT], shm: 'XcbShm', ) -> void:return void(lib.remove_shm(*parseArgs(conn, shm, )))
 def xcbAuxGetScreen(conn: CPtr[XcbConnectionT], screen: int, ) -> CPtr[XcbScreenT]:return XcbScreenT(lib.xcb_aux_get_screen(*parseArgs(conn, screen, )))
 def xcbChangeProperty(conn: CPtr[XcbConnectionT], mode: int, window: int, property: int, type: int, format: int, dataLen: int, data: Ptr[void], ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_change_property(*parseArgs(conn, mode, window, property, type, format, dataLen, data, )))
@@ -1065,12 +1117,18 @@ def xcbQueryTree(conn: CPtr[XcbConnectionT], window: int, ) -> 'XcbQueryTreeCook
 def xcbQueryTreeChildren(reply: CPtr[XcbQueryTreeReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_query_tree_children(*parseArgs(reply, )))
 def xcbQueryTreeReply(conn: CPtr[XcbConnectionT], cookie: 'XcbQueryTreeCookieT', e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbQueryTreeReplyT]:return XcbQueryTreeReplyT(lib.xcb_query_tree_reply(*parseArgs(conn, cookie, e, )))
 def xcbRandrGetCrtcInfo(conn: CPtr[XcbConnectionT], cookie: int, e: int, ) -> 'XcbRandrGetCrtcInfoCookieT':return XcbRandrGetCrtcInfoCookieT(lib.xcb_randr_get_crtc_info(*parseArgs(conn, cookie, e, )))
+def xcbRandrGetCrtcInfoOutputs(R: CPtr[XcbRandrGetCrtcInfoReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_randr_get_crtc_info_outputs(*parseArgs(R, )))
 def xcbRandrGetCrtcInfoReply(conn: CPtr[XcbConnectionT], cookie: 'XcbRandrGetCrtcInfoCookieT', e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbRandrGetCrtcInfoReplyT]:return XcbRandrGetCrtcInfoReplyT(lib.xcb_randr_get_crtc_info_reply(*parseArgs(conn, cookie, e, )))
+def xcbRandrGetCrtcTransform(conn: CPtr[XcbConnectionT], crtc: int, ) -> 'XcbRandrGetCrtcTransformCookieT':return XcbRandrGetCrtcTransformCookieT(lib.xcb_randr_get_crtc_transform(*parseArgs(conn, crtc, )))
+def xcbRandrGetCrtcTransformReply(conn: CPtr[XcbConnectionT], cookie: 'XcbRandrGetCrtcTransformCookieT', e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbRandrGetCrtcTransformReplyT]:return XcbRandrGetCrtcTransformReplyT(lib.xcb_randr_get_crtc_transform_reply(*parseArgs(conn, cookie, e, )))
 def xcbRandrGetScreenResources(conn: CPtr[XcbConnectionT], window: int, ) -> 'XcbRandrGetScreenResourcesCookieT':return XcbRandrGetScreenResourcesCookieT(lib.xcb_randr_get_screen_resources(*parseArgs(conn, window, )))
 def xcbRandrGetScreenResourcesCrtcs(R: CPtr[XcbRandrGetScreenResourcesReplyT], ) -> Ptr[int]:return Ptr(lib.xcb_randr_get_screen_resources_crtcs(*parseArgs(R, )))
 def xcbRandrGetScreenResourcesCrtcsLength(R: CPtr[XcbRandrGetScreenResourcesReplyT], ) -> int:return int(lib.xcb_randr_get_screen_resources_crtcs_length(*parseArgs(R, )))
 def xcbRandrGetScreenResourcesReply(conn: CPtr[XcbConnectionT], cookie: 'XcbRandrGetScreenResourcesCookieT', e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbRandrGetScreenResourcesReplyT]:return XcbRandrGetScreenResourcesReplyT(lib.xcb_randr_get_screen_resources_reply(*parseArgs(conn, cookie, e, )))
 def xcbRandrSelectInput(conn: CPtr[XcbConnectionT], window: int, enable: int, ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_randr_select_input(*parseArgs(conn, window, enable, )))
+def xcbRandrSetCrtcConfig(conn: CPtr[XcbConnectionT], crtc: int, timestamp: int, configTimestamp: int, x: int, y: int, mode: int, rotation: int, outputsLen: int, outputs: Ptr[int], ) -> 'XcbRandrSetCrtcConfigCookieT':return XcbRandrSetCrtcConfigCookieT(lib.xcb_randr_set_crtc_config(*parseArgs(conn, crtc, timestamp, configTimestamp, x, y, mode, rotation, outputsLen, outputs, )))
+def xcbRandrSetCrtcConfigReply(conn: CPtr[XcbConnectionT], cookie: 'XcbRandrSetCrtcConfigCookieT', e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbRandrSetCrtcConfigReplyT]:return XcbRandrSetCrtcConfigReplyT(lib.xcb_randr_set_crtc_config_reply(*parseArgs(conn, cookie, e, )))
+def xcbRandrSetCrtcTransform(c: CPtr[XcbConnectionT], crtc: int, transform: 'XcbRenderTransformT', filterLen: int, filterName: Ptr[int], filterParamsLen: int, filterParams: Ptr[int], ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_randr_set_crtc_transform(*parseArgs(c, crtc, transform, filterLen, filterName, filterParamsLen, filterParams, )))
 def xcbReparentWindow(conn: CPtr[XcbConnectionT], window: int, parent: int, x: int, y: int, ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_reparent_window(*parseArgs(conn, window, parent, x, y, )))
 def xcbSendEvent(conn: CPtr[XcbConnectionT], propagate: bool, destination: int, eventMask: int, event: Ptr[int], ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_send_event(*parseArgs(conn, propagate, destination, eventMask, event, )))
 def xcbSetInputFocus(conn: CPtr[XcbConnectionT], revertTo: int, focus: int, time: int, ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_set_input_focus(*parseArgs(conn, revertTo, focus, time, )))

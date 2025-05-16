@@ -59,7 +59,7 @@ cfg = {
     'buttons': False,  # button related logs
     'focus': False,  # focus changes
     'drawable': False,  # basically anything from api/drawable.py
-    'errors': False,  # backend errors
+    'errors': True,  # backend errors
     'backend': True,  # backend debug info
     'windows': False,  # anything to do with windows
     'extensions': False,  # extension logs

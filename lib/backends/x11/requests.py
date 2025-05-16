@@ -84,3 +84,7 @@ QueryPointer = _Request(xcb.xcbQueryPointer, xcb.xcbQueryPointerReply)
 ShmGetImage = _Request(xcb.xcbShmGetImageUnchecked, xcb.xcbShmGetImageReply)
 GetImage = _Request(xcb.xcbGetImage, xcb.xcbGetImageReply)
 InternAtom = _Request(xcb.xcbInternAtom, xcb.xcbInternAtomReply)
+GetCrtcTransform = _Request(
+    xcb.xcbRandrGetCrtcTransform, xcb.xcbRandrGetCrtcTransformReply
+)
+SetCrtcConfig = _Request(xcb.xcbRandrSetCrtcConfig, xcb.xcbRandrSetCrtcConfigReply)

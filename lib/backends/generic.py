@@ -485,20 +485,23 @@ class GScreen:
         raise NotImplementedError
 
     def __repr__(self) -> str:
-        return '<Screen ({self.height} x {self.width})>'
+        return f'<Screen ({self.height} x {self.width})>'
 
 
 # screen
 class GDisplay:
-    def __init__(self) -> None:
+    def __init__(self, ctx: 'Ctx', x: int, y: int, width: int, height: int) -> None:
         self.x: int
         self.y: int
         self.width: int
         self.height: int
         raise NotImplementedError
 
+    async def scale(self, x: float, y: float):
+        raise NotImplementedError
+
     def __repr__(self) -> str:
-        return '<Display ({self.x}, {self.y})>'
+        return f'<Display {self.width}x{self.height}@({self.x}, {self.y})>'
 
 
 # eventLoop

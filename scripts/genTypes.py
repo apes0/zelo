@@ -81,6 +81,7 @@ def parseType(t):
             'char': 'int',  # TODO: make this | bytes, so that strings work better
             'void': 'void',
             '_Bool': 'bool',
+            'double': 'float',
         }.get(tname, None)
 
         if type is None:

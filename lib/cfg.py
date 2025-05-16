@@ -28,8 +28,8 @@ from utils.theme import Theme
 
 # debcfg['all'] = True
 
-# logTerm()
-# ('log')
+logTerm()
+# log('/tmp/log')
 
 if TYPE_CHECKING:
     from lib.backends.generic import GKey, GMod

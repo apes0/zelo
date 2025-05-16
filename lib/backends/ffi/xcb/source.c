@@ -38,3 +38,7 @@ void remove_shm(xcb_connection_t *c, xcb_shm shm) {
     xcb_shm_detach(c, shm.id);
     shmdt(shm.addr);
 }
+
+xcb_render_fixed_t double_to_fixed(double n) {
+    return (xcb_render_fixed_t)(n * 65536.0);
+}

@@ -69,7 +69,7 @@ EOF
 done
 
 cd $mypath/..
-PYTHONPATH=$PYTHONPATH python3 main.py > /dev/null &
+PYTHONPATH=$PYTHONPATH python3 main.py &
 xterm -font lucidasanstypewriter-24 -bg black -fg white -e 'su $2' &
 while [ 1 ]
 do
