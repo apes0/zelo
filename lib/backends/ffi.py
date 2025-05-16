@@ -56,7 +56,9 @@ def build(name, libraries, out):
         ).read(),
     )
 
-    ffibuilder.compile(verbose=True, target=os.path.join(buildloc, f'{out}.*'))
+    ffibuilder.compile(
+        verbose=True, tmpdir=buildloc, target=os.path.join(buildloc, f'{out}.*')
+    )
 
 
 buildX = partial(

@@ -1,6 +1,7 @@
 #include <xcb/randr.h>
 #include <xcb/shm.h>
 #include <xcb/xcb.h>
+#include <xcb/xcb_errors.h>
 #include <xcb/xcb_icccm.h>
 #include <xcb/xcb_image.h>
 #include <xcb/xcb_keysyms.h>
@@ -10,8 +11,6 @@
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
-
-#include "libxcb-errors/src/xcb_errors.h"
 
 // see this:
 // https://stackoverflow.com/questions/27745131/how-to-use-shm-pixmap-with-xcb
