@@ -37,8 +37,11 @@ if TYPE_CHECKING:
 cfg = Cfg()
 
 keys: dict[tuple[tuple['GKey', ...], 'GMod'], Callable] = {
+    # ((Key('any'),), Mod('any')): lambda ctx: None,
     #    ((Key('super_l'),), Mod('')): lambda _ctx: spawn('ulauncher-toggle'),
-    ((Key('t'),), Mod('control')): lambda ctx: spawn('xterm'),
+    ((Key('t'),), Mod('control')): lambda ctx: spawn(
+        'xterm -font lucidasanstypewriter-24 -bg black -fg white'
+    ),
     ((Key('s'),), Mod('control')): lambda ctx: ctx.nurs.start_soon(stop, ctx),
     ((Key('g'),), Mod('control')): lambda _ctx: spawn('glxgears'),
     ((Key('x'),), Mod('control')): lambda ctx: (

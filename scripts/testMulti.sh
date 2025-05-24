@@ -1,28 +1,33 @@
 #!/bin/bash
 
-_DISPLAY=`echo $DISPLAY | awk '{print ":" strtonum(substr($1, 2)) + 1}'`
-w=480
-h=270
-#Xnest -geometry 960x540 $_DISPLAY &
-#Xephyr -screen 1280x720 $_DISPLAY &
-# here ``+extension RANDR`` does nothing (altho randr support works i think) :/
-#TODO: figure out how to do multiple monitors, without maybe faking them in the config
-Xephyr +extension RANDR +xinerama -ac -br -screen $(($w*2))x$(echo $h) $_DISPLAY &
-DISPLAY=$_DISPLAY
-#sleep .5
-#xrandr --setmonitor vl $(echo $w)/0x$(echo $h)/1+0+0 0
-#xrandr --setmonitor vr $(echo $w)/1x$(echo $h)/1+$(echo $w)+0 null
-##xrandr --fb $(($w*2))/$(($h+1)); xrandr --fb $(($w*2))/$(echo $h)
-inotifywait --timeout 2 /tmp/.X11-unix/
+w=960
+h=540
 
-#setxkbmap -display $DISPLAY -print | xkbcomp - $_DISPLAY
+args="+xinerama -ac -br"
+_DISPLAY=:$(for i in {0..10}; do [ -e "/tmp/.X11-unix/X$i" ] || break; done; echo $i)
+
+for _ in {0..2}
+do
+    # TODO: fix keymaps
+    Xephyr +xinerama -ac -br -screen $(echo $w)x$(echo $h) -xkb-rules evdev -xkb-model pc105 -xkb-layout us $_DISPLAY &
+    args="$args -display $_DISPLAY -input $_DISPLAY"
+    inotifywait --timeout 2 /tmp/.X11-unix/
+    # xkbcomp $DISPLAY $_DISPLAY
+    _DISPLAY=`echo $_DISPLAY | awk '{print ":" strtonum(substr($1, 2)) + 1}'`
+done
+
+Xdmx $args $_DISPLAY 2>/dev/null &
+
+DISPLAY=$_DISPLAY
+
+inotifywait --timeout 2 /tmp/.X11-unix/
 
 progs=('glxgears' 'ulauncher' 'alacritty')
 
 while [ true ]
 do
 #    clear
-    echo 
+    echo
     echo starting new session
     python3 main.py
 #    [ $? == 1 ] && rm xcb_cffi.* 
