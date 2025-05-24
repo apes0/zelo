@@ -1022,6 +1022,26 @@ typedef struct xcb_randr_set_crtc_config_reply_t
     xcb_timestamp_t timestamp;
     unsigned char pad0[20];
 } xcb_randr_set_crtc_config_reply_t;
+typedef struct xcb_xinerama_query_screens_cookie_t
+{
+    unsigned int sequence;
+} xcb_xinerama_query_screens_cookie_t;
+typedef struct xcb_xinerama_query_screens_reply_t
+{
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    unsigned int length;
+    unsigned int number;
+    unsigned char pad1[20];
+} xcb_xinerama_query_screens_reply_t;
+typedef struct xcb_xinerama_screen_info_t
+{
+    short  x_org;
+    short  y_org;
+    unsigned short width;
+    unsigned short height;
+} xcb_xinerama_screen_info_t;
 
 // custom from source:
 
@@ -1132,6 +1152,9 @@ xcb_void_cookie_t xcb_randr_set_crtc_transform(xcb_connection_t *c, xcb_randr_cr
 xcb_randr_set_crtc_config_cookie_t xcb_randr_set_crtc_config(xcb_connection_t *conn, xcb_randr_crtc_t crtc, xcb_timestamp_t timestamp, xcb_timestamp_t config_timestamp, short x, short y, xcb_randr_mode_t mode, unsigned short rotation, unsigned int outputs_len, const xcb_randr_output_t *outputs);
 xcb_randr_set_crtc_config_reply_t *xcb_randr_set_crtc_config_reply(xcb_connection_t *conn, xcb_randr_set_crtc_config_cookie_t cookie, xcb_generic_error_t **e);
 xcb_randr_output_t *xcb_randr_get_crtc_info_outputs(const xcb_randr_get_crtc_info_reply_t *R);
+xcb_xinerama_query_screens_cookie_t xcb_xinerama_query_screens(xcb_connection_t *conn);
+xcb_xinerama_query_screens_reply_t *xcb_xinerama_query_screens_reply(xcb_connection_t *conn, xcb_xinerama_query_screens_cookie_t cookie, xcb_generic_error_t **e);
+xcb_xinerama_screen_info_t *xcb_xinerama_query_screens_screen_info(const xcb_xinerama_query_screens_reply_t *R);
 
 // custom from source:
 

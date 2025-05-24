@@ -1,14 +1,12 @@
 from ..generic import GDisplay, GScreen
 from .types import chararr
 from .. import xcb
-from .requests import GetCrtcTransform, SetCrtcConfig
+from .requests import RandrGetCrtcTransform, RandrSetCrtcConfig
 
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
-
-# TODO: support xinerama as well (should not be difficult i hope)
 
 
 class Display(GDisplay):
@@ -26,13 +24,15 @@ class Display(GDisplay):
 
     # TODO: check if randr is present for scale
     async def scale(self, x: float, y: float):
-        # https://gitlab.freedesktop.org/xorg/app/xrandr/-/blob/master/xrandr.c?ref_type=heads#L3022
+        if not self.ctx.gctx.avail('RANDR'):
+            raise NotImplementedError('Display.scale doesn\'t work without xrandr')
 
+        # https://gitlab.freedesktop.org/xorg/app/xrandr/-/blob/master/xrandr.c?ref_type=heads#L3022
         filter = b'nearest' if round(x) == x and round(y) == y else b'bilinear'
 
         # https://github.com/winft/disman/blob/fdc697e27f28e45524ec146184ad61ed1de74062/backends/xrandr/xrandroutput.cpp#L459
 
-        transform = await GetCrtcTransform(
+        transform = await RandrGetCrtcTransform(
             self.ctx, self.ctx.gctx.connection, self._crtc
         ).reply()
 
@@ -51,7 +51,7 @@ class Display(GDisplay):
             xcb.NULL,
         )
 
-        r = await SetCrtcConfig(
+        r = await RandrSetCrtcConfig(
             self.ctx,
             self.ctx.gctx.connection,
             self._crtc,
@@ -67,7 +67,7 @@ class Display(GDisplay):
 
         xcb.xcbFlush(self.ctx.gctx.connection)
 
-        transform = await GetCrtcTransform(
+        transform = await RandrGetCrtcTransform(
             self.ctx, self.ctx.gctx.connection, self._crtc
         ).reply()
 
