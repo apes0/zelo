@@ -163,7 +163,7 @@ async def readIcon(atom: Atom):
 
 class Hints:
     def __init__(self):
-        self.icon = None
+        self.icon = np.array([])
 
 
 @reader('WM_HINTS')
