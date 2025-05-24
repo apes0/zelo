@@ -203,6 +203,7 @@ NULL = ffi.NULL
                 text += f'''class {toCamelCase(_type, cls=True)}(Base):
     def __init__(self, obj):
         self.obj = obj
+        super().__init__()
         if obj == ffi.NULL:return
 '''
                 for attr in dir(obj):
@@ -223,6 +224,7 @@ NULL = ffi.NULL
 class {toCamelCase(_type, cls=True)}(Base):
     def __init__(self, obj):
         self.obj = obj
+        super().__init__()
 '''
 
     text += '''
@@ -251,6 +253,19 @@ class {toCamelCase(_type, cls=True)}(Base):
                 if '//' in l:
                     l = l.split('//')[0].strip(' ')
                 if fname in l:
+                    found = False
+                    loc = 0
+                    try:
+                        while not found:
+                            loc = l.index(fname, loc) + len(fname)
+                            if l[loc] in '( *':
+                                found = True
+                                break
+                            loc += 1
+                    except:
+                        pass
+                    if not found:
+                        continue
                     try:
                         _args = l.split('(')[1].strip(';').strip(')').split(',')
                         if len(_args) == len(args):

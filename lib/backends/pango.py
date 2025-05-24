@@ -9,6 +9,7 @@ NULL = ffi.NULL
 class FtBitmap(Base):
     def __init__(self, obj):
         self.obj = obj
+        super().__init__()
         if obj == ffi.NULL:return
         self.buffer: Ptr[int] = obj.buffer
         self.numGrays: int = obj.num_grays

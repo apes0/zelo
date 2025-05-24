@@ -22,8 +22,9 @@ def parseArgs(*args) -> list[Any]:
 
 
 class Base:
-    def __init__(self) -> None:
+    def __init__(self, cast=True) -> None:
         self.obj: _CDataBase
+        self.cast = cast
 
     def __eq__(self, __value: object) -> bool:
         if isinstance(__value, _CDataBase):
@@ -31,7 +32,10 @@ class Base:
         return self.__dict__ == __value.__dict__
 
     def __getitem__(self, itm):
-        return self.obj[itm]
+        obj = self.obj[itm]
+        if not self.cast:
+            return obj
+        return self.__class__(obj)
 
     def __repr__(self) -> str:
         return f'''<{self.__class__.__name__}: \n    {"""
@@ -47,6 +51,7 @@ class Base:
 class Ptr[T](Base):
     def __init__(self, obj: T):
         self.obj: T = obj
+        super().__init__(cast=False)
 
 
 type CPtr[T] = T
