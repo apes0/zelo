@@ -7,6 +7,7 @@ from .. import xcb
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
+    from .gctx import Ctx as GCtx
 
 Ret = TypeVar('Ret')
 
@@ -30,9 +31,9 @@ Args = ParamSpec('Args')
 def _Request(
     reqf: Callable[Args, Any], respf: Callable[..., Ret]
 ) -> Callable[Concatenate['Ctx', Args], Request[Ret]]:
-    def makeReq(ctx: 'Ctx', *a, **kwa):
+    def makeReq(ctx: 'Ctx[GCtx]', *a, **kwa):
         req = Request(reqf(*a, **kwa), respf)
-        ctx._getGCtx().requestLoop.add(req)
+        ctx.gctx.requestLoop.add(req)
         return req
 
     return makeReq
@@ -54,7 +55,7 @@ class RequestLoop:
                 # print(f'{len(self.queue)} pending requests')
                 r: Request = self.queue.popleft()
                 # print(f'handling {r}')
-                r.data = r.respf(self.ctx._getGCtx().connection, r.req, xcb.NULL)
+                r.data = r.respf(self.ctx.gctx.connection, r.req, xcb.NULL)
                 trio.from_thread.run_sync(r.finished.set)
 
             self._start = trio.Event()

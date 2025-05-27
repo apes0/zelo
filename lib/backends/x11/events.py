@@ -55,11 +55,10 @@ def handler(n):
 
 
 @handler(xcb.XCBCreateNotify)
-async def createNotify(event, ctx: 'Ctx'):
+async def createNotify(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbCreateNotifyEventT(createNotifyTC(event))
-    gctx: 'GCtx' = ctx._getGCtx()
 
-    gctx.atoms[event.window] = {}
+    ctx.gctx.atoms[event.window] = {}
 
     window = ctx.getWindow(event.window)
     log('backend', DEBUG, f'{window} was created')
@@ -77,12 +76,11 @@ async def createNotify(event, ctx: 'Ctx'):
 
     await window.createNotify.trigger()
 
-    await gctx.updateClientsList()
+    await ctx.gctx.updateClientsList()
 
 
 @handler(xcb.XCBMapRequest)
-async def mapRequest(event, ctx: 'Ctx'):
-    gctx = ctx._getGCtx()
+async def mapRequest(event, ctx: 'Ctx[GCtx]'):
     # NOTE: its not our responsibility to map or focus the window, the tiler should do so
     event = xcb.XcbMapRequestEventT(mapRequestTC(event))
     _id: int = event.window
@@ -91,20 +89,20 @@ async def mapRequest(event, ctx: 'Ctx'):
     window.parent = ctx.getWindow(event.parent)
     # TODO: this is the only instance of ctx.values in the code, so we should remove it
     # its just a leftover from the initial code and i think i can remove it
-    gctx.values[0] = (
+    ctx.gctx.values[0] = (
         xcb.XCBEventMaskEnterWindow
         | xcb.XCBEventMaskLeaveWindow
         | xcb.XCBEventMaskPropertyChange
     )
     xcb.xcbChangeWindowAttributesChecked(
-        gctx.connection, _id, xcb.XCBCwEventMask, gctx.values
+        ctx.gctx.connection, _id, xcb.XCBCwEventMask, ctx.gctx.values
     )
 
     await window.mapRequest.trigger()
 
 
 @handler(xcb.XCBConfigureRequest)
-async def confRequest(event, ctx: 'Ctx'):
+async def confRequest(event, ctx: 'Ctx[GCtx]'):
     # TODO: there is a parent field, so should i follow it?
     event = xcb.XcbConfigureRequestEventT(confRequestTC(event))
     window = ctx.getWindow(event.window)
@@ -126,23 +124,21 @@ async def confRequest(event, ctx: 'Ctx'):
             change.append(max(value, 0))  # safety first :)
             window.__dict__[lable] = value
 
-    gctx = ctx._getGCtx()
-
     vals = uintarr(change)
     xcb.xcbConfigureWindow(
-        gctx.connection,
+        ctx.gctx.connection,
         event.window,
         valueMask,
         vals,
     )
 
-    xcb.xcbFlush(gctx.connection)
+    xcb.xcbFlush(ctx.gctx.connection)
 
     await window.configureRequest.trigger()
 
 
 @handler(xcb.XCBConfigureNotify)
-async def confNotify(event, ctx: 'Ctx'):
+async def confNotify(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbConfigureNotifyEventT(confNotifyTC(event))
     window: GWindow = ctx.getWindow(event.window)
 
@@ -165,7 +161,7 @@ async def confNotify(event, ctx: 'Ctx'):
 
 
 # @handler(xcb.XCBClientMessage)
-# async def clientMessage(event, ctx: 'Ctx'):
+# async def clientMessage(event, ctx: 'Ctx[GCtx]'):
 #    event = xcb.XcbClientMessageEventT(clientMessageTC(event))
 #    data = event.data
 #    data = {8: data.data8, 16: data.data16, 32: data.data32}[event.format]
@@ -178,7 +174,7 @@ async def confNotify(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBDestroyNotify)
-async def destroyNotify(event, ctx: 'Ctx'):
+async def destroyNotify(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbDestroyNotifyEventT(destroyNotifyTC(event))
     # NOTE: actually doesn't appear to be that slow, check this:
     # https://wiki.python.org/moin/TimeComplexity
@@ -189,9 +185,8 @@ async def destroyNotify(event, ctx: 'Ctx'):
 
     win.destroyed = True
 
-    gctx = ctx._getGCtx()
-    if window in gctx.atoms:
-        del gctx.atoms[window]
+    if window in ctx.gctx.atoms:
+        del ctx.gctx.atoms[window]
 
     if ctx.focused and window == ctx.focused.id:
         win.mapped = False
@@ -208,11 +203,11 @@ async def destroyNotify(event, ctx: 'Ctx'):
 
     await win.destroyNotify.trigger()
 
-    await gctx.updateClientsList()
+    await ctx.gctx.updateClientsList()
 
 
 @handler(xcb.XCBMapNotify)
-async def mapNotify(event, ctx: 'Ctx'):
+async def mapNotify(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbMapNotifyEventT(mapNotifyTC(event))
     _id = event.window
     win: GWindow = ctx.getWindow(_id)
@@ -226,7 +221,7 @@ async def mapNotify(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBUnmapNotify)
-async def unmapNotify(event, ctx: 'Ctx'):
+async def unmapNotify(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbUnmapNotifyEventT(unmapNotifyTC(event))
     _id = event.window
     win: GWindow = ctx.getWindow(_id)
@@ -251,7 +246,7 @@ async def unmapNotify(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBMotionNotify)
-async def motionNotify(event, ctx: 'Ctx'):
+async def motionNotify(event, ctx: 'Ctx[GCtx]'):
     # TODO: when does this get called???
     event = motionNotifyTC(event)
 
@@ -270,13 +265,11 @@ async def motionNotify(event, ctx: 'Ctx'):
 
 
 @handler(0)
-async def error(event, ctx: 'Ctx'):
+async def error(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbGenericErrorT(genericErrorTC(event))
 
-    gctx = ctx._getGCtx()
-
     _errCtx = xcbErrorContext()
-    xcb.xcbErrorsContextNew(gctx.connection, _errCtx)
+    xcb.xcbErrorsContextNew(ctx.gctx.connection, _errCtx)
     errCtx = _errCtx[0]
     extension = charpp()
 
@@ -306,7 +299,7 @@ async def error(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBKeyPress)
-async def keyPress(event, ctx: 'Ctx'):
+async def keyPress(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbKeyPressEventT(keyPressTC(event))
     key = Key(code=event.detail)
     mod = Mod(value=event.state)
@@ -318,7 +311,7 @@ async def keyPress(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBKeyRelease)
-async def keyRelease(event, ctx: 'Ctx'):
+async def keyRelease(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbKeyPressEventT(keyPressTC(event))
     key = Key(code=event.detail)
     mod = Mod(value=event.state)
@@ -330,7 +323,7 @@ async def keyRelease(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBButtonPress)
-async def buttonPress(event, ctx: 'Ctx'):
+async def buttonPress(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbButtonPressEventT(buttonPressTC(event))
     button = Button(button=event.detail)
     mod = Mod(value=event.state)
@@ -342,7 +335,7 @@ async def buttonPress(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBButtonRelease)
-async def buttonRelease(event, ctx: 'Ctx'):
+async def buttonRelease(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbButtonPressEventT(buttonPressTC(event))
     button = Button(button=event.detail)
     mod = Mod(value=event.state)
@@ -354,7 +347,7 @@ async def buttonRelease(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBEnterNotify)
-async def enterNotify(event, ctx: 'Ctx'):
+async def enterNotify(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbEnterNotifyEventT(enterNotifyTC(event))
     window: GWindow = ctx.getWindow(event.event)
 
@@ -364,7 +357,7 @@ async def enterNotify(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBLeaveNotify)
-async def leaveNotify(event, ctx: 'Ctx'):
+async def leaveNotify(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbEnterNotifyEventT(enterNotifyTC(event))
     window: GWindow = ctx.getWindow(event.event)
 
@@ -374,7 +367,7 @@ async def leaveNotify(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBRandrNotify)
-async def randrNotify(event, ctx: 'Ctx'):
+async def randrNotify(event, ctx: 'Ctx[GCtx]'):
     event = randrNotifyTC(event)  # TODO: typing
 
 
@@ -383,7 +376,7 @@ async def randrNotify(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBReparentNotify)
-async def reparentNotify(event, ctx: 'Ctx'):
+async def reparentNotify(event, ctx: 'Ctx[GCtx]'):
     ev = xcb.XcbReparentNotifyEventT(ReparentNotifyTC(event))
 
     win = ctx.getWindow(ev.window)
@@ -393,7 +386,7 @@ async def reparentNotify(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBExpose)
-async def expose(event, ctx: 'Ctx'):
+async def expose(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbExposeEventT(ExposeTC(event))
 
     if event.count:
@@ -408,14 +401,12 @@ async def expose(event, ctx: 'Ctx'):
 
 
 @handler(xcb.XCBPropertyNotify)
-async def propertyNotify(event, ctx: 'Ctx'):
+async def propertyNotify(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbPropertyNotifyEventT(PropertyNotifyTC(event))
 
     log('backend', DEBUG, f'atom {event.atom} of win {event.window} changed')
 
-    gctx: 'GCtx' = ctx._getGCtx()
-
-    winatoms: dict[int, 'Atom'] | None = gctx.atoms.get(event.window)
+    winatoms: dict[int, 'Atom'] | None = ctx.gctx.atoms.get(event.window)
     if not winatoms:
         return
 
@@ -436,7 +427,7 @@ ignore = [9, 10, 14, 89]  # list of events to ignore
 
 
 # TODO: support event 34 (XCB_MAPPING_NOTIFY)
-async def setup(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
+async def setup(ctx: 'Ctx[GCtx]', task_status=trio.TASK_STATUS_IGNORED):
     # this is, in practice, the init function for the ctx
     gctx = GCtx(ctx)
     gctx.dname = ctx.gctxConf.get('display', xcb.NULL)
@@ -459,15 +450,13 @@ async def setup(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
     task_status.started()
 
 
-async def update(ctx: 'Ctx', conn: 'GConnection'):
-    gctx = ctx._getGCtx()
-
-    if ctx.closed or xcb.xcbConnectionHasError(gctx.connection):
+async def update(ctx: 'Ctx[GCtx]', conn: 'GConnection'):
+    if ctx.closed or xcb.xcbConnectionHasError(ctx.gctx.connection):
         conn.disconnect()
         return
 
     while not ctx.closed:  # we might get closed ig lol
-        event = xcb.xcbPollForEvent(gctx.connection)
+        event = xcb.xcbPollForEvent(ctx.gctx.connection)
         if event == xcb.NULL:
             return
 

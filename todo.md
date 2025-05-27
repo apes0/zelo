@@ -64,4 +64,3 @@
 - stop using x.a = {**x.get("a"), ...} because its very slow
 - export xcb pixmap to a generic class
 - fake transparency if no compositor is present (with the alpha blending from pango.c)
-- fix gctx typing bc i actually didnt fix it last time

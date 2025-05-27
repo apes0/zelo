@@ -25,11 +25,10 @@ def init(fn):
 
 @applyPre
 class Connection(GConnection):
-    def __init__(self, ctx: 'Ctx') -> None:
+    def __init__(self, ctx: 'Ctx[GCtx]') -> None:
         self.ctx = ctx
-        gctx: GCtx = ctx._getGCtx()
-        self.conn = xcb.xcbConnect(gctx.dname, gctx.screenp)
-        gctx.connection = self.conn
+        self.conn = xcb.xcbConnect(ctx.gctx.dname, ctx.gctx.screenp)
+        ctx.gctx.connection = self.conn
         assert not xcb.xcbConnectionHasError(self.conn), 'Xcb connection error'
 
     async def __ainit__(self):
@@ -41,8 +40,8 @@ class Connection(GConnection):
 
 
 @init
-async def startRequests(ctx: 'Ctx'):
-    await ctx.nurs.start(ctx._getGCtx().requestLoop.start)
+async def startRequests(ctx: 'Ctx[GCtx]'):
+    await ctx.nurs.start(ctx.gctx.requestLoop.start)
 
 
 # list of all extensions i had on my x server (via ``xdpyinfo -display :1 -queryExtensions``):
@@ -80,27 +79,25 @@ async def startRequests(ctx: 'Ctx'):
 
 
 @init
-async def extensions(ctx: 'Ctx'):
-    gctx: GCtx = ctx._getGCtx()
+async def extensions(ctx: 'Ctx[GCtx]'):
     reqs = {}
     names = ['RANDR', 'MIT-SHM', 'XTEST', 'RENDER', 'XINERAMA', 'DPMS']
 
     for name in names:
         reqs[name] = requests.QueryExtension(
-            ctx, gctx.connection, len(name), chararr(name.encode())
+            ctx, ctx.gctx.connection, len(name), chararr(name.encode())
         )
 
     for name, req in reqs.items():
         rep = await req.reply()
 
-        gctx.extResps[name] = rep
+        ctx.gctx.extResps[name] = rep
         log('backend', DEBUG, f'{name} is {"not "*(not rep.present)}present')
 
 
-async def initRandr(ctx: 'Ctx'):
-    gctx: GCtx = ctx._getGCtx()
-    conn = gctx.connection
-    ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, gctx.screenp[0]))
+async def initRandr(ctx: 'Ctx[GCtx]'):
+    conn = ctx.gctx.connection
+    ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, ctx.gctx.screenp[0]))
     ctx._root = ctx.screen.root
 
     screenRes = await requests.GetScreenResources(ctx, conn, ctx._root).reply()
@@ -130,10 +127,9 @@ async def initRandr(ctx: 'Ctx'):
     xcb.xcbRandrSelectInput(conn, ctx._root, xcb.XCBRandrNotifyMaskScreenChange)
 
 
-async def initXinerama(ctx: 'Ctx'):
-    gctx: GCtx = ctx._getGCtx()
-    conn = gctx.connection
-    ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, gctx.screenp[0]))
+async def initXinerama(ctx: 'Ctx[GCtx]'):
+    conn = ctx.gctx.connection
+    ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, ctx.gctx.screenp[0]))
     ctx._root = ctx.screen.root
 
     o = await requests.XineramaQueryScreens(ctx, conn).reply()
@@ -149,15 +145,13 @@ async def initXinerama(ctx: 'Ctx'):
     r = await requests.GetGeometry(ctx, conn, ctx._root).reply()
     ctx.screen.height = r.height
     ctx.screen.width = r.width
-    print(ctx.screen)
 
 
 @init
-async def initScreens(ctx: 'Ctx'):
-    gctx: GCtx = ctx._getGCtx()
-    if gctx.avail('RANDR'):
+async def initScreens(ctx: 'Ctx[GCtx]'):
+    if ctx.gctx.avail('RANDR'):
         await initRandr(ctx)
-    elif gctx.avail('XINERAMA'):
+    elif ctx.gctx.avail('XINERAMA'):
         await initXinerama(ctx)
     else:
         log(
@@ -168,14 +162,14 @@ async def initScreens(ctx: 'Ctx'):
 
 
 @init
-async def loadAtoms(ctx: 'Ctx'):
+async def loadAtoms(ctx: 'Ctx[GCtx]'):
     for name, (id, type, fmt) in atoms.items():
         if id is not None:
             continue
 
         rep = await requests.InternAtom(
             ctx,
-            ctx._getGCtx().connection,
+            ctx.gctx.connection,
             0,
             len(name),
             name.encode(),
@@ -187,13 +181,12 @@ async def loadAtoms(ctx: 'Ctx'):
 
 
 @init
-async def initWindows(ctx: 'Ctx'):
-    gctx: GCtx = ctx._getGCtx()
-    conn = gctx.connection
+async def initWindows(ctx: 'Ctx[GCtx]'):
+    conn = ctx.gctx.connection
 
     ctx.root = Window(0, 0, 0, ctx._root, ctx)
-    gctx.values = intarr([0, 0, 0])  # magic values
-    gctx.values[0] = (
+    ctx.gctx.values = intarr([0, 0, 0])  # magic values
+    ctx.gctx.values[0] = (
         xcb.XCBEventMaskSubstructureRedirect
         | xcb.XCBEventMaskStructureNotify
         | xcb.XCBEventMaskSubstructureNotify
@@ -202,7 +195,7 @@ async def initWindows(ctx: 'Ctx'):
     )  # TODO: remove this shit lol
 
     xcb.xcbChangeWindowAttributesChecked(
-        conn, ctx._root, xcb.XCBCwEventMask, gctx.values
+        conn, ctx._root, xcb.XCBCwEventMask, ctx.gctx.values
     )
     xcb.xcbUngrabKey(conn, xcb.XCBGrabAny, ctx._root, xcb.XCBModMaskAny)
 
@@ -244,20 +237,18 @@ async def initWindows(ctx: 'Ctx'):
 
 
 @init
-async def createClientsAtom(ctx: 'Ctx'):
+async def createClientsAtom(ctx: 'Ctx[GCtx]'):
     ctx.gctx.clients = Atom(ctx, ctx.root, '_NET_CLIENT_LIST')  # type: ignore
 
 
 @init
-async def initMouse(ctx: 'Ctx'):
+async def initMouse(ctx: 'Ctx[GCtx]'):
     ctx.mouse = Mouse(ctx)
 
 
 @init
-async def initModMap(ctx: 'Ctx'):
-    gctx: GCtx = ctx._getGCtx()
-
-    rep = await requests.GetModifierMapping(ctx, gctx.connection).reply()
+async def initModMap(ctx: 'Ctx[GCtx]'):
+    rep = await requests.GetModifierMapping(ctx, ctx.gctx.connection).reply()
 
     mappings = xcb.xcbGetModifierMappingKeycodes(rep)
 
@@ -275,20 +266,19 @@ async def initModMap(ctx: 'Ctx'):
 
 
 @init
-async def shm(ctx: 'Ctx'):
-    gctx: GCtx = ctx._getGCtx()
-    if not gctx.avail('MIT-SHM'):
+async def shm(ctx: 'Ctx[GCtx]'):
+    if not ctx.gctx.avail('MIT-SHM'):
         return
 
-    rep = await requests.ShmQueryVersion(ctx, gctx.connection).reply()
+    rep = await requests.ShmQueryVersion(ctx, ctx.gctx.connection).reply()
 
-    gctx.sharedPixmaps = bool(rep.sharedPixmaps)
+    ctx.gctx.sharedPixmaps = bool(rep.sharedPixmaps)
 
     log('backend', DEBUG, f'shared pixmaps are {"not "*(not rep.sharedPixmaps)}present')
 
 
 @init
-async def supportingWmCheck(ctx: 'Ctx'):
+async def supportingWmCheck(ctx: 'Ctx[GCtx]'):
     w = ctx.createWindow(1, 1, 1, 1, 1)
 
     await Atom(ctx, ctx.root, '_NET_SUPPORTING_WM_CHECK').set(intp(w.id), 4)

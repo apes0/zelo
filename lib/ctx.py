@@ -1,5 +1,5 @@
 import traceback
-from typing import TYPE_CHECKING, Any, Awaitable, Callable
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, TypeVar
 
 import trio
 
@@ -22,12 +22,15 @@ async def _wrapper(afn):
         log('startSoon', ERROR, f'{afn} encountered:\n {traceback.format_exc()}')
 
 
-class Ctx:
+_GCtx = TypeVar('_GCtx', bound='GCtx')
+
+
+class Ctx[_GCtx]:
     def __init__(self):
         self._root: int
         self.root: GWindow
         self.screen: GScreen
-        self.gctx: GCtx
+        self.gctx: _GCtx
         self.windows: dict[int, GWindow] = {}
         self.watcher = Watcher(self)
         self.focused: GWindow | None = None
@@ -126,9 +129,3 @@ class Ctx:
 
     def startSoon(self, fn: Callable[..., Awaitable], *args):
         self.nurs.start_soon(_wrapper, fn(*args))
-
-    def _getGCtx(self) -> Any:
-        # NOTE: this was made for typing reasons
-        # NOTE: basically, i just dont want to ``cast`` everywhere lol
-        # NOTE: fuck python typing
-        return self.gctx

@@ -12,11 +12,10 @@ if TYPE_CHECKING:
 @applyPre
 class Window(GWindow):
     def __init__(
-        self, height: int, width: int, borderWidth: int, _id: int, ctx: 'Ctx'
+        self, height: int, width: int, borderWidth: int, _id: int, ctx: 'Ctx[GCtx]'
     ) -> None:
         super().__init__(height, width, borderWidth, _id, ctx)
-        gctx: GCtx = ctx._getGCtx()
-        self.id = gctx.nextId()
+        self.id = ctx.gctx.nextId()
         self.x: int = 0
         self.y: int = 0
         self.focused = False

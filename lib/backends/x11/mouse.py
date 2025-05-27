@@ -95,16 +95,14 @@ cursors = {
 
 @applyPre
 class Mouse(GMouse):
-    def __init__(self, ctx: 'Ctx') -> None:
+    def __init__(self, ctx: 'Ctx[GCtx]') -> None:
         self.ctx = ctx
 
     async def location(self) -> tuple[int, int]:
         assert not self.ctx.closed, 'conn is closed'
 
-        gctx: GCtx = self.ctx._getGCtx()
-
         resp = await requests.QueryPointer(
-            self.ctx, gctx.connection, self.ctx._root
+            self.ctx, self.ctx.gctx.connection, self.ctx._root
         ).reply()
 
         return (
@@ -122,23 +120,21 @@ class Mouse(GMouse):
     ):
         assert not self.ctx.closed, 'conn is closed'
 
-        gctx: GCtx = self.ctx._getGCtx()
-
         cursorId = cursors[name]
 
-        font = xcb.xcbGenerateId(gctx.connection)
+        font = xcb.xcbGenerateId(self.ctx.gctx.connection)
 
         xcb.xcbOpenFont(
-            gctx.connection,
+            self.ctx.gctx.connection,
             font,
             len(_font),
             chararr(_font.encode()),
         )
 
-        cursor = xcb.xcbGenerateId(gctx.connection)
+        cursor = xcb.xcbGenerateId(self.ctx.gctx.connection)
 
         xcb.xcbCreateGlyphCursor(
-            gctx.connection,
+            self.ctx.gctx.connection,
             cursor,
             font,
             font,
@@ -154,12 +150,14 @@ class Mouse(GMouse):
 
         mask = xcb.XCBCwCursor
         args = uintarr([cursor])
-        xcb.xcbChangeWindowAttributesChecked(gctx.connection, window.id, mask, args)
+        xcb.xcbChangeWindowAttributesChecked(
+            self.ctx.gctx.connection, window.id, mask, args
+        )
 
-        xcb.xcbCloseFont(gctx.connection, font)
-        xcb.xcbFreeCursor(gctx.connection, cursor)
+        xcb.xcbCloseFont(self.ctx.gctx.connection, font)
+        xcb.xcbFreeCursor(self.ctx.gctx.connection, cursor)
 
-        xcb.xcbFlush(gctx.connection)
+        xcb.xcbFlush(self.ctx.gctx.connection)
 
 
 mappings = {
@@ -191,17 +189,15 @@ class Button(GButton):
                     self.lable = lable
                     break
 
-    def grab(self, ctx: 'Ctx', window: 'GWindow', *mods: 'GMod'):
+    def grab(self, ctx: 'Ctx[GCtx]', window: 'GWindow', *mods: 'GMod'):
         assert not ctx.closed, 'conn is closed'
-
-        gctx: GCtx = ctx._getGCtx()
 
         mod = 0
         for _mod in mods:
             mod |= _mod.mod
 
         xcb.xcbGrabButton(
-            gctx.connection,
+            ctx.gctx.connection,
             0,
             window.id,
             xcb.XCBEventMaskButtonPress,
@@ -213,36 +209,34 @@ class Button(GButton):
             mod,
         )
 
-        xcb.xcbFlush(gctx.connection)
+        xcb.xcbFlush(ctx.gctx.connection)
 
-    def ungrab(self, ctx: 'Ctx', window: 'GWindow', *mods: 'GMod'):
+    def ungrab(self, ctx: 'Ctx[GCtx]', window: 'GWindow', *mods: 'GMod'):
         assert not ctx.closed, 'conn is closed'
-
-        gctx: GCtx = ctx._getGCtx()
 
         mod = 0
         for _mod in mods:
             mod |= _mod.mod
 
         xcb.xcbUngrabButton(
-            gctx.connection,
+            ctx.gctx.connection,
             self.button,
             window.id,
             mod,
         )
 
-        xcb.xcbFlush(gctx.connection)
+        xcb.xcbFlush(ctx.gctx.connection)
 
-    def press(self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: Mod):
+    def press(
+        self, ctx: 'Ctx[GCtx]', window: 'GWindow', x: int, y: int, *modifiers: Mod
+    ):
         assert not ctx.closed, 'conn is closed'
-
-        gctx: GCtx = ctx._getGCtx()
 
         for mod in modifiers:
             Key(code=mod.mappings[mod.mod][0]).press(ctx, window, flush=False)
 
         xcb.xcbTestFakeInput(
-            gctx.connection,
+            ctx.gctx.connection,
             xcb.XCBButtonPress,
             self.button,
             xcb.XCBCurrentTime,
@@ -252,18 +246,18 @@ class Button(GButton):
             0,
         )
 
-        xcb.xcbFlush(gctx.connection)
+        xcb.xcbFlush(ctx.gctx.connection)
 
-    def release(self, ctx: 'Ctx', window: 'GWindow', x: int, y: int, *modifiers: Mod):
+    def release(
+        self, ctx: 'Ctx[GCtx]', window: 'GWindow', x: int, y: int, *modifiers: Mod
+    ):
         assert not ctx.closed, 'conn is closed'
-
-        gctx: GCtx = ctx._getGCtx()
 
         for mod in modifiers:
             Key(code=Mod.mappings[mod.mod][0]).release(ctx, window, flush=False)
 
         xcb.xcbTestFakeInput(
-            gctx.connection,
+            ctx.gctx.connection,
             xcb.XCBButtonRelease,
             self.button,
             xcb.XCBCurrentTime,
@@ -273,7 +267,7 @@ class Button(GButton):
             0,
         )
 
-        xcb.xcbFlush(gctx.connection)
+        xcb.xcbFlush(ctx.gctx.connection)
 
     def __hash__(self) -> int:
         return hash(self.lable)

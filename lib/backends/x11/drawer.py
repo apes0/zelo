@@ -22,9 +22,10 @@ if TYPE_CHECKING:
 
 @applyPre
 class Image(GImage):
+
     def __init__(
         self,
-        ctx: 'Ctx',
+        ctx: 'Ctx[GCtx]',
         window: 'Window',
         img: np.ndarray | None,
         width: int,
@@ -36,7 +37,6 @@ class Image(GImage):
         self.x: int = x
         self.y: int = y
 
-        gctx = ctx._getGCtx()
         self.ctx = ctx
 
         self.windowId = window.id
@@ -44,17 +44,17 @@ class Image(GImage):
         self.width = width
         self.height = height
 
-        self.gc = xcb.xcbGenerateId(gctx.connection)
-        self.pixmap = xcb.xcbGenerateId(gctx.connection)
+        self.gc = xcb.xcbGenerateId(ctx.gctx.connection)
+        self.pixmap = xcb.xcbGenerateId(ctx.gctx.connection)
 
         self.image: xcb.XcbImageT
-        self.useShm = gctx.avail('MIT-SHM')
+        self.useShm = ctx.gctx.avail('MIT-SHM')
 
         if self.useShm:
-            self.shm = xcb.createShm(gctx.connection, self.width * self.height * 4)
-            if gctx.sharedPixmaps:
+            self.shm = xcb.createShm(ctx.gctx.connection, self.width * self.height * 4)
+            if ctx.gctx.sharedPixmaps:
                 xcb.xcbShmCreatePixmap(
-                    gctx.connection,
+                    ctx.gctx.connection,
                     self.pixmap,
                     self.windowId,
                     self.width,
@@ -67,7 +67,7 @@ class Image(GImage):
                 self.pixmap = self.windowId
         else:
             xcb.xcbCreatePixmap(
-                gctx.connection,
+                ctx.gctx.connection,
                 ctx.screen.screen.rootDepth,
                 self.pixmap,
                 self.windowId,
@@ -75,7 +75,7 @@ class Image(GImage):
                 self.height,
             )
 
-        xcb.xcbCreateGc(gctx.connection, self.gc, self.pixmap, 0, xcb.NULL)
+        xcb.xcbCreateGc(ctx.gctx.connection, self.gc, self.pixmap, 0, xcb.NULL)
 
         if img is not None:
             self.set(img)
@@ -87,8 +87,6 @@ class Image(GImage):
 
     def set(self, img):
         assert not self.ctx.closed, 'conn is closed'
-
-        self.gctx = self.ctx._getGCtx()
 
         img = cv2.resize(img, (self.width, self.height))
 
@@ -104,7 +102,7 @@ class Image(GImage):
             ffi.memmove(self.shm.addr, data, len(data))
             if not self.gctx.sharedPixmaps:  # type: ignore
                 xcb.xcbShmPutImage(  # TODO: do i need to do this every time, or only once?
-                    self.gctx.connection,
+                    self.ctx.gctx.connection,
                     self.windowId,
                     self.gc,
                     self.width,
@@ -124,7 +122,7 @@ class Image(GImage):
 
         else:
             parts = (self.width * self.height * 4) // xcb.xcbGetMaximumRequestLength(
-                self.gctx.connection
+                self.ctx.gctx.connection
             ) + 2
             # this works with +2 for some reason
             pos = 0
@@ -135,7 +133,7 @@ class Image(GImage):
                 # TODO: use the.scanlinePad stuff
                 pos += size
                 self.image = xcb.xcbImageCreateNative(
-                    self.gctx.connection,
+                    self.ctx.gctx.connection,
                     self.width,
                     round(pos) - round(prev),
                     xcb.XCBImageFormatZPixmap,
@@ -146,7 +144,7 @@ class Image(GImage):
                 )
 
                 xcb.xcbImagePut(
-                    self.gctx.connection,
+                    self.ctx.gctx.connection,
                     self.pixmap,
                     self.gc,
                     self.image,
@@ -157,16 +155,14 @@ class Image(GImage):
 
                 prev = pos
 
-        xcb.xcbFlush(self.gctx.connection)
+        xcb.xcbFlush(self.ctx.gctx.connection)
 
     def draw(self):
         assert not self.ctx.closed, 'conn is closed'
 
-        self.gctx = self.ctx._getGCtx()
-
         if self.useShm and not self.gctx.sharedPixmaps:  # type: ignore
             xcb.xcbShmPutImage(
-                self.gctx.connection,
+                self.ctx.gctx.connection,
                 self.windowId,
                 self.gc,
                 self.width,
@@ -185,7 +181,7 @@ class Image(GImage):
             )
             return
         xcb.xcbCopyArea(
-            self.gctx.connection,
+            self.ctx.gctx.connection,
             self.pixmap,
             self.windowId,
             self.gc,
@@ -197,21 +193,19 @@ class Image(GImage):
             self.height,
         )
 
-        xcb.xcbFlush(self.gctx.connection)
+        xcb.xcbFlush(self.ctx.gctx.connection)
 
     def destroy(self):
         assert not self.ctx.closed, 'conn is closed'
 
-        self.gctx = self.ctx._getGCtx()
-
         if self.useShm:
-            xcb.removeShm(self.gctx.connection, self.shm)
+            xcb.removeShm(self.ctx.gctx.connection, self.shm)
         else:
             xcb.xcbImageDestroy(self.image)
 
-        xcb.xcbFreePixmap(self.gctx.connection, self.pixmap)
+        xcb.xcbFreePixmap(self.ctx.gctx.connection, self.pixmap)
         self.pixmap = xcb.NULL
-        xcb.xcbFlush(self.gctx.connection)
+        xcb.xcbFlush(self.ctx.gctx.connection)
 
     def move(self, x: int, y: int):
         self.x = x
@@ -220,9 +214,10 @@ class Image(GImage):
 
 @applyPre
 class Text(GText):
+
     def __init__(
         self,
-        ctx: 'Ctx',
+        ctx: 'Ctx[GCtx]',
         win: 'Window',
         x: int,
         y: int,
@@ -305,9 +300,10 @@ class Text(GText):
 class Rectangle(
     GRectangle
 ):  # ? maybe implement this for any polygon and then just use that for a rectangle
+
     def __init__(
         self,
-        ctx: 'Ctx',
+        ctx: 'Ctx[GCtx]',
         window: 'GWindow',
         x: int,
         y: int,
@@ -317,8 +313,6 @@ class Rectangle(
     ) -> None:
         assert not ctx.closed, 'conn is closed'
 
-        gctx = ctx._getGCtx()
-
         self.x = x
         self.y = y
         self.width = width
@@ -327,23 +321,21 @@ class Rectangle(
         self.ctx = ctx
         self.rect = rectangle({'x': x, 'y': y, 'width': width, 'height': height})
 
-        self.gc = xcb.xcbGenerateId(gctx.connection)
+        self.gc = xcb.xcbGenerateId(ctx.gctx.connection)
 
         mask = xcb.XCBGcForeground
         args = uintarr([color])
 
-        xcb.xcbCreateGc(gctx.connection, self.gc, window.id, mask, args)
+        xcb.xcbCreateGc(ctx.gctx.connection, self.gc, window.id, mask, args)
 
     def draw(self):
         assert not self.ctx.closed, 'conn is closed'
 
-        self.gctx = self.ctx._getGCtx()
-
         xcb.xcbPolyFillRectangle(
-            self.gctx.connection, self.window.id, self.gc, 1, self.rect
+            self.ctx.gctx.connection, self.window.id, self.gc, 1, self.rect
         )
 
-        xcb.xcbFlush(self.gctx.connection)
+        xcb.xcbFlush(self.ctx.gctx.connection)
 
     def resize(self, width: int, height: int):
         assert not self.ctx.closed, 'conn is closed'

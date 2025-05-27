@@ -6,6 +6,7 @@ from .. import xcb
 from .keysyms import keys
 
 if TYPE_CHECKING:
+    from .gctx import Ctx as GCtx
     from ...ctx import Ctx
 
 modMap = {
@@ -57,10 +58,8 @@ class Key(GKey):
                     self.lable = lable
                     break
 
-    def load(self, ctx: 'Ctx'):
-        gctx = ctx._getGCtx()
-
-        syms = xcb.xcbKeySymbolsAlloc(gctx.connection)
+    def load(self, ctx: 'Ctx[GCtx]'):
+        syms = xcb.xcbKeySymbolsAlloc(ctx.gctx.connection)
         assert syms, 'Couldn\'t allocate key symbols (for some reason)'
 
         # NOTE: this is adapted from qtile's implementation
@@ -80,11 +79,9 @@ class Key(GKey):
         xcb.xcbKeySymbolsFree(syms)
 
     def grab(
-        self, ctx: 'Ctx', window: GWindow, *modifiers: Mod
+        self, ctx: 'Ctx[GCtx]', window: GWindow, *modifiers: Mod
     ):  # TODO: (un)grab on window
         assert not ctx.closed, 'conn is closed'
-
-        gctx = ctx._getGCtx()
 
         if self.key is None:
             self.load(ctx)
@@ -95,7 +92,7 @@ class Key(GKey):
             mod |= _mod.mod
 
         xcb.xcbGrabKey(
-            gctx.connection,
+            ctx.gctx.connection,
             1,
             window.id,
             mod,
@@ -104,12 +101,10 @@ class Key(GKey):
             xcb.XCBGrabModeAsync,
         )
 
-        xcb.xcbFlush(gctx.connection)
+        xcb.xcbFlush(ctx.gctx.connection)
 
-    def ungrab(self, ctx: 'Ctx', window: GWindow, *modifiers: Mod):
+    def ungrab(self, ctx: 'Ctx[GCtx]', window: GWindow, *modifiers: Mod):
         assert not ctx.closed, 'conn is closed'
-
-        gctx = ctx._getGCtx()
 
         if self.key is None:
             self.load(ctx)
@@ -119,20 +114,18 @@ class Key(GKey):
         for _mod in modifiers:
             mod |= _mod.mod
 
-        xcb.xcbUngrabKey(gctx.connection, self.key, window.id, mod)
-        xcb.xcbFlush(gctx.connection)
+        xcb.xcbUngrabKey(ctx.gctx.connection, self.key, window.id, mod)
+        xcb.xcbFlush(ctx.gctx.connection)
 
-    def press(self, ctx: 'Ctx', window: 'GWindow', *modifiers: Mod):
+    def press(self, ctx: 'Ctx[GCtx]', window: 'GWindow', *modifiers: Mod):
         assert not ctx.closed, 'conn is closed'
-
-        gctx = ctx._getGCtx()
 
         if self.key is None:
             self.load(ctx)
 
         # TODO: handle mods properly
         xcb.xcbTestFakeInput(
-            gctx.connection,
+            ctx.gctx.connection,
             xcb.XCBKeyPress,
             self.key,
             xcb.XCBCurrentTime,
@@ -142,7 +135,7 @@ class Key(GKey):
             0,
         )
         xcb.xcbTestFakeInput(
-            gctx.connection,
+            ctx.gctx.connection,
             xcb.XCBKeyRelease,
             self.key,
             xcb.XCBCurrentTime,

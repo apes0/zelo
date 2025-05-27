@@ -45,9 +45,8 @@ async def eloop(ctx: 'Ctx', task_status=trio.TASK_STATUS_IGNORED):
 
 
 @window.event
-def on_draw(ctx: 'Ctx'):
-    gctx: GCtx = ctx._getGCtx()
-    for obj in gctx.toDraw:
+def on_draw(ctx: 'Ctx[GCtx]'):
+    for obj in ctx.gctx.toDraw:
         obj.draw()
 
 

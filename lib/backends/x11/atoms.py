@@ -12,6 +12,7 @@ from .types import charpC, maxUVal, icccmWmHintsTC, voidpC, intpC
 if TYPE_CHECKING:
     from lib.backends.generic import GWindow
     from lib.ctx import Ctx
+    from lib.backends.x11.gctx import Ctx as GCtx
 
 # atom name: id or None, type, atom format
 atoms: dict[str, tuple[int | None, int, int]] = {
@@ -37,8 +38,8 @@ def reader(t: str):
 
 
 class Atom:
-    def __init__(self, ctx: 'Ctx', win: 'GWindow', name: str) -> None:
-        self.ctx: requests.Ctx = ctx
+    def __init__(self, ctx: 'Ctx[GCtx]', win: 'GWindow', name: str) -> None:
+        self.ctx: 'Ctx[GCtx]' = ctx
         self.win: 'GWindow' = win
         self.name: str = name
         self.value: Any = None
@@ -52,8 +53,10 @@ class Atom:
         assert id != None, f'atom {name} missing id'
         self.id: int = id
 
-        gctx = self.ctx._getGCtx()
-        gctx.atoms[self.win.id] = {**gctx.atoms.get(self.win.id, {}), self.id: self}
+        self.ctx.gctx.atoms[self.win.id] = {
+            **self.ctx.gctx.atoms.get(self.win.id, {}),
+            self.id: self,
+        }
 
     async def read(self):
         f = readers.get(self.name)
@@ -73,10 +76,15 @@ class Atom:
 
     async def _read(self, off: int = 0, buf: int = maxUVal('int')):
         # NOTE: buf and off are "32-bit multiples", so if you want 4 bytes, you should use a buf of 1
-        conn = self.ctx._getGCtx().connection
-
         resp = await requests.GetProperty(
-            self.ctx, conn, 0, self.win.id, self.id, self.type, off, buf
+            self.ctx,
+            self.ctx.gctx.connection,
+            0,
+            self.win.id,
+            self.id,
+            self.type,
+            off,
+            buf,
         ).reply()
 
         if resp == xcb.NULL:
@@ -91,7 +99,7 @@ class Atom:
             f'setting {self.name} of {self.win.id} to {data} (size: {size})',
         )
         xcb.xcbChangeProperty(
-            self.ctx._getGCtx().connection,
+            self.ctx.gctx.connection,
             mode,
             self.win.id,
             self.id,
@@ -176,14 +184,14 @@ async def readHints(atom: Atom):
     if obj.flags & xcb.XCBIcccmWmHintIconPixmap:
         # we have an icon!
         g = await requests.GetGeometry(
-            atom.ctx, atom.ctx._getGCtx().connection, obj.iconPixmap
+            atom.ctx, atom.ctx.gctx.connection, obj.iconPixmap
         ).reply()
 
         w, h = g.width, g.height
 
         i = await requests.GetImage(
             atom.ctx,
-            atom.ctx._getGCtx().connection,
+            atom.ctx.gctx.connection,
             xcb.XCBImageFormatZPixmap,
             obj.iconPixmap,
             0,

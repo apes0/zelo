@@ -7,10 +7,13 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ...ctx import Ctx
+    from .gctx import Ctx as GCtx
 
 
 class Display(GDisplay):
-    def __init__(self, ctx: 'Ctx', x: int, y: int, width: int, height: int) -> None:
+    def __init__(
+        self, ctx: 'Ctx[GCtx]', x: int, y: int, width: int, height: int
+    ) -> None:
         self.ctx = ctx
         self.x: int = x
         self.y: int = y
