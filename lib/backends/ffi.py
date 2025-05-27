@@ -73,6 +73,7 @@ buildX = partial(
         'xcb-xtest',
         'xcb-errors',
         'xcb-xinerama',
+        'xcb-dpms',
     ],
     xcb,
 )

@@ -71,6 +71,22 @@ class Display(GDisplay):
             self.ctx, self.ctx.gctx.connection, self._crtc
         ).reply()
 
+    def turnOff(self):
+        xcb.xcbDpmsForceLevel(self.ctx.gctx.connection, xcb.XCBDpmsDpmsModeOff)
+
+    def turnOn(self):
+        xcb.xcbDpmsForceLevel(self.ctx.gctx.connection, xcb.XCBDpmsDpmsModeOn)
+
+    def setTimeout(self, t: int):
+        # ? should these be seperated
+        xcb.xcbDpmsSetTimeouts(self.ctx.gctx.connection, t, t, t)
+
+    def disableTimeout(self):
+        xcb.xcbDpmsDisable(self.ctx.gctx.connection)
+
+    def enableTimeout(self):
+        xcb.xcbDpmsEnable(self.ctx.gctx.connection)
+
 
 class Screen(
     GScreen

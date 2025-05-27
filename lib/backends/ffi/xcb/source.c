@@ -1,3 +1,4 @@
+#include <xcb/dpms.h>
 #include <xcb/randr.h>
 #include <xcb/shm.h>
 #include <xcb/xcb.h>

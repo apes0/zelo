@@ -500,6 +500,22 @@ class GDisplay:
     async def scale(self, x: float, y: float):
         raise NotImplementedError
 
+    def turnOff(self):
+        raise NotImplementedError
+
+    def turnOn(self):
+        raise NotImplementedError
+
+    def setTimeout(self, t: int):
+        raise NotImplementedError
+        # ? should these be seperated
+
+    def disableTimeout(self):
+        raise NotImplementedError
+
+    def enableTimeout(self):
+        raise NotImplementedError
+
     def __repr__(self) -> str:
         return f'<Display {self.width}x{self.height}@({self.x}, {self.y})>'
 

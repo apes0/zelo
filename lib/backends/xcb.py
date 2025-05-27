@@ -125,6 +125,60 @@ class XcbDestroyNotifyEventT(Base):
         self.responseType: int = obj.response_type
         self.sequence: int = obj.sequence
         self.window: XcbWindowT = obj.window
+class XcbDpmsCapableCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        super().__init__()
+        if obj == ffi.NULL:return
+        self.sequence: int = obj.sequence
+class XcbDpmsCapableReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        super().__init__()
+        if obj == ffi.NULL:return
+        self.capable: int = obj.capable
+        self.length: int = obj.length
+        self.pad0: int = obj.pad0
+        self.pad1: int = obj.pad1
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+class XcbDpmsGetTimeoutsCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        super().__init__()
+        if obj == ffi.NULL:return
+        self.sequence: int = obj.sequence
+class XcbDpmsGetTimeoutsReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        super().__init__()
+        if obj == ffi.NULL:return
+        self.length: int = obj.length
+        self.offTimeout: int = obj.off_timeout
+        self.pad0: int = obj.pad0
+        self.pad1: int = obj.pad1
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.standbyTimeout: int = obj.standby_timeout
+        self.suspendTimeout: int = obj.suspend_timeout
+class XcbDpmsInfoCookieT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        super().__init__()
+        if obj == ffi.NULL:return
+        self.sequence: int = obj.sequence
+class XcbDpmsInfoReplyT(Base):
+    def __init__(self, obj):
+        self.obj = obj
+        super().__init__()
+        if obj == ffi.NULL:return
+        self.length: int = obj.length
+        self.pad0: int = obj.pad0
+        self.pad1: int = obj.pad1
+        self.powerLevel: int = obj.power_level
+        self.responseType: int = obj.response_type
+        self.sequence: int = obj.sequence
+        self.state: int = obj.state
 XcbDrawableT = int
 class XcbEnterNotifyEventT(Base):
     def __init__(self, obj):
@@ -991,6 +1045,10 @@ XCBCwOverrideRedirect: int = 512
 XCBCwSaveUnder: int = 1024
 XCBCwWinGravity: int = 32
 XCBDestroyNotify: int = 17
+XCBDpmsDpmsModeOff: int = 3
+XCBDpmsDpmsModeOn: int = 0
+XCBDpmsDpmsModeStandby: int = 1
+XCBDpmsDpmsModeSuspend: int = 2
 XCBEnterNotify: int = 7
 XCBEventMaskButton1Motion: int = 256
 XCBEventMaskButton2Motion: int = 512
@@ -1163,6 +1221,16 @@ def xcbCreateWindow(conn: CPtr[XcbConnectionT], depth: int, wid: int, parent: in
 def xcbDeleteProperty(conn: CPtr[XcbConnectionT], window: int, property: int, ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_delete_property(*parseArgs(conn, window, property, )))
 def xcbDestroyWindow(conn: CPtr[XcbConnectionT], window: int, ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_destroy_window(*parseArgs(conn, window, )))
 def xcbDisconnect(conn: CPtr[XcbConnectionT], ) -> void:return void(lib.xcb_disconnect(*parseArgs(conn, )))
+def xcbDpmsCapableReply(conn: CPtr[XcbConnectionT], cookie: 'XcbDpmsCapableCookieT', e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbDpmsCapableReplyT]:return XcbDpmsCapableReplyT(lib.xcb_dpms_capable_reply(*parseArgs(conn, cookie, e, )))
+def xcbDpmsCapableUnchecked(conn: CPtr[XcbConnectionT], ) -> 'XcbDpmsCapableCookieT':return XcbDpmsCapableCookieT(lib.xcb_dpms_capable_unchecked(*parseArgs(conn, )))
+def xcbDpmsDisable(conn: CPtr[XcbConnectionT], ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_dpms_disable(*parseArgs(conn, )))
+def xcbDpmsEnable(conn: CPtr[XcbConnectionT], ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_dpms_enable(*parseArgs(conn, )))
+def xcbDpmsForceLevel(conn: CPtr[XcbConnectionT], powerLevel: int, ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_dpms_force_level(*parseArgs(conn, powerLevel, )))
+def xcbDpmsGetTimeoutsReply(conn: CPtr[XcbConnectionT], cookie: 'XcbDpmsGetTimeoutsCookieT', e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbDpmsGetTimeoutsReplyT]:return XcbDpmsGetTimeoutsReplyT(lib.xcb_dpms_get_timeouts_reply(*parseArgs(conn, cookie, e, )))
+def xcbDpmsGetTimeoutsUnchecked(conn: CPtr[XcbConnectionT], ) -> 'XcbDpmsGetTimeoutsCookieT':return XcbDpmsGetTimeoutsCookieT(lib.xcb_dpms_get_timeouts_unchecked(*parseArgs(conn, )))
+def xcbDpmsInfoReply(conn: CPtr[XcbConnectionT], cookie: 'XcbDpmsInfoCookieT', e: CPtr[XcbGenericErrorT], ) -> CPtr[XcbDpmsInfoReplyT]:return XcbDpmsInfoReplyT(lib.xcb_dpms_info_reply(*parseArgs(conn, cookie, e, )))
+def xcbDpmsInfoUnchecked(conn: CPtr[XcbConnectionT], ) -> 'XcbDpmsInfoCookieT':return XcbDpmsInfoCookieT(lib.xcb_dpms_info_unchecked(*parseArgs(conn, )))
+def xcbDpmsSetTimeouts(conn: CPtr[XcbConnectionT], standbyTimeout: int, suspendTimeout: int, offTimeout: int, ) -> 'XcbVoidCookieT':return XcbVoidCookieT(lib.xcb_dpms_set_timeouts(*parseArgs(conn, standbyTimeout, suspendTimeout, offTimeout, )))
 def xcbErrorsContextFree(ctx: CPtr[XcbErrorsContextT], ) -> void:return void(lib.xcb_errors_context_free(*parseArgs(ctx, )))
 def xcbErrorsContextNew(conn: CPtr[XcbConnectionT], c: CPtr[XcbErrorsContextT], ) -> int:return int(lib.xcb_errors_context_new(*parseArgs(conn, c, )))
 def xcbErrorsGetNameForError(ctx: CPtr[XcbErrorsContextT], errorCode: int, extension: Ptr[int], ) -> Ptr[int]:return Ptr(lib.xcb_errors_get_name_for_error(*parseArgs(ctx, errorCode, extension, )))
@@ -1253,6 +1321,7 @@ type XcbAtomEnumT = Literal['XCBAtomNone', 'XCBAtomAny', 'XCBAtomPrimary', 'XCBA
 type XcbButtonIndexT = Literal['XCBButtonIndexAny', 'XCBButtonIndex1', 'XCBButtonIndex2', 'XCBButtonIndex3', 'XCBButtonIndex4', 'XCBButtonIndex5']
 type XcbConfigWindowT = Literal['XCBConfigWindowX', 'XCBConfigWindowY', 'XCBConfigWindowWidth', 'XCBConfigWindowHeight', 'XCBConfigWindowBorderWidth', 'XCBConfigWindowSibling', 'XCBConfigWindowStackMode']
 type XcbCwT = Literal['XCBCwBackPixmap', 'XCBCwBackPixel', 'XCBCwBorderPixmap', 'XCBCwBorderPixel', 'XCBCwBitGravity', 'XCBCwWinGravity', 'XCBCwBackingStore', 'XCBCwBackingPlanes', 'XCBCwBackingPixel', 'XCBCwOverrideRedirect', 'XCBCwSaveUnder', 'XCBCwEventMask', 'XCBCwDontPropagate', 'XCBCwColormap', 'XCBCwCursor']
+type XcbDpmsDpmsModeT = Literal['XCBDpmsDpmsModeOn', 'XCBDpmsDpmsModeStandby', 'XCBDpmsDpmsModeSuspend', 'XCBDpmsDpmsModeOff']
 type XcbEventMaskT = Literal['XCBEventMaskNoEvent', 'XCBEventMaskKeyPress', 'XCBEventMaskKeyRelease', 'XCBEventMaskButtonPress', 'XCBEventMaskButtonRelease', 'XCBEventMaskEnterWindow', 'XCBEventMaskLeaveWindow', 'XCBEventMaskPointerMotion', 'XCBEventMaskPointerMotionHint', 'XCBEventMaskButton1Motion', 'XCBEventMaskButton2Motion', 'XCBEventMaskButton3Motion', 'XCBEventMaskButton4Motion', 'XCBEventMaskButton5Motion', 'XCBEventMaskButtonMotion', 'XCBEventMaskKeymapState', 'XCBEventMaskExposure', 'XCBEventMaskVisibilityChange', 'XCBEventMaskStructureNotify', 'XCBEventMaskResizeRedirect', 'XCBEventMaskSubstructureNotify', 'XCBEventMaskSubstructureRedirect', 'XCBEventMaskFocusChange', 'XCBEventMaskPropertyChange', 'XCBEventMaskColorMapChange', 'XCBEventMaskOwnerGrabButton']
 type XcbGcT = Literal['XCBGcFunction', 'XCBGcPlaneMask', 'XCBGcForeground', 'XCBGcBackground', 'XCBGcLineWidth', 'XCBGcLineStyle', 'XCBGcCapStyle', 'XCBGcJoinStyle', 'XCBGcFillStyle', 'XCBGcFillRule', 'XCBGcTile', 'XCBGcStipple', 'XCBGcTileStippleOriginX', 'XCBGcTileStippleOriginY', 'XCBGcFont', 'XCBGcSubwindowMode', 'XCBGcGraphicsExposures', 'XCBGcClipOriginX', 'XCBGcClipOriginY', 'XCBGcClipMask', 'XCBGcDashOffset', 'XCBGcDashList', 'XCBGcArcMode']
 type XcbGetPropertyTypeT = Literal['XCBGetPropertyTypeAny']

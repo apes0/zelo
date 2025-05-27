@@ -1042,6 +1042,54 @@ typedef struct xcb_xinerama_screen_info_t
     unsigned short width;
     unsigned short height;
 } xcb_xinerama_screen_info_t;
+typedef enum xcb_dpms_dpms_mode_t
+{
+    XCB_DPMS_DPMS_MODE_ON = 0,
+    XCB_DPMS_DPMS_MODE_STANDBY = 1,
+    XCB_DPMS_DPMS_MODE_SUSPEND = 2,
+    XCB_DPMS_DPMS_MODE_OFF = 3
+} xcb_dpms_dpms_mode_t;
+typedef struct xcb_dpms_capable_cookie_t
+{
+    unsigned int sequence;
+} xcb_dpms_capable_cookie_t;
+typedef struct xcb_dpms_capable_reply_t
+{
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    unsigned int length;
+    unsigned char capable;
+    unsigned char pad1[23];
+} xcb_dpms_capable_reply_t;
+typedef struct xcb_dpms_get_timeouts_cookie_t
+{
+    unsigned int sequence;
+} xcb_dpms_get_timeouts_cookie_t;
+typedef struct xcb_dpms_get_timeouts_reply_t {
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    unsigned int length;
+    unsigned short standby_timeout;
+    unsigned short suspend_timeout;
+    unsigned short off_timeout;
+    unsigned char pad1[18];
+} xcb_dpms_get_timeouts_reply_t;
+typedef struct xcb_dpms_info_cookie_t
+{
+    unsigned int sequence;
+} xcb_dpms_info_cookie_t;
+typedef struct xcb_dpms_info_reply_t
+{
+    unsigned char response_type;
+    unsigned char pad0;
+    unsigned short sequence;
+    unsigned int length;
+    unsigned short power_level;
+    unsigned char state;
+    unsigned char pad1[21];
+} xcb_dpms_info_reply_t;
 
 // custom from source:
 
@@ -1155,6 +1203,16 @@ xcb_randr_output_t *xcb_randr_get_crtc_info_outputs(const xcb_randr_get_crtc_inf
 xcb_xinerama_query_screens_cookie_t xcb_xinerama_query_screens(xcb_connection_t *conn);
 xcb_xinerama_query_screens_reply_t *xcb_xinerama_query_screens_reply(xcb_connection_t *conn, xcb_xinerama_query_screens_cookie_t cookie, xcb_generic_error_t **e);
 xcb_xinerama_screen_info_t *xcb_xinerama_query_screens_screen_info(const xcb_xinerama_query_screens_reply_t *R);
+xcb_dpms_capable_cookie_t xcb_dpms_capable_unchecked(xcb_connection_t *conn);
+xcb_dpms_capable_reply_t *xcb_dpms_capable_reply(xcb_connection_t *conn, xcb_dpms_capable_cookie_t cookie, xcb_generic_error_t **e);
+xcb_dpms_get_timeouts_cookie_t xcb_dpms_get_timeouts_unchecked(xcb_connection_t *conn);
+xcb_dpms_get_timeouts_reply_t *xcb_dpms_get_timeouts_reply(xcb_connection_t *conn, xcb_dpms_get_timeouts_cookie_t cookie, xcb_generic_error_t **e);
+xcb_void_cookie_t xcb_dpms_set_timeouts(xcb_connection_t *conn, unsigned short standby_timeout, unsigned short suspend_timeout, unsigned short off_timeout);
+xcb_void_cookie_t xcb_dpms_enable(xcb_connection_t *conn);
+xcb_void_cookie_t xcb_dpms_disable(xcb_connection_t *conn);
+xcb_void_cookie_t xcb_dpms_force_level(xcb_connection_t *conn, unsigned short power_level);
+xcb_dpms_info_cookie_t xcb_dpms_info_unchecked(xcb_connection_t *conn);
+xcb_dpms_info_reply_t *xcb_dpms_info_reply(xcb_connection_t *conn, xcb_dpms_info_cookie_t cookie, xcb_generic_error_t **e);
 
 // custom from source:
 

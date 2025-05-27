@@ -83,7 +83,7 @@ async def startRequests(ctx: 'Ctx'):
 async def extensions(ctx: 'Ctx'):
     gctx: GCtx = ctx._getGCtx()
     reqs = {}
-    names = ['RANDR', 'MIT-SHM', 'XTEST', 'RENDER', 'XINERAMA']
+    names = ['RANDR', 'MIT-SHM', 'XTEST', 'RENDER', 'XINERAMA', 'DPMS']
 
     for name in names:
         reqs[name] = requests.QueryExtension(
@@ -138,7 +138,6 @@ async def initXinerama(ctx: 'Ctx'):
 
     o = await requests.XineramaQueryScreens(ctx, conn).reply()
 
-    # ctx.screen.
     a = xcb.xcbXineramaQueryScreensScreenInfo(o)
 
     for n in range(o.number):
