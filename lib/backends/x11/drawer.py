@@ -100,7 +100,7 @@ class Image(GImage):
         if self.useShm:
             data = img.tobytes()
             ffi.memmove(self.shm.addr, data, len(data))
-            if not self.gctx.sharedPixmaps:  # type: ignore
+            if not self.ctx.gctx.sharedPixmaps:  # type: ignore
                 xcb.xcbShmPutImage(  # TODO: do i need to do this every time, or only once?
                     self.ctx.gctx.connection,
                     self.windowId,
@@ -160,7 +160,7 @@ class Image(GImage):
     def draw(self):
         assert not self.ctx.closed, 'conn is closed'
 
-        if self.useShm and not self.gctx.sharedPixmaps:  # type: ignore
+        if self.useShm and not self.ctx.gctx.sharedPixmaps:  # type: ignore
             xcb.xcbShmPutImage(
                 self.ctx.gctx.connection,
                 self.windowId,
