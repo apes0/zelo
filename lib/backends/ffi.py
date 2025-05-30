@@ -111,7 +111,8 @@ for lib, check in checks.items():
         imp = lib
         break
 
-assert imp, 'didn\'t manage to find a backend'
+if not imp:
+    raise BaseException('didn\'t manage to find a backend')
 
 _build: Callable = builds[imp]
 
@@ -128,4 +129,5 @@ def load(
 ) -> (
     ModuleType
 ):  # this imports from the wrapper for you, but it also resolves circular imports
+    assert imp, 'ffi.load(): imp cannot be None'
     return import_module(f'{wrappers[imp]}.{mod}')

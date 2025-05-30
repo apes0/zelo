@@ -25,6 +25,8 @@ async def _wrapper(afn):
 _GCtx = TypeVar('_GCtx', bound='GCtx')
 
 
+# idk if mypy can actually typecheck this; i get a crash when running mypy lib/ctx.py
+# see this: https://github.com/python/mypy/issues/18996
 class Ctx[_GCtx]:
     def __init__(self):
         self._root: int
