@@ -476,28 +476,13 @@ class GText:
 
 # screen
 class GScreen:
-    def __init__(self) -> None:
+
+    def __init__(self, ctx: 'Ctx[GCtx]') -> None:
         self.width: int
         self.height: int
         self.root: int
         self.screen: CData
         self.displays: list[GDisplay] = []
-        raise NotImplementedError
-
-    def __repr__(self) -> str:
-        return f'<Screen ({self.height} x {self.width})>'
-
-
-# screen
-class GDisplay:
-    def __init__(self, ctx: 'Ctx', x: int, y: int, width: int, height: int) -> None:
-        self.x: int
-        self.y: int
-        self.width: int
-        self.height: int
-        raise NotImplementedError
-
-    async def scale(self, x: float, y: float):
         raise NotImplementedError
 
     def turnOff(self):
@@ -514,6 +499,22 @@ class GDisplay:
         raise NotImplementedError
 
     def enableTimeout(self):
+        raise NotImplementedError
+
+    def __repr__(self) -> str:
+        return f'<Screen ({self.height} x {self.width})>'
+
+
+# screen
+class GDisplay:
+    def __init__(self, ctx: 'Ctx', x: int, y: int, width: int, height: int) -> None:
+        self.x: int
+        self.y: int
+        self.width: int
+        self.height: int
+        raise NotImplementedError
+
+    async def scale(self, x: float, y: float):
         raise NotImplementedError
 
     def __repr__(self) -> str:

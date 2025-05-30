@@ -74,6 +74,19 @@ class Display(GDisplay):
             self.ctx, self.ctx.gctx.connection, self._crtc
         ).reply()
 
+
+class Screen(
+    GScreen
+):  # idk if wayland has an equivalent for rootDepth, so i wont put it here yet
+
+    def __init__(self, ctx: 'Ctx[GCtx]', screen) -> None:
+        self.width: int = screen.widthInPixels
+        self.height: int = screen.heightInPixels
+        self.root: int = screen.root
+        self.screen = screen
+        self.ctx = ctx
+        self.displays: list[Display] = []
+
     def turnOff(self):
         xcb.xcbDpmsForceLevel(self.ctx.gctx.connection, xcb.XCBDpmsDpmsModeOff)
 
@@ -89,14 +102,3 @@ class Display(GDisplay):
 
     def enableTimeout(self):
         xcb.xcbDpmsEnable(self.ctx.gctx.connection)
-
-
-class Screen(
-    GScreen
-):  # idk if wayland has an equivalent for rootDepth, so i wont put it here yet
-    def __init__(self, screen) -> None:
-        self.width: int = screen.widthInPixels
-        self.height: int = screen.heightInPixels
-        self.root: int = screen.root
-        self.screen = screen
-        self.displays: list[Display] = []

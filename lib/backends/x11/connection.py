@@ -97,7 +97,7 @@ async def extensions(ctx: 'Ctx[GCtx]'):
 
 async def initRandr(ctx: 'Ctx[GCtx]'):
     conn = ctx.gctx.connection
-    ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, ctx.gctx.screenp[0]))
+    ctx.screen = Screen(ctx, xcb.xcbAuxGetScreen(conn, ctx.gctx.screenp[0]))
     ctx._root = ctx.screen.root
 
     screenRes = await requests.GetScreenResources(ctx, conn, ctx._root).reply()
@@ -129,7 +129,7 @@ async def initRandr(ctx: 'Ctx[GCtx]'):
 
 async def initXinerama(ctx: 'Ctx[GCtx]'):
     conn = ctx.gctx.connection
-    ctx.screen = Screen(xcb.xcbAuxGetScreen(conn, ctx.gctx.screenp[0]))
+    ctx.screen = Screen(ctx, xcb.xcbAuxGetScreen(conn, ctx.gctx.screenp[0]))
     ctx._root = ctx.screen.root
 
     o = await requests.XineramaQueryScreens(ctx, conn).reply()
