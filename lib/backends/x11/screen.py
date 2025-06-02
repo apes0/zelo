@@ -1,4 +1,4 @@
-from ..generic import GDisplay, GScreen
+from ..generic import GDisplay, GScreen, pre, applyPre
 from .types import chararr
 from .. import xcb
 from .requests import RandrGetCrtcTransform, RandrSetCrtcConfig
@@ -10,6 +10,19 @@ if TYPE_CHECKING:
     from .gctx import Ctx as GCtx
 
 
+@pre
+def hasRandr(self, *_a, **_kwa):
+    if not self.ctx.gctx.avail('RANDR'):
+        raise BaseException('Xrandr is requred for this function')
+
+
+@pre
+def hasDpms(self, *_a, **_kwa):
+    if not self.ctx.gctx.avail('DPMS'):
+        raise BaseException('X11 DPMS is required for this function')
+
+
+@applyPre
 class Display(GDisplay):
     def __init__(
         self, ctx: 'Ctx[GCtx]', x: int, y: int, width: int, height: int
@@ -25,11 +38,8 @@ class Display(GDisplay):
         self._outputs: Any
         self._numOutputs: int
 
-    # TODO: check if randr is present for scale
+    @hasRandr
     async def scale(self, x: float, y: float):
-        if not self.ctx.gctx.avail('RANDR'):
-            raise NotImplementedError('Display.scale doesn\'t work without xrandr')
-
         # https://gitlab.freedesktop.org/xorg/app/xrandr/-/blob/master/xrandr.c?ref_type=heads#L3022
         filter = b'nearest' if round(x) == x and round(y) == y else b'bilinear'
 
@@ -75,6 +85,7 @@ class Display(GDisplay):
         ).reply()
 
 
+@applyPre
 class Screen(
     GScreen
 ):  # idk if wayland has an equivalent for rootDepth, so i wont put it here yet
@@ -87,18 +98,23 @@ class Screen(
         self.ctx = ctx
         self.displays: list[Display] = []
 
+    @hasDpms
     def turnOff(self):
         xcb.xcbDpmsForceLevel(self.ctx.gctx.connection, xcb.XCBDpmsDpmsModeOff)
 
+    @hasDpms
     def turnOn(self):
         xcb.xcbDpmsForceLevel(self.ctx.gctx.connection, xcb.XCBDpmsDpmsModeOn)
 
+    @hasDpms
     def setTimeout(self, t: int):
         # ? should these be seperated
         xcb.xcbDpmsSetTimeouts(self.ctx.gctx.connection, t, t, t)
 
+    @hasDpms
     def disableTimeout(self):
         xcb.xcbDpmsDisable(self.ctx.gctx.connection)
 
+    @hasDpms
     def enableTimeout(self):
         xcb.xcbDpmsEnable(self.ctx.gctx.connection)
