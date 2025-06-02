@@ -85,15 +85,20 @@ def applyPre(cls: type) -> type:
         base = cls.__base__
 
     for name in dir(base):
+        pres = []
+
         orobj = getattr(base, name)
+        obj = getattr(cls, name)
 
         if hasattr(orobj, 'pres'):
             obj = getattr(cls, name)
             pres = orobj.pres
 
-            if hasattr(obj, 'pres'):
-                # additional pres from the child class take a lower priority
-                pres += obj.pres
+        if hasattr(obj, 'pres'):
+            # pres from the child class take a lower priority
+            pres += obj.pres
+
+        if pres:
             isasync = inspect.iscoroutinefunction(obj)
 
             newF = makea(pres, obj) if isasync else make(pres, obj)
