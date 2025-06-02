@@ -17,6 +17,7 @@ from extensions.widgets.nowPlaying import NowPlaying
 from extensions.widgets.text import Text
 from extensions.winfo import Winfo
 from extensions.workspaces import Workspaces
+from extensions.blank import Blank
 from lib._cfg import Cfg
 from lib.api.keys import Key, Mod
 from lib.debcfg import cfg as debcfg
@@ -117,6 +118,7 @@ cfg.extensions = {
     Mouse: {},
     Tabs: {},
     Borders: {'width': 5, 'focused': theme.fore, 'unfocused': theme.back},
+    # Blank: {'timeout': 10},
     # Winfo: {},
     #    ShareServer:{},
     #    ShareClient:{'addr': '0.0.0.0'},
