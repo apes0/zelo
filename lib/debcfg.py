@@ -64,6 +64,7 @@ cfg = {
     'windows': False,  # anything to do with windows
     'extensions': False,  # extension logs
     'startSoon': True,  # stuff erroring in start soon calls
+    'screen': False,  # scaling a display, turning the screens on and off, etc..
     'others': True,  # anything else that's logging
 }
 

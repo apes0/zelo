@@ -481,7 +481,6 @@ class GText:
 
 # screen
 class GScreen:
-
     def __init__(self, ctx: 'Ctx[GCtx]') -> None:
         self.width: int
         self.height: int
@@ -490,19 +489,24 @@ class GScreen:
         self.displays: list[GDisplay] = []
         raise NotImplementedError
 
+    @logCall('screen', DEBUG)
     def turnOff(self):
         raise NotImplementedError
 
+    @logCall('screen', DEBUG)
     def turnOn(self):
         raise NotImplementedError
 
+    @logCall('screen', DEBUG)
     def setTimeout(self, t: int):
         raise NotImplementedError
         # ? should these be seperated
 
+    @logCall('screen', DEBUG)
     def disableTimeout(self):
         raise NotImplementedError
 
+    @logCall('screen', DEBUG)
     def enableTimeout(self):
         raise NotImplementedError
 
@@ -519,6 +523,7 @@ class GDisplay:
         self.height: int
         raise NotImplementedError
 
+    @logCall('screen', DEBUG)
     async def scale(self, x: float, y: float):
         raise NotImplementedError
 
