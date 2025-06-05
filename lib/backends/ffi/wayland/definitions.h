@@ -5,7 +5,7 @@ struct wl_event_loop;
 
 // functions
 
-struct wl_display *wl_display_create(void);
+struct wl_display *wl_display_create();
 const char *wl_display_add_socket_auto(struct wl_display *display);
 void wl_display_run(struct wl_display *display);
 void wl_display_destroy(struct wl_display *display);

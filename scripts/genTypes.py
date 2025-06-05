@@ -240,7 +240,7 @@ class {toCamelCase(_type, cls=True)}(Base):
             rtype = ' '.join(parts[:-1])
 
             rtype, rcast = parseType(rtype + ' *' * ptr)
-            args = definition.split('(')[1].strip(';').strip(')').split(',')
+            args = [a for a in definition.split('(')[1].strip(';').strip(')').split(',') if a.strip(' ')]
             types = ''
             callArgs = ''
             n = 0
@@ -268,13 +268,16 @@ class {toCamelCase(_type, cls=True)}(Base):
                         continue
                     try:
                         _args = l.split('(')[1].strip(';').strip(')').split(',')
+
                         if len(_args) == len(args):
                             argnames = []
                             for arg in _args:
                                 aname = arg.strip(' ').split(' ')[-1]
                                 while aname.startswith('*'):
                                     aname = aname[1:]
-                                argnames.append(aname.strip(' '))
+                                if not (aname := aname.strip(' ')):
+                                    continue
+                                argnames.append(aname)
                     except:
                         pass
 
@@ -306,5 +309,6 @@ def trybuild(libname, pyname):
 
 
 trybuild('xcb_cffi', 'xcb')
-trybuild('wayland_cffi', 'waylandServer')
+trybuild('wayland_cffi', 'wayland')
 trybuild('pango_cffi', 'pango')
+
