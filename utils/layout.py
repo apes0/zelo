@@ -27,11 +27,13 @@ class Layout:
             self.y + topspacing,
             self.width - topspacing * 2,
             self.height * y - topspacing * 2,
+            topspacing,
         ), Layout(
             self.x + bottomspacing,
             self.y + self.height * y + bottomspacing,
             self.width - bottomspacing * 2,
             self.height * (-y + 1) - bottomspacing * 2,
+            bottomspacing,
         )  # top, bottom
 
     def vsplit(self, x: float, leftspacing: float = -1, rightspacing: float = -1):
@@ -51,7 +53,9 @@ class Layout:
         )  # left, right
 
     def unspace(self):
-        self.x -= self.spacing
-        self.y -= self.spacing
-        self.width -= 2 * self.spacing
-        self.height -= 2 * self.spacing
+        return Layout(
+            self.x - self.spacing,
+            self.y - self.spacing,
+            self.width + 2 * self.spacing,
+            self.height + 2 * self.spacing,
+        )

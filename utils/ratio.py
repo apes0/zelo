@@ -47,4 +47,4 @@ class Ratio:
         return Ratio(-self.ratio, width=self.width, height=self.height)
 
     def __repr__(self) -> str:
-        return f'<Ratio {self.ratio} for {["", "width", "height", "both"][self.width + self.height*2]}>'
+        return f'<Ratio {self.ratio} for {["", "width", "height", "both"][self.width + self.height * 2]}>'
