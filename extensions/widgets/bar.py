@@ -35,13 +35,11 @@ class Bar(Widget):
     async def __ainit__(self):
         await super().__ainit__()
         for widget, cfg in self.widgets:
-            self.ctx.startSoon(self.initer, widget, cfg)
+            await self.initer(widget, cfg)
 
         self.rect = Rectangle(
             self.ctx, self.win, 0, 0, self.width, self.height, self.back
         )
-
-        self.ready()
 
     async def draw(self):
         await self.setSize(self.width, self.height)

@@ -38,7 +38,6 @@ class Clock(Widget):
             self.back,
         )
 
-        self.ready()
         self.ctx.startSoon(self._update)
 
     async def _update(self):

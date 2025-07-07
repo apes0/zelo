@@ -23,15 +23,16 @@ class Widget(Extension):
         )
         # the window to draw in
 
+    async def __ainit__(self):
+        await super().__ainit__()
+        self.ctx.startSoon(self.win.map)  # TODO: make win.map not block forever on x11
+        self.addListener(self.win.redraw, self.draw)
+
     async def draw(self):
         raise NotImplementedError
 
     async def setSize(self, width: int, height: int):
-        #        print(f'resizing to {width}x{height}')
         await self.win.configure(newWidth=width, newHeight=height)
 
         self._size = (width, height)
 
-    def ready(self):
-        self.addListener(self.win.redraw, self.draw)
-        self.ctx.startSoon(self.win.map)

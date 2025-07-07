@@ -71,7 +71,6 @@ class NowPlaying(Widget):
             self.ctx, self.win, 0, 0, None, self.font, self.fore, self.back
         )
         self.rect = Rectangle(self.ctx, self.win, 0, 0, self.width, 1, self.back)
-        self.ready()
 
     def getText(self):
         status, song = getSong()
