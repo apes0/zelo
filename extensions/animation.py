@@ -26,7 +26,7 @@ class Animation(Extension):
 
         _rat = 0
 
-        def filter(w, *_):
+        async def filter(w, *_):
             return w == win
 
         self.ctx.mapNotify.addFilter(filter)

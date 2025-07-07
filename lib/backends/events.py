@@ -1,6 +1,7 @@
 import traceback
 from logging import DEBUG, ERROR
 from typing import TYPE_CHECKING, Callable, Iterable, Coroutine
+from typing_extensions import Awaitable
 import trio
 
 from ..debcfg import log
@@ -64,7 +65,6 @@ type trans = Callable[..., Iterable]
 
 
 class Event[*T]:
-
     def __init__(
         self, ctx: 'Ctx', name: str, proxies: dict['Event', trans | None] | None = None
     ) -> None:
@@ -81,7 +81,7 @@ class Event[*T]:
     def removeProxy(self, event: 'Event'):
         del self.proxies[event]
 
-    def addFilter(self, filter: Callable[[*T], bool]):
+    def addFilter(self, filter: Callable[[*T], Awaitable[bool]]):
         return self.filters.append(filter)
 
     def removeFilter(self, n: int):
@@ -95,7 +95,7 @@ class Event[*T]:
 
     async def trigger(self, *args: *T):
         for filter in self.filters:
-            if not filter(*args):
+            if not await filter(*args):
                 log(
                     'events',
                     DEBUG,
