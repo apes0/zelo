@@ -2,7 +2,7 @@ import importlib
 import os
 import sys
 from itertools import chain
-from typing import Callable
+from collections.abc import Callable
 
 # WARN: touching this is hell, this whole thing took me like a week to figure out
 # This is what the output should resemble:
@@ -29,7 +29,7 @@ from typing import Callable
 #       return CType(somefunc(a.obj, a))
 
 
-path = os.path.join(os.path.dirname((os.path.realpath(__file__))), '..')
+path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 
 sys.path.append(path)
 os.chdir(path)
@@ -102,7 +102,7 @@ def parseType(t):
 
     cast = type
     if not custom and _ptr:
-        cast = f'Ptr'
+        cast = 'Ptr'
 
     return itype, cast
 
@@ -240,7 +240,11 @@ class {toCamelCase(_type, cls=True)}(Base):
             rtype = ' '.join(parts[:-1])
 
             rtype, rcast = parseType(rtype + ' *' * ptr)
-            args = [a for a in definition.split('(')[1].strip(';').strip(')').split(',') if a.strip(' ')]
+            args = [
+                a
+                for a in definition.split('(')[1].strip(';').strip(')').split(',')
+                if a.strip(' ')
+            ]
             types = ''
             callArgs = ''
             n = 0
@@ -281,9 +285,9 @@ class {toCamelCase(_type, cls=True)}(Base):
                     except:
                         pass
 
-            assert len(argnames) == len(
-                args
-            ), f'couldnt make definition for {fname}, fix your styling lol'
+            assert len(argnames) == len(args), (
+                f'couldnt make definition for {fname}, fix your styling lol'
+            )
 
             for a, aname in zip(args, argnames):
                 a = a.strip(' ')
@@ -299,16 +303,16 @@ class {toCamelCase(_type, cls=True)}(Base):
     return text + '\n' + enums
 
 
-def trybuild(libname, pyname):
+def trybuild(libname, ffiname, pyname=''):
+    pyname = pyname or ffiname
     try:
         l = importlib.import_module(f'lib.backends.build.{libname}')
     except:
-        print(f'couldn\'t generate {pyname}.py, compile {libname}')
+        print(f"couldn't generate {pyname}.py, compile {libname}")
         return
-    open(f'./lib/backends/{pyname}.py', 'w').write(generate(pyname, l.lib, l.ffi))
+    open(f'./lib/backends/{pyname}.py', 'w').write(generate(ffiname, l.lib, l.ffi))
 
 
 trybuild('xcb_cffi', 'xcb')
-trybuild('wayland_cffi', 'wayland')
+trybuild('wayland_cffi', 'wayland', 'waylandServer')
 trybuild('pango_cffi', 'pango')
-
