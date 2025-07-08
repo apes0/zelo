@@ -65,3 +65,5 @@
 - export xcb pixmap to a generic class
 - fake transparency if no compositor is present (with the alpha blending from pango.c)
 - add --config
+- maybe roll our own wayland server lib instead of using cffi
+
