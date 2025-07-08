@@ -1,5 +1,6 @@
 from functools import partial
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
+from collections.abc import Callable
 
 import numpy as np
 import trio
@@ -10,7 +11,7 @@ from xcb_cffi import ffi
 
 from ...lock import alock, calock
 from .. import xcb
-from ..generic import GButton, GKey, GMod, GWindow, applyPre
+from ..generic import GWindow, applyPre
 from .types import maxUVal, uintarr
 
 if TYPE_CHECKING:
@@ -54,6 +55,7 @@ class Window(GWindow):
         self._iconTitle = Atom(ctx, self, 'WM_ICON_NAME')
         self._icon = Atom(ctx, self, '_NET_WM_ICON')
         self._hints = Atom(ctx, self, 'WM_HINTS')
+        self._class = Atom(ctx, self, 'WM_CLASS')
         # TODO: export hints somewhere
 
         # custom events:
@@ -62,11 +64,14 @@ class Window(GWindow):
         self.iconTitleChanged = self._iconTitle.changed
         self.iconChanged = self._icon.changed
 
+    async def names(self):
+        return await self._class.get()
+
     async def title(self):
-        return await self._title.get()
+        return (await self._title.get())[0]
 
     async def iconTitle(self):
-        return await self._iconTitle.get()
+        return (await self._iconTitle.get())[0]
 
     async def icon(self):
         # ? should we prefer the hints icon or the _NET_WM_ICON icon?
@@ -86,14 +91,14 @@ class Window(GWindow):
     def ignore(self, val):
         self._ignore = val
         # ? can i perhaps do an async setter?
-        self.ctx.nurs.start_soon(self.ctx.ignored.trigger, self)
         self.ctx.nurs.start_soon(self.ignored.trigger)
 
     async def map(self):
         assert not self.ctx.closed, 'conn is closed'
 
         fn = partial(xcb.xcbMapWindow, self.ctx.gctx.connection, self.id)
-        await runAndWait(self.ctx, [self.mapNotify], fn)
+        fn()
+        # await runAndWait(self.ctx, [self.mapNotify], fn)
 
         self.mapped = True
 
@@ -101,7 +106,8 @@ class Window(GWindow):
         assert not self.ctx.closed, 'conn is closed'
 
         fn = partial(xcb.xcbUnmapWindow, self.ctx.gctx.connection, self.id)
-        await runAndWait(self.ctx, [self.unmapNotify], fn)
+        fn()
+        # await runAndWait(self.ctx, [self.unmapNotify], fn)
 
         self.mapped = False
 
