@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import trio
 
@@ -44,7 +44,8 @@ mine: {win.mine}
 parent: {win.parent}
 title: {await win.title()}
 icon title: {await win.iconTitle()}
-x: {win.x} y: {win.y} w: {win.width} h: {win.height}'''
+x: {win.x} y: {win.y} w: {win.width} h: {win.height}
+names: {await win.names()}'''
         )
         self.text.draw()
         if win.icon is not None:

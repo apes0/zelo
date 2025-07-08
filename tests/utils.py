@@ -63,6 +63,6 @@ async def pclose(proc: trio.Process):
     proc.terminate()
     with trio.move_on_after(2):
         await proc.wait()
-    if proc.poll() == None:
+    if proc.poll() is None:
         proc.kill()
         await proc.wait()

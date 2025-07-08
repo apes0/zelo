@@ -1,12 +1,12 @@
 import os
 import random
-from typing import Any, Callable
+from typing import Any
+from collections.abc import Callable
 
 import trio
 
 from lib._cfg import Cfg
 from lib.backends.ffi import load
-from lib.backends.x11.types import chararr
 from lib.ctx import Ctx
 from lib.lock import alock
 from utils.fns import stop
@@ -82,9 +82,9 @@ async def startX(pre: Pre, ctx: TCtx, done: trio.Event):
 
         await pclose(p)
 
-    assert (
-        proc.poll() == None
-    ), f'Something went wrong with Xephyr (returned {proc.poll()} on display {i})'
+    assert proc.poll() is None, (
+        f'Something went wrong with Xephyr (returned {proc.poll()} on display {i})'
+    )
 
     ctx.env['DISPLAY'] = new
     done.set()
@@ -94,7 +94,7 @@ async def startX(pre: Pre, ctx: TCtx, done: trio.Event):
 async def endX(pre: Pre, ctx: TCtx, done: trio.Event):
     await pclose(pre.data)
     for _ in range(20):
-        p = await popen(ctx.nurs, f'xrefresh', ctx.env)
+        p = await popen(ctx.nurs, 'xrefresh', ctx.env)
         if await p.wait():
             await pclose(p)
             break

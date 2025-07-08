@@ -65,7 +65,7 @@ def toCursor(ctx: 'Ctx', win: 'GWindow'):
 
 
 def getDisplay(ctx: 'Ctx', x: int, y: int):
-    display: 'GDisplay | None' = None
+    display: GDisplay | None = None
 
     for _display in ctx.screen.displays:
         if x - _display.x < _display.width and y - _display.y < _display.height:

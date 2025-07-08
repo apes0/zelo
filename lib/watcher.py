@@ -1,6 +1,7 @@
 import select
 from logging import DEBUG, FATAL
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
+from collections.abc import Callable
 
 import trio
 

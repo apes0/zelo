@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-import trio
 
 from .. import xcb
 from ..generic import GCtx, applyPre
@@ -23,9 +22,9 @@ class Ctx(GCtx):
         self.screenp: CData
         self.values: CData
         self.extResps = {}
-        self.clients: 'Atom'
+        self.clients: Atom
         self.sharedPixmaps: bool = False
-        self.atoms: dict[int, dict[int, 'Atom']] = {}
+        self.atoms: dict[int, dict[int, Atom]] = {}
         self.requestLoop = RequestLoop(ctx)
 
     def avail(self, ext: str):

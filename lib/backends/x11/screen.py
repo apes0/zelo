@@ -64,7 +64,7 @@ class Display(GDisplay):
             xcb.NULL,
         )
 
-        r = await RandrSetCrtcConfig(
+        await RandrSetCrtcConfig(
             self.ctx,
             self.ctx.gctx.connection,
             self._crtc,
@@ -89,7 +89,6 @@ class Display(GDisplay):
 class Screen(
     GScreen
 ):  # idk if wayland has an equivalent for rootDepth, so i wont put it here yet
-
     def __init__(self, ctx: 'Ctx[GCtx]', screen) -> None:
         self.width: int = screen.widthInPixels
         self.height: int = screen.heightInPixels

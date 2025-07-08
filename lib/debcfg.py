@@ -1,5 +1,5 @@
 import logging
-from logging import CRITICAL, DEBUG, ERROR, FATAL, INFO, WARN, WARNING
+from logging import CRITICAL, DEBUG, ERROR, FATAL, INFO, WARN, WARNING  # noqa
 
 grey = ''
 white = ''
@@ -60,9 +60,9 @@ cfg = {
     'focus': False,  # focus changes
     'drawable': False,  # basically anything from api/drawable.py
     'errors': True,  # backend errors
-    'backend': True,  # backend debug info
+    'backend': False,  # backend debug info
     'windows': False,  # anything to do with windows
-    'extensions': False,  # extension logs
+    'extensions': True,  # extension logs
     'startSoon': True,  # stuff erroring in start soon calls
     'screen': False,  # scaling a display, turning the screens on and off, etc..
     'others': True,  # anything else that's logging

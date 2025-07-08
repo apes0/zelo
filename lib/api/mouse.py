@@ -6,8 +6,10 @@ loaded = load("mouse")
 Button: type[GButton] = loaded.Button
 # sources:
 #lib.backends.standalone.mouse
+#lib.backends.wayland.mouse
 #lib.backends.x11.mouse
 Mouse: type[GMouse] = loaded.Mouse
 # sources:
 #lib.backends.standalone.mouse
+#lib.backends.wayland.mouse
 #lib.backends.x11.mouse

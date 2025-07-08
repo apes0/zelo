@@ -2,7 +2,8 @@ import os.path
 import pickle
 import traceback
 from logging import ERROR
-from typing import TYPE_CHECKING, Any, Callable, TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
+from collections.abc import Callable
 
 import trio
 
@@ -87,7 +88,7 @@ class Extension:
 T = TypeVar('T', bound=Extension)
 
 
-async def _initExt(ext: type[T], ctx: 'Ctx', cfg: dict, force: bool) -> T:
+async def _initExt[T: Extension](ext: type[T], ctx: 'Ctx', cfg: dict, force: bool) -> T:
     log(['backend', 'extensions'], INFO, f'loading {ext} with cfg: {cfg}')
     if not force and (e := ctx.extensions.get(ext)):
         e.conf(cfg)
@@ -103,7 +104,9 @@ async def _initExt(ext: type[T], ctx: 'Ctx', cfg: dict, force: bool) -> T:
     return e
 
 
-async def initExt(ext: type[T], ctx: 'Ctx', cfg: dict, force: bool = False) -> T | None:
+async def initExt[T: Extension](
+    ext: type[T], ctx: 'Ctx', cfg: dict, force: bool = False
+) -> T | None:
     try:
         return await _initExt(ext, ctx, cfg, force)
     except:

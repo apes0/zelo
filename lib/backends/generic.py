@@ -1,5 +1,6 @@
 import inspect
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
+from collections.abc import Callable
 
 import numpy as np
 
@@ -158,7 +159,7 @@ class GWindow:
         self.borderWidth: int = borderWidth
         self.x: int = 0
         self.y: int = 0
-        self.ctx: 'Ctx' = ctx
+        self.ctx: Ctx = ctx
         self.focused = False
         self.mapped = False
         self.ignore: bool
@@ -170,7 +171,9 @@ class GWindow:
 
         from .events import Event
 
-        trans = lambda *a: (*a, self)
+        def trans(*a):
+            return (*a, self)
+
         self.keyPress = Event[GKey, GMod](ctx, 'keyPress', {ctx.keyPress: trans})
         self.keyRelease = Event[GKey, GMod](ctx, 'keyRelease', {ctx.keyRelease: trans})
         self.buttonPress = Event[GButton, GMod](

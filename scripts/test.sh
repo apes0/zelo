@@ -20,12 +20,12 @@ progs=('glxgears' 'ulauncher' 'alacritty')
 while [ true ]
 do
 #    clear
-    echo 
+    echo
     echo starting new session
 #    python3 -mcProfile -o program.prof main.py > program.prof
 #    python3 main.py --wayland
     python3 main.py
-#    [ $? == 1 ] && rm xcb_cffi.* 
+#    [ $? == 1 ] && rm xcb_cffi.*
 #    echo opening profile
 #    pgrep tuna | xargs kill -9
 #    tuna program.prof &
@@ -38,3 +38,4 @@ do
 #    echo enter to restart
 #    read
 done
+

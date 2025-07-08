@@ -1,5 +1,6 @@
 from itertools import combinations
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
+from collections.abc import Callable
 
 from lib.api.keys import Mod
 from lib.backends.generic import GWindow
@@ -103,7 +104,7 @@ class Shortcuts(Extension):
 
     def unloader(self):
         for keys, mod in self.shortcuts:
-            key: 'GKey'
+            key: GKey
             for key in keys:
                 key.ungrab(self.ctx, self.ctx.root, Mod('any'))
 

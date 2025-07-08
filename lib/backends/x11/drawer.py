@@ -22,7 +22,6 @@ if TYPE_CHECKING:
 
 @applyPre
 class Image(GImage):
-
     def __init__(
         self,
         ctx: 'Ctx[GCtx]',
@@ -214,7 +213,6 @@ class Image(GImage):
 
 @applyPre
 class Text(GText):
-
     def __init__(
         self,
         ctx: 'Ctx[GCtx]',
@@ -300,7 +298,6 @@ class Text(GText):
 class Rectangle(
     GRectangle
 ):  # ? maybe implement this for any polygon and then just use that for a rectangle
-
     def __init__(
         self,
         ctx: 'Ctx[GCtx]',

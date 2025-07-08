@@ -5,7 +5,7 @@ old=$(pwd)
 cd $mypath
 export api="../lib/api/"
 generic="../lib/backends/generic.py"
-backends="../lib/backends/"
+export backends="../lib/backends/"
 
 rm -r $api
 mkdir $api
@@ -34,5 +34,6 @@ a=$(gawk '
 ' $generic)
 
 echo running $a
-echo $a | sh
+echo $a | bash
 cd $old
+

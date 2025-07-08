@@ -1,5 +1,6 @@
 from collections import deque
-from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, Concatenate, ParamSpec, TypeVar
+from collections.abc import Callable
 
 import trio
 
@@ -28,7 +29,7 @@ class Request[Ret]:
 Args = ParamSpec('Args')
 
 
-def _Request(
+def _Request[**Args, Ret](
     reqf: Callable[Args, Any], respf: Callable[..., Ret]
 ) -> Callable[Concatenate['Ctx', Args], Request[Ret]]:
     def makeReq(ctx: 'Ctx[GCtx]', *a, **kwa):

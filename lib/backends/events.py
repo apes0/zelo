@@ -1,7 +1,8 @@
 import traceback
 from logging import DEBUG, ERROR
-from typing import TYPE_CHECKING, Callable, Iterable, Coroutine
-from typing_extensions import Awaitable
+from typing import TYPE_CHECKING
+from collections.abc import Callable, Iterable, Coroutine
+from collections.abc import Awaitable
 import trio
 
 from ..debcfg import log

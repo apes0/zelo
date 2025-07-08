@@ -169,7 +169,7 @@ class ShareServer(Extension):
     def __init__(self, ctx: 'Ctx', cfg) -> None:
         self.port = defPort
         self.auth: bytes = b''
-        self.wins: list['GWindow'] = []
+        self.wins: list[GWindow] = []
         self.rate = 1 / 10
         self.running = False
         self.event = trio.Event()

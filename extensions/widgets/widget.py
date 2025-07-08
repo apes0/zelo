@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class Widget(Extension):
     def __init__(self, ctx: 'Ctx', cfg: dict, resolve={}) -> None:
-        self.win: 'GWindow'
+        self.win: GWindow
         self.x: int
         self.y: int
 
@@ -35,4 +35,3 @@ class Widget(Extension):
         await self.win.configure(newWidth=width, newHeight=height)
 
         self._size = (width, height)
-

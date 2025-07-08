@@ -11,4 +11,4 @@ class Ctx:
     def __init__(self, nurs: trio.Nursery) -> None:
         self.env = os.environ.copy()
         self.nurs = nurs
-        self.pres: list['Pre'] = []
+        self.pres: list[Pre] = []

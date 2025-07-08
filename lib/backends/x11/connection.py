@@ -92,7 +92,7 @@ async def extensions(ctx: 'Ctx[GCtx]'):
         rep = await req.reply()
 
         ctx.gctx.extResps[name] = rep
-        log('backend', DEBUG, f'{name} is {"not "*(not rep.present)}present')
+        log('backend', DEBUG, f'{name} is {"not " * (not rep.present)}present')
 
 
 async def initRandr(ctx: 'Ctx[GCtx]'):
@@ -157,7 +157,7 @@ async def initScreens(ctx: 'Ctx[GCtx]'):
         log(
             'backend',
             WARN,
-            'can\'t get a list of screens, because neither randr or xinerama are present...',
+            "can't get a list of screens, because neither randr or xinerama are present...",
         )
 
 
@@ -274,7 +274,11 @@ async def shm(ctx: 'Ctx[GCtx]'):
 
     ctx.gctx.sharedPixmaps = bool(rep.sharedPixmaps)
 
-    log('backend', DEBUG, f'shared pixmaps are {"not "*(not rep.sharedPixmaps)}present')
+    log(
+        'backend',
+        DEBUG,
+        f'shared pixmaps are {"not " * (not rep.sharedPixmaps)}present',
+    )
 
 
 @init
@@ -283,5 +287,5 @@ async def supportingWmCheck(ctx: 'Ctx[GCtx]'):
 
     await Atom(ctx, ctx.root, '_NET_SUPPORTING_WM_CHECK').set(intp(w.id), 4)
     await Atom(ctx, w, '_NET_SUPPORTING_WM_CHECK').set(intp(w.id), 4)
-    await Atom(ctx, w, 'WM_NAME').set(chararr('Zelo'.encode()), 4)
-    await Atom(ctx, w, '_NET_WM_NAME').set(chararr('Zelo'.encode()), 4)
+    await Atom(ctx, w, 'WM_NAME').set(chararr(b'Zelo'), 4)
+    await Atom(ctx, w, '_NET_WM_NAME').set(chararr(b'Zelo'), 4)

@@ -38,8 +38,10 @@ class Base:
         return self.__class__(obj)
 
     def __repr__(self) -> str:
+        # fmt: off
         return f'''<{self.__class__.__name__}: \n    {"""
     """.join([f"{obj} = {val}" for obj, val in self.__dict__.items()])}\n>'''
+        # fmt: on
 
     # triple quotes here make this work with py 3.10 lol
     # TODO: do this better lol

@@ -29,8 +29,8 @@ class Tab:
         self.win = win
         self.win.configureNotify.addListener(self.configureNotify)
 
-        self.wins: list['GWindow'] = []
-        self.cur: 'GWindow | None' = None
+        self.wins: list[GWindow] = []
+        self.cur: GWindow | None = None
 
         layout = Layout()
         self.top, self.bottom = layout.hsplit(0.1, 0)
@@ -64,7 +64,7 @@ class Tabs(Extension):
         self.prev: tuple
 
         self.tabs: list[Tab] = []
-        self.win: 'GWindow | None' = None
+        self.win: GWindow | None = None
 
         super().__init__(ctx, cfg)
 

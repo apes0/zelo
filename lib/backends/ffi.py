@@ -4,7 +4,7 @@ from functools import partial
 from importlib import import_module
 from logging import DEBUG
 from types import ModuleType
-from typing import Callable
+from collections.abc import Callable
 
 from cffi import FFI
 
@@ -112,7 +112,7 @@ for lib, check in checks.items():
         break
 
 if not imp:
-    raise BaseException('didn\'t manage to find a backend')
+    raise BaseException("didn't manage to find a backend")
 
 _build: Callable = builds[imp]
 

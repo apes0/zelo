@@ -1,7 +1,8 @@
 # A class for tilers to use, because its really annoying to keep track of windows
 # NOTE: i literally made this just because of the workspaces hah
 
-from typing import TYPE_CHECKING, Callable, Coroutine
+from typing import TYPE_CHECKING
+from collections.abc import Callable, Coroutine
 
 from lib.extension import Extension
 from utils.fns import getDisplay
@@ -25,7 +26,7 @@ def track(updateFn: str, custom: list = []):
 
 
 def perDisplay(ctx: 'Ctx', wins: list['GWindow']):
-    out: dict['GDisplay', list['GWindow']] = {}
+    out: dict[GDisplay, list[GWindow]] = {}
     for win in wins:
         dpy = getDisplay(ctx, win.x, win.y)
 
@@ -61,7 +62,7 @@ class Tracker:
         customEvents: list['Event'],
         ext: Extension,  # a hack to make the tracker destroyable lol
     ):
-        self.ctx: 'Ctx' = ctx
+        self.ctx: Ctx = ctx
         self.exts: dict[GDisplay, Extension] = {}
         self.updates: dict[GDisplay, UpdateType] = {}
         self.focusQueue: list[GWindow] = [
@@ -103,7 +104,7 @@ class Tracker:
                 return
 
     async def update(self):
-        ordered: dict['GDisplay', list['GWindow']] = {}
+        ordered: dict[GDisplay, list[GWindow]] = {}
 
         for dpy, wins in perDisplay(self.ctx, self.focusQueue).items():
             for win in wins:
@@ -162,4 +163,3 @@ class Tracker:
                     self.focusQueue.append(win)
 
         await self.update()
-

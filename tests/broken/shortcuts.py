@@ -26,7 +26,7 @@ defShared = Shared([startX, startWm(cfg), openWins])
 # @defShared
 # @test('shortcut buttons work?', [])
 async def shortcutKeys(test: 'Test'):
-    ctx: 'Ctx' = test.pres[0].data[1]
+    ctx: Ctx = test.pres[0].data[1]
 
     ev = trio.Event()
     random.choice
@@ -69,7 +69,7 @@ mods = [
 @defShared
 @test('shortcut mods work?', [])
 async def shortcutMods(test: 'Test'):
-    ctx: 'Ctx' = test.pres[0].data[1]
+    ctx: Ctx = test.pres[0].data[1]
 
     ev = trio.Event()
     key = Key(random.choice(ascii_lowercase))

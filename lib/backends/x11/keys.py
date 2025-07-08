@@ -60,18 +60,18 @@ class Key(GKey):
 
     def load(self, ctx: 'Ctx[GCtx]'):
         syms = xcb.xcbKeySymbolsAlloc(ctx.gctx.connection)
-        assert syms, 'Couldn\'t allocate key symbols (for some reason)'
+        assert syms, "Couldn't allocate key symbols (for some reason)"
 
         # NOTE: this is adapted from qtile's implementation
         keysym: int | None = keys.get(self.lable)
 
-        assert (
-            keysym is not None
-        ), f'No {self.lable} key! (you can check keysyms.py for a list of keys)'
+        assert keysym is not None, (
+            f'No {self.lable} key! (you can check keysyms.py for a list of keys)'
+        )
 
         code = xcb.xcbKeySymbolsGetKeycode(syms, keysym)
 
-        assert code, f'Couldn\'t find keycode for {self.lable}...'
+        assert code, f"Couldn't find keycode for {self.lable}..."
 
         key: int = code[0]
         self.key = key

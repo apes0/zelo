@@ -1,11 +1,9 @@
 import sys
-from logging import DEBUG
 
 import coverage
 import trio
 from junit_xml import TestCase, TestSuite
 
-from lib.debcfg import cfg, logger
 from tests.tester import Test, load, tests
 
 # for c in cfg:
@@ -84,9 +82,9 @@ else:
         f'''
     Summary:
         succeeded: {suc}
-        ({round(suc/tot*100, 1)}%, {suc}/{tot})
+        ({round(suc / tot * 100, 1)}%, {suc}/{tot})
         failed:    {fai}
-        ({round(fai/tot*100, 1)}%, {fai}/{tot})'''
+        ({round(fai / tot * 100, 1)}%, {fai}/{tot})'''
         + (
             (':\n        ' + '\n        '.join([f.lable for f in failed]))
             if failed

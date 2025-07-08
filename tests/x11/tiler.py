@@ -27,29 +27,29 @@ suit = 'x11/tiler'
 
 @test('opened == focused?', [startX, startWm(cfg), openWins], suit)
 async def OpeningWinsFocusesThem(tctx: 'TCtx'):
-    ctx: 'Ctx' = tctx.pres[1].data
+    ctx: Ctx = tctx.pres[1].data
 
     await randFocus(ctx)
 
-    assert ctx.focused != None, 'there must be a focused window'
+    assert ctx.focused is not None, 'there must be a focused window'
 
 
 @test('focused == main?', [startX, startWm(cfg), openWins], suit)
 async def focusedIsMain(tctx: 'TCtx'):
-    ctx: 'Ctx' = tctx.pres[1].data
+    ctx: Ctx = tctx.pres[1].data
 
-    assert ctx.focused != None, 'there must be a focused window'
+    assert ctx.focused is not None, 'there must be a focused window'
     assert checkWin(ctx.focused, 10, 10, 378, 378), 'The window is not the right size'
 
     win = await randFocus(ctx)
 
-    assert ctx.focused.id == win.id, 'setFocus doesn\'t work'
+    assert ctx.focused.id == win.id, "setFocus doesn't work"
     assert checkWin(ctx.focused, 10, 10, 378, 378), 'The window is not the right size'
 
 
 @test('side windows correct?', [startX, startWm(cfg), openWins], suit)
 async def checkSideWins(tctx: 'TCtx'):
-    ctx: 'Ctx' = tctx.pres[1].data
+    ctx: Ctx = tctx.pres[1].data
 
     await randFocus(ctx)
 
@@ -73,7 +73,7 @@ bigSpacing.extensions = {Tiler: {'mainSize': 2 / 3, 'border': 5, 'spacing': spac
 
 @test('spacing works?', [startX, startWm(bigSpacing), openWins], suit)
 async def _bigSpacing(tctx: 'TCtx'):
-    ctx: 'Ctx' = tctx.pres[1].data
+    ctx: Ctx = tctx.pres[1].data
 
     await randFocus(ctx)
     assert ctx.focused, 'No focused window'

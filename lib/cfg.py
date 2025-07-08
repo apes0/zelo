@@ -1,13 +1,10 @@
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
+from collections.abc import Callable
 
-from extensions.animation import Animation
 from extensions.borders import Borders
-from extensions.fakeMonitors import FakeDisplays
 from extensions.mouse import Mouse
 from extensions.mouseFocus import MouseFocus
-from extensions.share import ShareClient, ShareServer
 from extensions.shortcuts import Shortcuts
-from extensions.tabs import Tabs
 from extensions.tiler import Tiler
 from extensions.wallpaper import Wallpaper
 from extensions.widget import Widget
@@ -15,16 +12,13 @@ from extensions.widgets.bar import Bar
 from extensions.widgets.clock import Clock
 from extensions.widgets.nowPlaying import NowPlaying
 from extensions.widgets.text import Text
-from extensions.winfo import Winfo
 from extensions.workspaces import Workspaces
-from extensions.blank import Blank
+from extensions.popup import Popup
 from lib._cfg import Cfg
 from lib.api.keys import Key, Mod
-from lib.debcfg import cfg as debcfg
-from utils.fns import spawn, stop, toCursor
+from utils.fns import spawn, stop
 from utils.layout import Layout
-from utils.log import log, logTerm
-from utils.ratio import Ratio
+from utils.log import logTerm
 from utils.theme import Theme
 
 # debcfg['all'] = True
@@ -75,7 +69,7 @@ cfg.extensions = {
     },
     MouseFocus: {},
     Wallpaper: {'wall': wall},
-    #    Wallpaper: {'wall': 'video.gif', 'video': True},
+    # Wallpaper: {'wall': 'video.gif', 'video': True},
     Shortcuts: {'shortcuts': keys},
     Workspaces: {
         'prev': ((Key('left'), Key('super_l')), Mod('control')),
@@ -110,14 +104,25 @@ cfg.extensions = {
                             },
                         ),
                         (Text, {'text': 'Hello World!', 'font': 'Ubuntu 33'}),
+                        # (Button, {'back': 0, 'fn': lambda *a: print(a)}),
                     ],
                 },
             )
         ]
     },
-    Mouse: {},
-    Tabs: {},
+    Mouse: {'cursor': 'pirate'},
+    # Tabs: {},
     Borders: {'width': 5, 'focused': theme.fore, 'unfocused': theme.back},
+    Popup: {
+        'width': main.width,
+        'x': main.x,
+        'executable': 'xterm -font lucidasanstypewriter-24 -bg black -fg white',
+        'name': 'xterm',
+        # 'executable': 'xournalpp',
+        # 'name': 'com.github.xournalpp.xournalpp',
+        'open': ((Key('f12'),), Mod('control')),
+        'y': main.unspace().y,
+    },
     # Blank: {'timeout': 10},
     # Winfo: {},
     #    ShareServer:{},

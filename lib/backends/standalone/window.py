@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING
 
-from ..events import Event
-from ..generic import GButton, GKey, GMod, GWindow, applyPre
+from ..generic import GWindow, applyPre
 
 if TYPE_CHECKING:
     from lib.ctx import Ctx

@@ -7,7 +7,7 @@ from lib.api.drawer import Image
 from lib.extension import Extension
 
 if TYPE_CHECKING:
-    from lib.backends.generic import GImage, GWindow
+    from lib.backends.generic import GImage
     from lib.ctx import Ctx
 
 # TODO: support multiple wallpapers for each screen

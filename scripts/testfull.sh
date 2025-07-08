@@ -89,3 +89,4 @@ cp /tmp/xauth $xauth
 chmod 777 $xauth
 
 chvt $n
+

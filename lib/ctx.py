@@ -1,5 +1,6 @@
 import traceback
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
+from collections.abc import Awaitable, Callable
 
 import trio
 
@@ -11,7 +12,7 @@ from .backends.events import Event
 
 if TYPE_CHECKING:
     from ._cfg import Cfg
-    from .backends.generic import GCtx, GMouse, GScreen, GWindow, GKey, GMod, GButton
+    from .backends.generic import GCtx, GMouse, GScreen, GWindow
     from .extension import Extension
 
 
@@ -40,7 +41,7 @@ class Ctx[_GCtx]:
         self.extensions: dict[type, Extension] = {}  # list of loaded extensions
         self.closed = False
         self.nurs: trio.Nursery
-        self.cfg: 'Cfg'
+        self.cfg: Cfg
         self.gctxConf = {}
 
         # events:

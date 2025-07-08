@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 class Cfg:
     def __init__(self) -> None:
         self.extensions: dict
-        self.theme: 'Theme'
+        self.theme: Theme
 
 
 # TODO: maybe add cursor stuff here when i figure it out (or move it to a plugin idk)

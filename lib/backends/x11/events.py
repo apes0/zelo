@@ -413,7 +413,7 @@ async def propertyNotify(event, ctx: 'Ctx[GCtx]'):
 
     log('backend', DEBUG, f'atom {event.atom} of win {event.window} changed')
 
-    winatoms: dict[int, 'Atom'] | None = ctx.gctx.atoms.get(event.window)
+    winatoms: dict[int, Atom] | None = ctx.gctx.atoms.get(event.window)
     if not winatoms:
         return
 

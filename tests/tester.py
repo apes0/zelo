@@ -1,7 +1,7 @@
 import importlib
 import os
 import traceback
-from typing import TYPE_CHECKING, Callable
+from collections.abc import Callable
 
 import trio
 
