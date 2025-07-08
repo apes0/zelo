@@ -213,13 +213,16 @@ class GWindow:
     def __repr__(self) -> str:
         return f'<Window {self.id}>'
 
-    async def title(self) -> str | None:
+    async def names(self) -> list[str]:
         raise NotImplementedError
 
-    async def iconTitle(self) -> str | None:
+    async def title(self) -> str:
         raise NotImplementedError
 
-    async def icon(self) -> np.ndarray | None:
+    async def iconTitle(self) -> str:
+        raise NotImplementedError
+
+    async def icon(self) -> np.ndarray:
         raise NotImplementedError
 
     @logCall('windows', DEBUG)

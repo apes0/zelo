@@ -1,5 +1,6 @@
 import struct
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
+from collections.abc import Callable
 
 import numpy as np
 
@@ -7,7 +8,7 @@ from lib.backends.x11 import requests
 from lib.debcfg import log, DEBUG
 
 from .. import xcb
-from .types import charpC, maxUVal, icccmWmHintsTC, voidpC, intpC
+from .types import charpC, maxUVal, icccmWmHintsTC, voidpC
 
 if TYPE_CHECKING:
     from lib.backends.generic import GWindow
@@ -22,6 +23,8 @@ atoms: dict[str, tuple[int | None, int, int]] = {
     '_NET_WM_ICON': (None, xcb.XCBAtomCardinal, 0),
     '_NET_SUPPORTING_WM_CHECK': (None, xcb.XCBAtomWindow, 32),
     'WM_HINTS': (xcb.XCBAtomWmHints, xcb.XCBAtomWmHints, 0),
+    'WM_CLASS': (xcb.XCBAtomWmClass, xcb.XCBAtomString, 8),
+    # 'WM_COMMAND': (xcb.XCBAtomWmCommand, xcb.)
     '_NET_CLIENT_LIST': (None, xcb.XCBAtomWindow, 32),
     '_NET_WM_STATE': (None, xcb.XCBAtomAtom, 0),
     '_NET_WM_STATE_FULLSCREEN': (None, xcb.XCBAtomAtom, 0),
@@ -39,8 +42,8 @@ def reader(t: str):
 
 class Atom:
     def __init__(self, ctx: 'Ctx[GCtx]', win: 'GWindow', name: str) -> None:
-        self.ctx: 'Ctx[GCtx]' = ctx
-        self.win: 'GWindow' = win
+        self.ctx: Ctx[GCtx] = ctx
+        self.win: GWindow = win
         self.name: str = name
         self.value: Any = None
         self._set = False
@@ -50,7 +53,7 @@ class Atom:
         self.changed = Event[()](ctx, 'atomChanged')
 
         id, self.type, self.fmt = atoms[name]
-        assert id != None, f'atom {name} missing id'
+        assert id is not None, f'atom {name} missing id'
         self.id: int = id
 
         self.ctx.gctx.atoms[self.win.id] = {
@@ -125,23 +128,34 @@ class Atom:
 
 
 async def readString(atom: Atom):
-    out = b''
+    outs = []
 
     read, data = await atom._read()
 
+    out = b''
+
     if not read:
         # basically just if its empty
-        return out.decode()
+        return [out.decode()]
 
     data = charpC(data.obj)
     for n in range(read):
+        c = data[n]
+        if c == b'\x00':
+            outs.append(out.decode())
+            out = b''
+            continue
         out += data[n]
 
-    return out.decode()
+    if out:
+        outs.append(out.decode())
+
+    return outs
 
 
 readers['WM_NAME'] = readString
 readers['WM_ICON_NAME'] = readString
+readers['WM_CLASS'] = readString
 
 
 @reader('_NET_WM_ICON')
