@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-from .. import waylandServer as wl
 from .connection import Connection
 
 if TYPE_CHECKING:
@@ -8,19 +7,19 @@ if TYPE_CHECKING:
     from ..generic import GConnection
 
 
-async def setup(ctx: 'Ctx'):
+async def setup(ctx: 'Ctx', task_status):
     conn = Connection()
-    print('i came')
-    ctx.connection = conn.conn
+    ctx.connection = conn
 
     async def _update():
         await update(ctx, conn)
 
-    a = wl.wlEventLoopDispatch(conn.eventLoop, 0)
-    print(a)
-    ctx.watcher.watch(conn.fd, _update)
+    # NOTE: conn.fd will only exist if we decide to roll our own event loop
+    # ctx.watcher.watch(conn.fd, _update)
+    await ctx.nurs.start(conn.run)
+    task_status.started()
 
 
 async def update(ctx: 'Ctx', conn: 'GConnection'):
     print('a')
-    wl.wlEventLoopDispatch
+    # wl.wlEventLoopDispatch
