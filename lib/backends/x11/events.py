@@ -6,7 +6,7 @@ import trio
 from lib.extension import setupExtensions
 
 from ...debcfg import log
-from .. import events, xcb
+from .. import xcb
 from .connection import Connection
 from .gctx import Ctx as GCtx
 from .keys import Key, Mod
@@ -37,6 +37,7 @@ from .types import (
 if TYPE_CHECKING:
     from lib.backends.generic import GConnection, GWindow
     from lib.ctx import Ctx
+    from lib.backends.x11.window import Window
 
     from .atoms import Atom
 
@@ -54,6 +55,12 @@ def handler(n):
     return decorator
 
 
+# TODO: move this to ctx & stop using a @property
+async def ignoreWin(win: 'Window', i):
+    win._ignore = i
+    await win.ignored.trigger()
+
+
 @handler(xcb.XCBCreateNotify)
 async def createNotify(event, ctx: 'Ctx[GCtx]'):
     event = xcb.XcbCreateNotifyEventT(createNotifyTC(event))
@@ -64,7 +71,7 @@ async def createNotify(event, ctx: 'Ctx[GCtx]'):
     log('backend', DEBUG, f'{window} was created')
     ignore = bool(event.overrideRedirect)
 
-    window.ignore = ignore
+    await ignoreWin(window, ignore)
     if not ignore:  # if we follow configureNotify, we should follow this?
         await window.configure(
             newX=max(0, event.x),
@@ -145,7 +152,7 @@ async def confNotify(event, ctx: 'Ctx[GCtx]'):
     log('backend', DEBUG, f'{window} sent a configure notify')
 
     ignore = event.overrideRedirect
-    window.ignore = bool(ignore)
+    await ignoreWin(window, bool(ignore))
 
     change = {
         event.x: 'x',
@@ -215,7 +222,7 @@ async def mapNotify(event, ctx: 'Ctx[GCtx]'):
     log('backend', DEBUG, f'{win} was mapped')
 
     ignore = event.overrideRedirect
-    win.ignore = bool(ignore)
+    await ignoreWin(win, bool(ignore))
 
     await win.mapNotify.trigger()
 
