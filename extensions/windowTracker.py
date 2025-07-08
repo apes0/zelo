@@ -1,10 +1,8 @@
 # A class for tilers to use, because its really annoying to keep track of windows
 # NOTE: i literally made this just because of the workspaces hah
 
-from logging import DEBUG
 from typing import TYPE_CHECKING, Callable, Coroutine
 
-from lib.debcfg import log
 from lib.extension import Extension
 from utils.fns import getDisplay
 
@@ -92,6 +90,10 @@ class Tracker:
             and self.ctx.focused.mapped
             and not self.ctx.focused.destroyed
         ):
+            if self.ctx.editable(self.ctx.focused):
+                # if the focused window is not editable, we should just give up, instead of looking for a new win to focus on
+                return
+
             await self.update()
             return
 
@@ -122,6 +124,9 @@ class Tracker:
 
     async def confNotify(self, win: 'GWindow'):
         # ? should we do something more complex here?
+        if win.ignore:
+            return
+
         await self.update()
 
     async def mapNotify(self, win: 'GWindow'):
@@ -153,6 +158,8 @@ class Tracker:
         for win in [old, new]:
             if win:
                 removeAll(self.focusQueue, win)
-                self.focusQueue.append(win)
+                if self.ctx.editable(win):
+                    self.focusQueue.append(win)
 
         await self.update()
+
